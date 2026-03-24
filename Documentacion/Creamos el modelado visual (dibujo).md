@@ -1,0 +1,1 @@
+# Creamos el modelado visual (dibujo), es decir, el diagrama EER con todas las tablas definidas en el análisis.

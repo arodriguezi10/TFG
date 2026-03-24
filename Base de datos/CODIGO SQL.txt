@@ -1,0 +1,277 @@
+CODIGO SQL
+
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema fylios
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema fylios
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `fylios` DEFAULT CHARACTER SET utf8 ;
+USE `fylios` ;
+
+-- -----------------------------------------------------
+-- Table `fylios`.`users`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`users` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`users` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(50) NOT NULL,
+  `last_name` VARCHAR(50) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `role` ENUM('coach', 'athlete') NOT NULL,
+  `avatar_url` VARCHAR(2048) NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`user_profiles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`user_profiles` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`user_profiles` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `birth_date` DATE NULL,
+  `height` INT NULL,
+  `gender` ENUM('M', 'F', 'Other') NULL,
+  `bio` TEXT NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_user_profiles_users1_idx` (`user_id` ASC) VISIBLE,
+  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_user_profiles_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`coach_athlete`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`coach_athlete` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`coach_athlete` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `status` ENUM('pending', 'active') NULL DEFAULT 'pending',
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `coach_id` BIGINT UNSIGNED NOT NULL,
+  `athlete_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_coach_athlete_users1_idx` (`coach_id` ASC) VISIBLE,
+  INDEX `fk_coach_athlete_users2_idx` (`athlete_id` ASC) VISIBLE,
+  CONSTRAINT `fk_coach_athlete_users1`
+    FOREIGN KEY (`coach_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_coach_athlete_users2`
+    FOREIGN KEY (`athlete_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`messages`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`messages` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`messages` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `content` TEXT NOT NULL,
+  `is_read` TINYINT(1) NULL DEFAULT 0,
+  `sent_at` DATETIME NULL DEFAULT NOW(),
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `sender_id` BIGINT UNSIGNED NOT NULL,
+  `receiver_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_messages_users1_idx` (`sender_id` ASC) VISIBLE,
+  INDEX `fk_messages_users2_idx` (`receiver_id` ASC) VISIBLE,
+  CONSTRAINT `fk_messages_users1`
+    FOREIGN KEY (`sender_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_messages_users2`
+    FOREIGN KEY (`receiver_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`exercises`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`exercises` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`exercises` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `muscle_group` VARCHAR(100) NOT NULL,
+  `is_custom` TINYINT(1) NULL DEFAULT 0,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`routines`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`routines` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`routines` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_routines_users1_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_routines_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`routine_exercises`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`routine_exercises` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`routine_exercises` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `order_index` INT NOT NULL DEFAULT 0,
+  `target_sets` INT NOT NULL,
+  `target_reps` VARCHAR(50) NOT NULL,
+  `rest_seconds` INT NULL DEFAULT 90,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `routine_id` BIGINT UNSIGNED NOT NULL,
+  `exercise_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_routine_exercises_routines1_idx` (`routine_id` ASC) VISIBLE,
+  INDEX `fk_routine_exercises_exercises1_idx` (`exercise_id` ASC) VISIBLE,
+  CONSTRAINT `fk_routine_exercises_routines1`
+    FOREIGN KEY (`routine_id`)
+    REFERENCES `fylios`.`routines` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_routine_exercises_exercises1`
+    FOREIGN KEY (`exercise_id`)
+    REFERENCES `fylios`.`exercises` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`training_sessions`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`training_sessions` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`training_sessions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NULL,
+  `description` TEXT NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `routine_id` BIGINT UNSIGNED NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_training_sessions_users1_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_training_sessions_routines1_idx` (`routine_id` ASC) VISIBLE,
+  CONSTRAINT `fk_training_sessions_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_training_sessions_routines1`
+    FOREIGN KEY (`routine_id`)
+    REFERENCES `fylios`.`routines` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`session_sets`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`session_sets` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`session_sets` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `weight_kg` DECIMAL(5,2) NOT NULL,
+  `reps_performed` INT NOT NULL,
+  `rpe` INT NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `session_id` BIGINT UNSIGNED NOT NULL,
+  `exercise_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_session_sets_training_sessions1_idx` (`session_id` ASC) VISIBLE,
+  INDEX `fk_session_sets_exercises1_idx` (`exercise_id` ASC) VISIBLE,
+  CONSTRAINT `fk_session_sets_training_sessions1`
+    FOREIGN KEY (`session_id`)
+    REFERENCES `fylios`.`training_sessions` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_session_sets_exercises1`
+    FOREIGN KEY (`exercise_id`)
+    REFERENCES `fylios`.`exercises` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `fylios`.`body_measurements`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `fylios`.`body_measurements` ;
+
+CREATE TABLE IF NOT EXISTS `fylios`.`body_measurements` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `weight_kg` DECIMAL(5,2) NOT NULL,
+  `waist_cm` DECIMAL(5,2) NULL,
+  `body_fat_pct` DECIMAL(4,2) NULL,
+  `created_at` DATETIME NULL DEFAULT NOW(),
+  `updated_at` DATETIME NULL DEFAULT NOW(),
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_body_measurements_users1_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_body_measurements_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `fylios`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
