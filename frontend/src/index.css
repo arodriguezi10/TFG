@@ -1,1 +1,42 @@
+/*fonts*/
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Syne:wght@400..800&display=swap");
 @import "tailwindcss";
+
+@theme {
+  /*fonts*/
+  --font-heading: "Syne";
+  --font-subheading: "DM Sans";
+  --font-body: "Inter";
+
+  /*colors*/
+  --color-primary: #6c63ff;
+  --color-primary-bg: #262543;
+  --color-background: #0a0a0f;
+  --color-surface: #1e293b;
+  --color-accent1: #ff6b9d;
+  --color-accent1-bg1: #38272d;
+  --color-surf: #1a1a26;
+  --color-accent2: #36d9b8;
+  --color-accent2-bg1: #1c3236;
+  --color-accent2-bg2: #28403b;
+  --color-accent2-bg3: #131e1c;
+  --color-text-high: #f8fafc;
+  --color-text-low: #6b6b8a;
+  --color-orange: #ff8d28;
+  --color-orange-bg1: #2b1f17;
+  --color-orange-bg2: #472915;
+  --color-blue: #00c0e8;
+  --color-blue-bg1: #1c3236;
+  --color-blue-bg2: #0c323a;
+  --color-yellow: #ffcc00;
+  --color-yellow-bg1: #312c19;
+  --color-yellow-bg2: #301f11;
+  --color-brown: #975102;
+  --color-brown-bg: #402f1b;
+  --color-red: #ff383c;
+  --color-red-bg1: #3e1f20;
+  --color-red-bg2: #2d0e0f;
+  --color-green: #34c759;
+  --color-green-bg1: #1d3a24;
+  --color-green-bg2: #28403b;
+}
