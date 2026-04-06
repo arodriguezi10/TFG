@@ -45,7 +45,9 @@ const Register = () => {
         </section>
 
         <section className="items-center mt-[22px]">
-            <span className="bg-surf h-[30px] py-[2px] px-[12px] rounded-[16px] border border-accent1 text-[16px] text-accent1 font-subheading "> ◆ Nuevo por aquí</span>
+            <span className="bg-surf h-[30px] py-[2px] px-[12px] rounded-[16px] border border-accent1 text-[16px] text-accent1 font-subheading "> 
+                ◆ Nuevo por aquí
+            </span>
             <h1 className="text-[50px] font-heading font-bold leading-tight">
                 Crea tu 
                 <span className="text-accent1"> cuenta

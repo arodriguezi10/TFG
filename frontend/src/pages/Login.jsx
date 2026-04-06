@@ -36,7 +36,6 @@ const Login = () => {
 
       <section className="items-center mt-[22px]">
         <span className="bg-surf h-[30px] py-[2px] px-[12px] rounded-[16px] border border-primary text-[16px] text-primary font-subheading ">
-          {" "}
           ◆ Acceso seguro
         </span>
         <h1 className="text-[50px] font-heading font-bold leading-tight">
