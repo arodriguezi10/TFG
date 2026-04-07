@@ -4,24 +4,28 @@ import Button from "../components/Button";
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen bg-background flex flex-col" >
+    <div className="min-h-screen bg-background flex flex-col mb-[10px]" >
 
       <section className="w-[100%] px-[16px]">
+
         <p className="font-body text-[12px] text-text-low">
           jueves, 13 de enero
         </p>
+
         <div className="flex justify-between items-center">
           <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight mt-[5px]">
             Hola,
             <span className="text-accent1">Alejandro</span>
           </h1>
+
           <h1 className="bg-accent1 h-[55px] w-[55px] rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
             F
           </h1>
         </div>
+
       </section>
 
-      <section className="mt-[16px] flex flex-col items-center justify-center leading-tight">
+      <section className="mt-[16px] flex flex-col px-[16px] items-center justify-center leading-tight">
         <Card>
 
           <p className="font-subheading font-bold text-text-low text-[16px]"> 
@@ -30,6 +34,7 @@ const Dashboard = () => {
 
           <div className="mt-[16px]">
             <p className="font-heading font-extrabold text-text-high text-[28px] mt[]">Push A</p>
+
             <div className="flex space-x-2">
               <span className="bg-surf h-[30px] py-[2px] px-[10px] rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                 8 ejercicios
@@ -47,6 +52,7 @@ const Dashboard = () => {
                 MINUTOS
               </span>
             </p>
+
             <div className="w-[1px] h-[40px] bg-text-low"></div>
             <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
               8
@@ -54,6 +60,7 @@ const Dashboard = () => {
                 EJERCICIOS
               </span>
             </p>
+
             <div className="w-[1px] h-[40px] bg-text-low"></div>
             <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
               3x
@@ -67,6 +74,124 @@ const Dashboard = () => {
             <Button text="Empezar entrenamiento" color="bg-primary" variant="filled"></Button>
           </div>
 
+        </Card>
+      </section>
+
+      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px]">
+
+        <p className="font-subheading font-bold text-text-high text-[16px]">¿TODO MARCADO HOY?</p>
+
+        <div className="flex gap-[15px]">
+          <Card>
+            <div className="bg-surf h-[30px] w-[30px] rounded-[8px] border border-white/27 flex justify-center">&</div>
+            <p className="font-subheading font-semibold text-text-high text-[14px] mt-[5px]">Pre-entreno</p>
+            <p className="font-subheading font-semibold text-text-low text-[14px] mt-[5px]">Carbohidratos</p>
+          </Card>
+          <Card>
+            <div className="bg-surf h-[30px] w-[30px] rounded-[8px] border border-white/27 flex justify-center">&</div>
+            <p className="font-subheading font-semibold text-text-high text-[14px] mt-[5px]">Post-entreno</p>
+            <p className="font-subheading font-semibold text-text-low text-[14px] mt-[5px]">Proteína</p>
+          </Card>
+        </div>
+
+      </section>
+
+      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px] items-center leading-tight">
+        
+        <div className="w-[100%] flex justify-between">
+          <p className="font-subheading font-bold text-text-high text-[16px]">PESO DE HOY</p>
+          <p className="font-subheading font-bold text-primary text-[16px]">Historial &</p>
+        </div>
+
+        <Card>
+          <p className="font-subheading font-bold text-text-low text-[16px]">PESO DEL DÍA HOY</p>
+
+          <div className="flex mt-[10px] items-center justify-between">
+            <div className="flex gap-[5px]">
+              <div className="w-[153px] h-[60px] rounded-[16px] border border-text-high flex items-center justify-center">
+                <p className="font-heading font-bold text-text-high text-[50px]">
+                  75
+                  <span className="font-heading font-bold text-text-low text-[50px]">,36</span>
+                </p>
+              </div>
+
+              <p className="font-heading font-bold text-text-low  text-[22px]">kg</p>
+            </div>
+
+            <div className="bg-surf rounded-[16px] py-[5px] px-[12px] border border-accent2">
+              <p className="font-heading font-bold text-accent2 text-[22px]">-1,8</p>
+              <p className="font-subheading font-semibold text-text-low text-[12px]">kg/mes</p>
+            </div>
+          </div>
+
+          <div className="mt-[5px]">
+            <span className="bg-surf rounded-[16px] py-[2px] px-[12px] border border-accent2 font-subheading font-semibold text-[16px] text-accent2 "> 
+              & 0,4 kg esta semana
+            </span>
+          </div>
+
+          <div className="w-full h-[65px] bg-surf rounded-[12px] mt-[10px] flex items-center justify-center">
+            <p className="text-text-low text-[12px]">Gráfica de peso</p>
+          </div>
+        </Card>
+
+      </section>
+
+      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px] items-center leading-tight">
+
+        <div className="w-[100%] flex justify-between">
+          <p className="font-subheading font-bold text-text-high text-[16px]">ESTA SEMANA</p>
+          <p className="font-subheading font-bold text-primary text-[16px]">Ver todo &</p>
+        </div>
+
+        <Card>
+          <p className="font-subheading font-bold text-text-low text-[16px]">ENERO 2026</p>
+
+          <div className="flex items-center justify-between mt-[16px]">
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">L</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">&</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">M</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">10</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">X</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">&</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">J</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">12</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">V</p>
+              <p className="bg-accent1 h-[22px] w-[33px] rounded-[8px] font-heading font-bold text-text-high text-[16px] flex items-center justify-center">13</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">S</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">14</p>
+              <p>·</p>
+            </div>
+
+            <div className="flex flex-col items-center gap-[7px]">
+              <p className="font-subheading font-bold text-text-low text-[16px]">D</p>
+              <p className="font-heading font-bold text-text-low text-[16px]">15</p>
+              <p>·</p>
+            </div>
+
+          </div>
         </Card>
       </section>
 
