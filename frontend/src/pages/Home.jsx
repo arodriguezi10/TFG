@@ -2,6 +2,7 @@ import React from "react";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Input from "../components/Input";
+import Header from "../components/Header";
 
 const Home = () => {
   return (
@@ -20,6 +21,8 @@ const Home = () => {
       <Input label="Correo electrónico" placeholder="email@ejemplo.com" type="email">
       
       </Input>
+
+      <Header subtitle="Rutinas" title="Crear rutina"/>
     </div>
   );
 };

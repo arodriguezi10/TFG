@@ -2,20 +2,46 @@ import React from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
+/*importaciones para la lógica */
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
+import { useContext, useState, useEffect } from "react";
+
 const Dashboard = () => {
+
+  /*mostrar la fecha actual */
+  const today = new Date().toLocaleDateString("es-ES", {
+    weekday: "long" , day: "numeric", month: "long",
+  });
+
+  /*mostrar el el first_name del usuario en pantalla */
+  const { user } = useContext(AuthContext);
+
+  const [ name, setName] = useState("");
+  
+  useEffect(() => {
+    supabase.from("users").select("first_name").eq("id", user.id).single().then(({data})=>{
+      setName(data.first_name ?? null);
+    });
+
+  }, []);
+  
+
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]" >
 
       <section className="w-[100%] px-[16px]">
 
         <p className="font-body text-[12px] text-text-low">
-          jueves, 13 de enero
+          {today}
         </p>
 
         <div className="flex justify-between items-center">
           <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight mt-[5px]">
             Hola,
-            <span className="text-accent1">Alejandro</span>
+            <span className="text-accent1">
+              {name}
+            </span>
           </h1>
 
           <h1 className="bg-accent1 h-[55px] w-[55px] rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
