@@ -27,25 +27,32 @@ const MainLayout = () => {
         {/* Botones de navegación (Fila en móvil, Columna en PC) */}
         <nav className="flex flex-row justify-around p-2 md:flex-col md:p-0 md:space-y-4">
           <Link
-            to="/"
-            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
-          >
-            <span className="text-xl">🏠</span>
-            <span className="text-xs md:text-base font-medium">Inicio</span>
-          </Link>
-          <Link
             to="/dashboard"
             className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
           >
-            <span className="text-xl">📊</span>
+            <span className="text-xl">🏠</span>
             <span className="text-xs md:text-base font-medium">Panel</span>
+          </Link>
+          <Link
+            to="/routines"
+            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
+          >
+            <span className="text-xl">&</span>
+            <span className="text-xs md:text-base font-medium">Rutinas</span>
+          </Link>
+          <Link
+            to="/"
+            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
+          >
+            <span className="text-xl">📊</span>
+            <span className="text-xs md:text-base font-medium">Progreso</span>
           </Link>
           <Link
             to="/checkout"
             className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
           >
             <span className="text-xl">💳</span>
-            <span className="text-xs md:text-base font-medium">Pago</span>
+            <span className="text-xs md:text-base font-medium">Chat</span>
           </Link>
         </nav>
       </aside>

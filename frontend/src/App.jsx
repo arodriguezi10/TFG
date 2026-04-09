@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
 import PrivateRoute from "./components/PrivateRoutes";
+import Routines from "./pages/Routines";
 
 
 const App = () => {
@@ -27,8 +28,9 @@ const App = () => {
               <MainLayout />
             </PrivateRoute>
           }>
-            <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/routines" element={<Routines />} />
+            <Route path="/" element={<Home />} />
             <Route path="/checkout" element={<Checkout />} />
           </Route>
            

@@ -22,7 +22,7 @@ const Home = () => {
       
       </Input>
 
-      <Header subtitle="Rutinas" title="Crear rutina"/>
+      <Header showback={true} subtitle="Rutinas" title="Crear rutina"/>
     </div>
   );
 };

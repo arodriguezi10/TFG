@@ -28,7 +28,7 @@ const Dashboard = () => {
   
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]" >
+    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
 
       <section className="w-[100%] px-[16px]">
 
@@ -105,7 +105,9 @@ const Dashboard = () => {
 
       <section className="mt-[16px] flex flex-col px-[16px] gap-[12px]">
 
-        <p className="font-subheading font-bold text-text-high text-[16px]">¿TODO MARCADO HOY?</p>
+        <p className="font-subheading font-bold text-text-high text-[16px]">
+          ¿TODO MARCADO HOY?
+        </p>
 
         <div className="flex gap-[15px]">
           <Card>
