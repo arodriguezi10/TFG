@@ -11,7 +11,8 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
 import PrivateRoute from "./components/PrivateRoutes";
-import Routines from "./pages/Routines";
+import Routines1 from "./pages/Routines1";
+import Routines3 from "./pages/Routines3";
 
 
 const App = () => {
@@ -23,13 +24,15 @@ const App = () => {
 
           <Route path="/register" element={<Register />} />
 
+          <Route path="/routines1" element={<Routines1 />} />
+
           <Route element={
             <PrivateRoute>
               <MainLayout />
             </PrivateRoute>
           }>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/routines" element={<Routines />} />
+            <Route path="/routines3" element={<Routines3 />} />
             <Route path="/" element={<Home />} />
             <Route path="/checkout" element={<Checkout />} />
           </Route>

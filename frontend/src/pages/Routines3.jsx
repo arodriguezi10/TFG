@@ -2,10 +2,10 @@ import React from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
-const Routines = () => {
+const Routines3 = () => {
     return(
         <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
-            <section className="w-[100%] flex justify-between">
+            <section className="w-[100%] flex items-center justify-between">
 
                 <div className="flex flex-col gap-[5px]">
                     <div className="flex gap-[15px]">
@@ -13,7 +13,7 @@ const Routines = () => {
                             Biblioteca
                         </p>
                         <span className="bg-yellow-bg2 h-auto px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
-                            ◆ ÉLITE
+                            ◆ ÉLITE {/*! PONER EL ICONO */}
                         </span>
                     </div>
 
@@ -24,15 +24,15 @@ const Routines = () => {
 
                 <div className="flex gap-[10px]">
                     <div className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
-                        ←
+                        ← {/*! PONER EL ICONO */}
                     </div>
 
                     <div className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
-                        ←
+                        ← {/*! PONER EL ICONO */}
                     </div>
 
                     <div className="bg-accent1 h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-high">
-                        ←
+                        ← {/*! PONER EL ICONO */}
                     </div>
                 </div>
             </section>
@@ -85,7 +85,7 @@ const Routines = () => {
                     </div>
 
                     <div className="mt-[16px] flex items-center ">
-                        <Button text="Empezar entrenamiento" color="bg-primary" variant="filled"></Button>
+                        <Button text="Empezar entrenamiento" color="bg-primary" variant="filled"></Button> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>
@@ -102,14 +102,14 @@ const Routines = () => {
                         <div>
                             <div className="bg-blue-bg2 px-[14px] py-[2px] rounded-[16px] border border-blue font-subheading font-semibold text-[16px] text-blue">
                                 <span className="text-orange">
-                                    & 
+                                    & {/*! PONER EL ICONO */}
                                 </span>  
                                 Push / Pull / Leg
                             </div>
                         </div>
                         
                         <div className="bg-surface h-[33px] w-[33px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
-                            &
+                            & {/*! PONER EL ICONO */}
                         </div>
                     </div>
                     
@@ -162,7 +162,7 @@ const Routines = () => {
                     <div className="-mx-[16px] -mb-[23px] mt-[12px] bg-surface rounded-b-[16px] px-[14px] py-[10px] flex items-center justify-between border border-white/27">
                         <p className="font-body text-[14px] text-text-low">& Última vez hace 3 días</p>
 
-                        <p className="text-text-low">→</p>
+                        <p className="text-text-low">→</p> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>
@@ -178,11 +178,11 @@ const Routines = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex gap-[15px] items-center justify-center">
                             <div className="bg-orange-bg2 h-[50px] w-[40px] rounded-[8px] border border-orange flex items-center justify-center text-orange">
-                                &
+                                & {/*! PONER EL ICONO */}
                             </div>
 
                             <div>
-                                <div className="font-subheading font-bold text-[16px] text-orange">EXCLUSIVO &</div>
+                                <div className="font-subheading font-bold text-[16px] text-orange">EXCLUSIVO &</div> {/*! PONER EL ICONO */}
                                 
                                 <div className=" font-heading font-extrabold text-[18px] text-text-high">
                                     <p>Progresión</p> de cargas
@@ -191,13 +191,13 @@ const Routines = () => {
                         </div>
 
                         <span className="bg-yellow-bg2 h-auto px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
-                            ◆ ÉLITE
+                            ◆ ÉLITE {/*! PONER EL ICONO */}
                         </span>
                     </div>
                     
                     <div className="mt-[16px] flex flex-col items-center justify-center gap-[12px]">
                         <span className="bg-orange-bg2 h-[60px] w-[60px] px-[10px] rounded-[16px] border border-orange font-body text-[25px] text-orange flex items-center justify-center">
-                            &
+                            & {/*! PONER EL ICONO */}
                         </span>
 
                         <p className="font-heading font-bold text-[16px] text-text-high">Ninguna progresión creada</p>
@@ -212,25 +212,25 @@ const Routines = () => {
                     <div className="mt-[8px] flex flex-col items-center justify-center gap-[5px]">
                         <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
                             <span className="text-orange">
-                                & 
+                                &  {/*! PONER EL ICONO */}
                             </span>  Sobre carga progresiva
                         </div>
                         
                         <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
                             <span className="text-orange">
-                                & 
+                                & {/*! PONER EL ICONO */}
                             </span>  Semana de descarga
                         </div>
 
                         <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
                             <span className="text-orange">
-                                & 
+                                &  {/*! PONER EL ICONO */}
                             </span>  Vista por bloque
                         </div>
                     </div>
 
                     <div className="mt-[16px] w-full flex items-center justify-center gap-[30px] border border-text-low rounded-[16px]">
-                        <Button text="Crear progresión" color="bg-orange" variant="filled"></Button> {/*TODO poner icono*/}
+                        <Button text="Crear progresión" color="bg-orange" variant="filled"></Button> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>
@@ -238,4 +238,4 @@ const Routines = () => {
     );
 };
 
-export default Routines;
+export default Routines3;
