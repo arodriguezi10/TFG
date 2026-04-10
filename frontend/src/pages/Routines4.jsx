@@ -2,10 +2,10 @@ import React from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
-const Routines3 = () => {
+const Routines4 = () => {
     return(
         <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
-            <section className="w-[100%] flex items-center justify-between">
+            <section className="w-full flex items-center justify-between">
 
                 <div className="flex flex-col gap-[5px]">
                     <div className="flex gap-[15px]">
@@ -91,7 +91,7 @@ const Routines3 = () => {
             </section>
 
             <section className="mt-[16px] flex flex-col gap-[10px]">
-                <div className="w-[100%] flex justify-between">
+                <div className="w-full flex justify-between">
                     <p className="font-subheading font-bold text-text-low text-[16px]">MIS RUTINAS</p>
 
                     <p className="font-body text-text-low text-[14px]">1 rutina</p>
@@ -168,10 +168,10 @@ const Routines3 = () => {
             </section>
 
             <section className="mt-[16px] flex flex-col gap-[10px]">
-                <div className="w-[100%] flex justify-between">
+                <div className="w-full flex justify-between">
                     <p className="font-subheading font-bold text-text-low text-[16px]">PROGRESIÓN</p>
 
-                    <p className="font-body text-orange text-[14px]">0 activadas</p>
+                    <p className="font-body text-orange text-[14px]">Sem. 3 de 6</p>
                 </div>
 
                 <Card variant="elite">
@@ -182,55 +182,107 @@ const Routines3 = () => {
                             </div>
 
                             <div>
-                                <div className="font-subheading font-bold text-[16px] text-orange">EXCLUSIVO &</div> {/*! PONER EL ICONO */}
+                                <div className="font-subheading font-bold text-[16px] text-orange">& PROGRESIÓN ÉLITE</div> {/*! PONER EL ICONO */}
                                 
                                 <div className=" font-heading font-extrabold text-[18px] text-text-high">
-                                    <p>Progresión</p> de cargas
+                                    <p>Bloque de </p> volumen
                                 </div> 
                             </div>
                         </div>
 
-                        <span className="bg-yellow-bg2 h-auto px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
-                            ◆ ÉLITE {/*! PONER EL ICONO */}
-                        </span>
+                        <div className="bg-surface h-[33px] w-[33px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
+                            & {/*! PONER EL ICONO */}
+                        </div>
+                    </div>
+
+                    <div className="bg-brown-bg w-full rounded-[16px] border border-orange mt-[16px] flex items-center justify-between px-[25px] py-[5px]">
+                        <div>
+                            <p className="font-heading font-extrabold text-[28px] text-orange">s3</p>
+                        </div>
+                        
+                        <div className="w-[1px] h-[25px] bg-orange"></div>  {/**Esto es una linea de división */}
+
+                        <div className="flex flex-col">
+                            <p className="font-subheading font-bold text-[16px] text-text-low">SEMANA ACTUAL</p>
+                            <p className="font-subheading font-bold text-[16px] text-text-high">Acumulación II</p>
+                            <p className="font-body text-[16px] text-text-low">Press plano en máquina</p>
+                        </div>                        
                     </div>
                     
-                    <div className="mt-[16px] flex flex-col items-center justify-center gap-[12px]">
-                        <span className="bg-orange-bg2 h-[60px] w-[60px] px-[10px] rounded-[16px] border border-orange font-body text-[25px] text-orange flex items-center justify-center">
-                            & {/*! PONER EL ICONO */}
-                        </span>
+                    <div className="flex items-center justify-between mt-[16px]">
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-text-low text-[16px]">S1</p> 
+                            <p className="bg-accent2-bg2 h-[25px] w-[33px] rounded-[8px] border border-accent2 font-heading font-bold text-accent2 text-[16px] flex items-center justify-center">&</p> {/*! PONER EL ICONO */}
+                            <p className="font-body text-[12px] text-accent2">Acum.I</p>
+                        </div>
 
-                        <p className="font-heading font-bold text-[16px] text-text-high">Ninguna progresión creada</p>
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-text-low text-[16px]">S2</p> 
+                            <p className="bg-accent2-bg2 h-[25px] w-[33px] rounded-[8px] border border-accent2 font-heading font-bold text-accent2 text-[16px] flex items-center justify-center">&</p> {/*! PONER EL ICONO */}
+                            <p className="font-body text-[12px] text-accent2">Acum.I</p>
+                        </div>
 
-                        <div className="flex items-center justify-center">
-                            <p className="font-body text-[16px] text-text-low text-center">
-                                Diseña la evolución de tus cargas semana a semana y lleva tu rendimiento al siguiente nivel.
-                            </p>
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-orange text-[16px]">S3</p>
+                            <p className="bg-orange h-[25px] w-[33px] rounded-[8px] font-heading font-bold text-surf text-[16px] flex items-center justify-center">3</p>
+                            <p className="font-body text-[12px] text-orange">Acum.II</p>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-text-low text-[16px]">S4</p>
+                            <p className="bg-surf h-[25px] w-[33px] rounded-[8px] font-heading font-bold text-text-low text-[16px] flex items-center justify-center">4</p>
+                            <p className="font-body text-[12px] text-text-low">Acum.III</p>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-text-low text-[16px]">S5</p>
+                            <p className="bg-surf h-[25px] w-[33px] rounded-[8px] font-heading font-bold text-text-low text-[16px] flex items-center justify-center">5</p>
+                            <p className="font-body text-[12px] text-text-low">Intesif.</p>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center gap-[2px]">
+                            <p className="font-subheading font-bold text-text-low text-[16px]">S6</p>
+                            <p className="bg-surf h-[25px] w-[33px] rounded-[8px] font-heading font-bold text-primary text-[16px] flex items-center justify-center">&</p> {/*! PONER EL ICONO */}
+                            <p className="font-body text-[12px] text-primary">Descg.</p>
                         </div>
                     </div>
 
                     <div className="mt-[8px] flex flex-col items-center justify-center gap-[5px]">
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                &  {/*! PONER EL ICONO */}
-                            </span>  Sobre carga progresiva
+                        <div className="w-full flex items-center justify-between">
+                            <p className="font-body text-[16px] text-text-low">Progreso del bloque</p>
+                            <p className="font-subheading font-bold text-[16px] text-orange">50%</p>
                         </div>
                         
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                & {/*! PONER EL ICONO */}
-                            </span>  Semana de descarga
-                        </div>
-
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                &  {/*! PONER EL ICONO */}
-                            </span>  Vista por bloque
+                        <div className="w-full bg-slate-800 rounded-full h-2.5 border border-text-low outline outline-1 outline-slate-700/50 overflow-hidden">
+                            <div className="bg-orange h-full rounded-full w-[75%] border border-orange"></div>
                         </div>
                     </div>
 
-                    <div className="mt-[16px] w-full flex items-center justify-center gap-[30px] border border-text-low rounded-[16px]">
-                        <Button text="Crear progresión" color="bg-orange" variant="filled"></Button> {/*! PONER EL ICONO */}
+                    <div className="mt-[16px] w-full flex items-center justify-center gap-[22px] bg-brown-bg2 rounded-[16px] py-[10px]">
+                        <p className="flex flex-col items-center font-heading font-extrabold text-[22px] text-text-high">
+                            6
+                            <span className="font-body font-normal text-[16px] text-text-low">
+                                semanas
+                            </span>
+                        </p>
+
+                        <div className="w-[1px] h-[35px] bg-text-low"></div>  {/**Esto es una linea de división */}
+
+                        <p className="flex flex-col items-center font-heading font-extrabold text-[22px] text-orange">
+                            +5kg
+                            <span className="font-body font-normal text-[16px] text-text-low">
+                                activo
+                            </span>
+                        </p>
+
+                        <div className="w-[1px] h-[35px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+                        <p className="flex flex-col items-center font-heading font-extrabold text-[22px] text-accent2">
+                            S6
+                            <span className="font-body font-normal text-[16px] text-text-low">
+                                activo
+                            </span>
+                        </p>
                     </div>
                 </Card>
             </section>
@@ -238,4 +290,4 @@ const Routines3 = () => {
     );
 };
 
-export default Routines3;
+export default Routines4;

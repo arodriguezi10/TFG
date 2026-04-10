@@ -2,7 +2,7 @@ import React from "react";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
-const Routines3 = () => {
+const Routines2 = () => {
     return(
         <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
             <section className="w-[100%] flex items-center justify-between">
@@ -12,9 +12,6 @@ const Routines3 = () => {
                         <p className="font-subheading text-[12px] text-text-low">
                             Biblioteca
                         </p>
-                        <span className="bg-yellow-bg2 h-auto px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
-                            ◆ ÉLITE {/*! PONER EL ICONO */}
-                        </span>
                     </div>
 
                     <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight">
@@ -170,67 +167,34 @@ const Routines3 = () => {
             <section className="mt-[16px] flex flex-col gap-[10px]">
                 <div className="w-[100%] flex justify-between">
                     <p className="font-subheading font-bold text-text-low text-[16px]">PROGRESIÓN</p>
-
-                    <p className="font-body text-orange text-[14px]">0 activadas</p>
                 </div>
 
-                <Card variant="elite">
-                    <div className="flex items-center justify-between">
-                        <div className="flex gap-[15px] items-center justify-center">
-                            <div className="bg-orange-bg2 h-[50px] w-[40px] rounded-[8px] border border-orange flex items-center justify-center text-orange">
-                                & {/*! PONER EL ICONO */}
-                            </div>
-
-                            <div>
-                                <div className="font-subheading font-bold text-[16px] text-orange">EXCLUSIVO &</div> {/*! PONER EL ICONO */}
-                                
-                                <div className=" font-heading font-extrabold text-[18px] text-text-high">
-                                    <p>Progresión</p> de cargas
-                                </div> 
-                            </div>
-                        </div>
-
-                        <span className="bg-yellow-bg2 h-auto px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
-                            ◆ ÉLITE {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
-                    
-                    <div className="mt-[16px] flex flex-col items-center justify-center gap-[12px]">
+                <Card>
+                    <div className="flex items-center justify-between gap-[15px]">
                         <span className="bg-orange-bg2 h-[60px] w-[60px] px-[10px] rounded-[16px] border border-orange font-body text-[25px] text-orange flex items-center justify-center">
                             & {/*! PONER EL ICONO */}
                         </span>
 
-                        <p className="font-heading font-bold text-[16px] text-text-high">Ninguna progresión creada</p>
+                        <div className="w-[70%] flex flex-col gap-[1px]">
+                            <div className="flex gap-[2px]">
+                                <div className="flex">
+                                    <p className="font-heading font-semibold text-[20px] text-text-high leading-tight">
+                                        Crear <br />progresión
+                                    </p>
+                                </div>
 
-                        <div className="flex items-center justify-center">
-                            <p className="font-body text-[16px] text-text-low text-center">
-                                Diseña la evolución de tus cargas semana a semana y lleva tu rendimiento al siguiente nivel.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mt-[8px] flex flex-col items-center justify-center gap-[5px]">
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                &  {/*! PONER EL ICONO */}
-                            </span>  Sobre carga progresiva
+                                <span className="bg-yellow-bg2 h-[20px] px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
+                                    ◆ ÉLITE {/*! PONER EL ICONO */}
+                                </span>
+                            </div>
+                            
+                            <p className="font-body text-[14px] text-text-low">Planifica la evolución de cargas semana a semana</p>
+                            
                         </div>
                         
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                & {/*! PONER EL ICONO */}
-                            </span>  Semana de descarga
-                        </div>
-
-                        <div className="bg-orange-bg2 px-[14px] py-[2px] rounded-[16px] border border-orange font-subheading font-semibold text-[16px] text-orange">
-                            <span className="text-orange">
-                                &  {/*! PONER EL ICONO */}
-                            </span>  Vista por bloque
-                        </div>
-                    </div>
-
-                    <div className="mt-[16px] w-full flex items-center justify-center gap-[30px] border border-text-low rounded-[16px]">
-                        <Button text="Crear progresión" color="bg-orange" variant="filled"></Button> {/*! PONER EL ICONO */}
+                        <div className="bg-orange-bg2 h-[37px] w-[37px] px-[8px] rounded-[8px] border border-orange font-body text-[15px] text-orange flex items-center justify-center">
+                            ← {/*! PONER EL ICONO */}
+                        </div>                     
                     </div>
                 </Card>
             </section>
@@ -238,4 +202,4 @@ const Routines3 = () => {
     );
 };
 
-export default Routines3;
+export default Routines2
