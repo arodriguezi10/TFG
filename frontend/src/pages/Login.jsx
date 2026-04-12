@@ -49,14 +49,18 @@ const Login = () => {
 
       <section className="mt-[14px]">
         <Input
+          variant="outlined"
           label="Correo electrónico"
+          p="p-[16px]"
           placeholder="email@ejemplo.com"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         ></Input>
         <Input
+        variant="outlined"
           label="Contraseña"
+          p="p-[16px]"
           placeholder="Tu contraseña"
           type="password"
           value={password}

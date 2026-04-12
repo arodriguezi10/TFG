@@ -59,20 +59,20 @@ const Register = () => {
         </section>
         
         <section className="mt-[14px]">
-            <Input label="Nombre" placeholder="Alejandro" type="text" value={name} onChange={(e) => setName(e.target.value)}>
+            <Input variant="outlined" p="p-[16px]" label="Nombre" placeholder="Alejandro" type="text" value={name} onChange={(e) => setName(e.target.value)}>
       
             </Input>
             <div className="flex gap-[10px]">
-                <Input label="Apellido" placeholder="Rodríguez" type="text" value={surname} onChange={(e) => setSurname(e.target.value)}/>
-                <Input label="Fecha de nacimiento" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+                <Input variant="outlined" p="p-[16px]" label="Apellido" placeholder="Rodríguez" type="text" value={surname} onChange={(e) => setSurname(e.target.value)}/>
+                <Input variant="outlined" p="p-[16px]" label="Fecha de nacimiento" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
             </div>
-            <Input label="Correo electrónico" placeholder="email@ejemplo.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)}>
+            <Input variant="outlined" p="p-[16px]" label="Correo electrónico" placeholder="email@ejemplo.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)}>
       
             </Input>
-            <Input label="Contraseña" placeholder="Tu contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)}>
+            <Input variant="outlined" p="p-[16px]" label="Contraseña" placeholder="Tu contraseña" type="password" value={password} onChange={(e) => setPassword(e.target.value)}>
 
             </Input>
-            <Input label="Confirmar contraseña" placeholder="Repite la contraseña" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}>
+            <Input variant="outlined" p="p-[16px]" label="Confirmar contraseña" placeholder="Repite la contraseña" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}>
 
             </Input>
         </section>
