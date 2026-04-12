@@ -7,23 +7,22 @@ import { loginUser } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    /*manejo de inicio de sesion*/
-    const handleLogin = async () => {
-        const { data, error } = await loginUser (email, password);
+  /*manejo de inicio de sesion*/
+  const handleLogin = async () => {
+    const { data, error } = await loginUser(email, password);
 
-        if(error) {
-            console.error ("Error: " , error )
-        }else{
-            console.log("Login exitoso: ", data)
-            navigate("/dashboard");
-        }
-    };
+    if (error) {
+      console.error("Error: ", error);
+    } else {
+      console.log("Login exitoso: ", data);
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background px-[16px] flex flex-col text-text-high">
@@ -31,6 +30,7 @@ const Login = () => {
         <h1 className="bg-primary h-[55px] w-[55px] rounded-[12px] flex items-center justify-center">
           F
         </h1>
+
         <h1>FYLIOS</h1>
       </section>
 
@@ -38,10 +38,12 @@ const Login = () => {
         <span className="bg-surf h-[30px] py-[2px] px-[12px] rounded-[16px] border border-primary text-[16px] text-primary font-subheading ">
           ◆ Acceso seguro
         </span>
+
         <h1 className="text-[50px] font-heading font-bold leading-tight">
           Bienvenido de
           <span className="text-accent1"> vuelta</span>
         </h1>
+
         <p className="font-subheading font-bold text-[16px] text-text-low">
           Inicia sesión para continuar donde lo dejaste
         </p>
@@ -57,8 +59,9 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         ></Input>
+
         <Input
-        variant="outlined"
+          variant="outlined"
           label="Contraseña"
           p="p-[16px]"
           placeholder="Tu contraseña"
@@ -70,16 +73,27 @@ const Login = () => {
 
       <section className="flex justify-between mt-[16px] items-center">
         <div className="flex gap-1 items-center">
-          <input type="checkbox" className="w-[18px] h-[18px]" />
+          <input type="checkbox" className="w-[18px] h-[18px]"/>
+
           <p className="font-body text-[16px] text-text-low">Recuérdame</p>
         </div>
+
         <p className="font-body text-[16px] text-primary">
           ¿Olvidaste la contraseña?
         </p>
       </section>
 
       <section className="mt-[16px]">
-        <Button variant="outlined" text="Iniciar sesión" bgColor={"bg-primary"} textColor={"text-text-high"} borderColor={"border-primary"} w="w-[100%]"  onClick={handleLogin} />
+        <Button
+          variant="outlined"
+          text="Iniciar sesión"
+          bgColor={"bg-primary"}
+          textColor={"text-text-high"}
+          borderColor={"border-primary"}
+          w="w-[100%]"
+          onClick={handleLogin}
+        />
+
         <p className="font-body text-[16px] text-text-low text-center mt-[20px]">
           o continúa con
         </p>
@@ -89,6 +103,7 @@ const Login = () => {
         <button className="bg-surface w-[170px] h-[61px] rounded-[16px] font-body font-semibold text-[24px] text-text-high">
           Google
         </button>
+        
         <button className="bg-surface w-[170px] h-[61px] rounded-[16px] font-body font-semibold text-[24px] text-text-high">
           Apple
         </button>
