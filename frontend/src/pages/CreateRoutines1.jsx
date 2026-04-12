@@ -162,7 +162,7 @@ const CreateRoutines1 = () => {
                             Añade los ejercicios que componen esta sesión. Podrás ordenarlos y configuar series y repeticiones
                         </p>
                     </div>
-                    <Button variant="outlined" text="& Añadir ejercicios" bgColor={"bg-primary-bg"} textColor={"text-primary"} borderColor={"border-primary"} w="w-[65%]"/>           
+                    <Button variant="outlined" text="& Añadir ejercicios" bgColor={"bg-primary-bg"} textColor={"text-primary"} borderColor={"border-primary"} w="w-[65%]"/>
                 </div>
             </Card>
         </section>

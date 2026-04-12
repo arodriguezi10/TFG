@@ -85,7 +85,7 @@ const Routines4 = () => {
                     </div>
 
                     <div className="mt-[16px] flex items-center ">
-                        <Button text="Empezar entrenamiento" color="bg-primary" variant="filled"></Button> {/*! PONER EL ICONO */}
+                        <Button variant="outlined" text="& Empezar entrenamiento" bgColor={"bg-accent1"} textColor={"text-text-high"} borderColor={"border-accent1"} w="w-[100%]"/> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>

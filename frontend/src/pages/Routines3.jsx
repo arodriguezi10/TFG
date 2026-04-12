@@ -85,7 +85,7 @@ const Routines3 = () => {
                     </div>
 
                     <div className="mt-[16px] flex items-center ">
-                        <Button text="Empezar entrenamiento" color="bg-primary" variant="filled"></Button> {/*! PONER EL ICONO */}
+                        <Button variant="outlined" text="& Empezar entrenamiento" bgColor={"bg-accent1"} textColor={"text-text-high"} borderColor={"border-accent1"} w="w-[100%]"/> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>
@@ -230,7 +230,7 @@ const Routines3 = () => {
                     </div>
 
                     <div className="mt-[16px] w-full flex items-center justify-center gap-[30px] border border-text-low rounded-[16px]">
-                        <Button text="Crear progresión" color="bg-orange" variant="filled"></Button> {/*! PONER EL ICONO */}
+                        <Button variant="outlined" text="Crear progresión" bgColor={"bg-orange"} textColor={"text-text-high"} borderColor={"border-orange"} w="w-[100%]"/> {/*! PONER EL ICONO */}
                     </div>
                 </Card>
             </section>
