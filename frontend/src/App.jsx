@@ -14,6 +14,10 @@ import Routines1 from "./pages/Routines1";
 import Routines2 from "./pages/Routines2";
 import Routines3 from "./pages/Routines3";
 import Routines4 from "./pages/Routines4";
+import CreateRoutines1 from "./pages/CreateRoutines1";
+import CreateRoutines2 from "./pages/CreateRoutines2";
+import CreateRoutines3 from "./pages/CreateRoutines3";
+
 
 const App = () => {
   return (
@@ -29,6 +33,12 @@ const App = () => {
           <Route path="/routines2" element={<Routines2 />} />
 
           <Route path="/routines3" element={<Routines3 />} />
+          
+          <Route path="/CreateRoutines1" element={<CreateRoutines1 />} />
+
+          <Route path="/CreateRoutines2" element={<CreateRoutines2 />} />
+
+          <Route path="/CreateRoutines3" element={<CreateRoutines3 />} />
 
           <Route
             element={

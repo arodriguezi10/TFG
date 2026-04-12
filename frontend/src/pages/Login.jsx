@@ -75,7 +75,7 @@ const Login = () => {
       </section>
 
       <section className="mt-[16px]">
-        <Button text="Iniciar sesión" color="bg-primary" variant="filled" onClick={handleLogin} />
+        <Button variant="outlined" text="Iniciar sesión" bgColor={"bg-primary"} textColor={"text-text-high"} borderColor={"border-primary"} w="w-[100%]"  onClick={handleLogin} />
         <p className="font-body text-[16px] text-text-low text-center mt-[20px]">
           o continúa con
         </p>

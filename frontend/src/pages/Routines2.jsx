@@ -6,7 +6,6 @@ const Routines2 = () => {
     return(
         <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
             <section className="w-[100%] flex items-center justify-between">
-
                 <div className="flex flex-col gap-[5px]">
                     <div className="flex gap-[15px]">
                         <p className="font-subheading text-[12px] text-text-low">

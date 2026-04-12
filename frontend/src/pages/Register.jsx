@@ -89,7 +89,7 @@ const Register = () => {
         </section>
 
         <section className="mt-[16px]">
-            <Button text="Crear cuenta" color="bg-accent1" variant="filled" onClick={handleRegister}/>
+            <Button variant="filled" text="Crear cuenta" bgColor="bg-accent1" textColor={"text-text-high"} borderColor={"border-accent1"} w="w-[100%]"  onClick={handleRegister}/>
             <p className="font-body text-[16px] text-text-low text-center mt-[20px]">o continúa con</p>
         </section>
 
