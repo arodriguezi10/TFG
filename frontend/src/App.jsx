@@ -20,6 +20,9 @@ import CreateRoutines3 from "./pages/CreateRoutines3";
 import ExerciseSearchElite from "./pages/ExerciseSearchElite";
 import ExerciseSearchPro from "./pages/ExerciseSearchPro";
 import ExerciseSearchFree from "./pages/ExerciseSearchFree";
+import ConfigExerciseFree from "./pages/ConfigExerciseFree";
+import ConfigExercisePro from "./pages/ConfigExercisePro";
+import ConfigExerciseElite from "./pages/ConfigExerciseElite";
 
 
 const App = () => {
@@ -45,9 +48,16 @@ const App = () => {
 
           <Route path="/exerciseSearchElite" element={<ExerciseSearchElite />} />
 
-          <Route path="/ExerciseSearchPro" element={<ExerciseSearchPro />} />
+          <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
 
-          <Route path="/ExerciseSearchFree" element={<ExerciseSearchFree />} />
+          <Route path="/exerciseSearchFree" element={<ExerciseSearchFree />} />
+
+          <Route path="/configExerciseFree" element={<ConfigExerciseFree />} />
+
+          <Route path="/configExercisePro" element={<ConfigExercisePro />} />
+
+          <Route path="/ConfigExerciseElite" element={<ConfigExerciseElite />} />
+
 
           <Route
             element={

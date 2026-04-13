@@ -15,7 +15,7 @@ const Header = ({ subtitle, title, showback, children }) =>{
                 <p className="font-subheading font-bold text-text-low text-[16px] uppercase">
                     {subtitle}
                 </p>
-                <h1 className="font-heading font-extrabold text-text-high text-[18px]">
+                <h1 className="font-heading font-extrabold text-text-high text-[18px] text-center">
                     {title}      
                 </h1>
             </div>
