@@ -128,9 +128,9 @@ const ForgotPassword = () => {
             {error && (
             <section className="mt-[16px]">
                 <div className="bg-red-500/10 rounded-[16px] border border-red-500 p-[16px]">
-                <p className="font-body text-[14px] text-red-500 text-center">
-                    {error}
-                </p>
+                    <p className="font-body text-[14px] text-red-500 text-center">
+                        {error}
+                    </p>
                 </div>
             </section>
             )}

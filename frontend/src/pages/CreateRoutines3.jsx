@@ -12,36 +12,35 @@ const CreateRoutines3 = () => {
 
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
                 
-                    <p className="font-subheading font-bold text-text-low text-[16px]">INFORMACIÓN BÁSICA</p>
-                
+            <p className="font-subheading font-bold text-text-low text-[16px]">INFORMACIÓN BÁSICA</p>      
 
-                <Card>
-                    <div className="flex flex-col justify-between">
-                        <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
-                            NOMBRE DE LA RUTINA
-                        </label>
+            <Card>
+                <div className="flex flex-col justify-between">
+                    <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
+                        NOMBRE DE LA RUTINA
+                    </label>
 
-                        <div className="flex gap-[15px]">
-                            <p className="text-text-low">&</p>
-                            <input className="font-body text-[16px] text-text-low" type="text" placeholder="Ej: Push A, Piernas Fuerza..."/>
-                        </div>
+                    <div className="flex gap-[15px]">
+                        <p className="text-text-low">&</p>
+                        <input className="font-body text-[16px] text-text-low" type="text" placeholder="Ej: Push A, Piernas Fuerza..."/>
                     </div>
+                </div>
 
-                    <div className="w-full h-[1px] bg-text-low mt-[15px]"></div>  {/**Esto es una linea de división */}  
+                <div className="w-full h-[1px] bg-text-low mt-[15px]"></div>  {/**Esto es una linea de división */}  
 
-                    <div className="mt-[15px] flex flex-col justify-between">
-                        <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
-                            DESCRIPCIÓN 
-                            <span className="font-subheading font-semibold text-[12px]"> (opcional)</span>
-                        </label>
+                <div className="mt-[15px] flex flex-col justify-between">
+                    <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
+                        DESCRIPCIÓN 
+                        <span className="font-subheading font-semibold text-[12px]"> (opcional)</span>
+                    </label>
 
-                        <div className="flex gap-[15px]">
-                            <p className="text-text-low">&</p>
+                    <div className="flex gap-[15px]">
+                        <p className="text-text-low">&</p>
 
-                            <textarea className="w-full font-body text-[16px] text-text-low" type="text" placeholder="Ej: Push A, Piernas Fuerza..."/>
-                        </div>
+                        <textarea className="w-full font-body text-[16px] text-text-low" type="text" placeholder="Ej: Push A, Piernas Fuerza..."/>
                     </div>
-                </Card>
+                </div>
+            </Card>
         </section>
    
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
