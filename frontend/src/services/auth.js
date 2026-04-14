@@ -35,10 +35,15 @@ export const logoutUser = async () => {
 
 // fución para enviar el email de recuperación de contraseña
 export const sendPasswordResetEmail = async (email) =>{
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email,{
-    redirectTo: 'http://localhost:5173/resetPassword', // URL local para desarrollo
+
+  const redirectUrl = import.meta.env.PROD 
+    ? 'https://tfg-topaz.vercel.app/reset-password'
+    : 'http://localhost:5173/reset-password';
+    
+  const { error } = await supabase.auth.resetPasswordForEmail(email,{
+    redirectTo: redirectUrl,
   });
-  return { data, error };
+  return { error };
 }
 
 //funcion para actualizar la contraseña
