@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -36,6 +37,8 @@ const App = () => {
           <Route path="/register" element={<Register />} />
 
           <Route path="/forgotPassword" element={<ForgotPassword />} />
+
+          <Route path="/resetPassword" element={<ResetPassword />} />
 
           <Route path="/routines1" element={<Routines1 />} />
           

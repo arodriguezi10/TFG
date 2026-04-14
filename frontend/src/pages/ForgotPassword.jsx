@@ -1,9 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import Input from "../components/Input";
 import Button from "../components/Button";
-
+import { sendPasswordResetEmail } from "../services/auth";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
+
+    const [ email, setEmail ] = useState("");
+    const [ loading, setLoading ] = useState(false);
+    const [ message, setMessage ] = useState("");
+    const [ error, setError ] = useState("");
+
+    const navigate = useNavigate();
+
+    //manejo del envio del email
+    const handleSendEmail = async () => {
+        //limpiamos los mensajes previos
+        setMessage("");
+        setError("");
+
+        //validamos que el email no este vacio
+        if(!email) {
+            setError("Por favor ingresa tu correo electrónico");
+            return;
+        }
+
+        //validamos el fomato de email basico
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)){
+            setError("Por favor ingresa un correo electrónico válido");
+            return;
+        }
+
+        setLoading(true);
+
+        const { error: resetError } = await sendPasswordResetEmail(email);
+
+        setLoading(false);
+
+        if (resetError) {
+            console.error("Error al enviar email:", resetError);
+            setError("Hubo un error al enviar el correo. Intenta de nuevo.");
+        } else {
+            setMessage("Te hemos enviado un correo con el enlace de recuperación");
+            console.log("Email enviado correctamente");
+        }
+    };
 
   return (
     <div className="min-h-screen bg-background px-[16px] flex flex-col text-text-high">
@@ -38,9 +80,15 @@ const ForgotPassword = () => {
         </section>
         
         <section className="mt-[14px] flex flex-col gap-[25px]">
-            <Input variant="outlined" p="p-[16px]" label="Correo electrónico" placeholder="email@ejemplo.com" type="email">
-      
-            </Input>
+            <Input 
+                variant="outlined" 
+                p="p-[16px]" 
+                label="Correo electrónico" 
+                placeholder="email@ejemplo.com" 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
 
             <div className="h-[77px] rounded-[16px] bg-primary-bg border border-accent2 p-[16px] flex gap-[10px] items-center justify-center">
                 <span className="text-accent2">&</span>
@@ -54,7 +102,38 @@ const ForgotPassword = () => {
         </section>
 
         <section className="mt-[16px]">
-            <Button variant="filled" text="Enviar enlace" bgColor="bg-accent2" textColor={"text-background"} borderColor={"border-accent1"} w="w-[100%]" />
+            <Button
+                variant="filled"
+                text={loading ? "Enviando..." : "Enviar enlace"}
+                bgColor="bg-accent2"
+                textColor="text-text-high"
+                borderColor="border-accent2"
+                w="w-[100%]"
+                onClick={handleSendEmail}
+                disabled={loading}
+            />
+
+            {/* Mostrar mensaje de éxito */}
+            {message && (
+            <section className="mt-[16px]">
+                <div className="bg-green-bg2 rounded-[16px] border border-accent2 p-[16px]">
+                <p className="font-body text-[14px] text-accent2 text-center">
+                    {message}
+                </p>
+                </div>
+            </section>
+            )}
+
+            {/* Mostrar mensaje de error */}
+            {error && (
+            <section className="mt-[16px]">
+                <div className="bg-red-500/10 rounded-[16px] border border-red-500 p-[16px]">
+                <p className="font-body text-[14px] text-red-500 text-center">
+                    {error}
+                </p>
+                </div>
+            </section>
+            )}
 
             <p className="font-body text-[16px] text-text-low text-center mt-[20px]">
                 ¿No recibiste nada?
@@ -63,7 +142,7 @@ const ForgotPassword = () => {
 
             <p className="font-body text-[16px] text-text-low text-center mt-[20px]">
                 ¿Recordaste la contraseña?
-                <span className="text-accent1"> Iniciar sesión</span>
+                <span className="text-accent1" onClick={() => navigate("/login")}> Iniciar sesión</span>
             </p>
         </section>
     </div>

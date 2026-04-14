@@ -32,3 +32,19 @@ export const logoutUser = async () => {
   const { error } = await supabase.auth.signOut();
   return { error };
 };
+
+// fución para enviar el email de recuperación de contraseña
+export const sendPasswordResetEmail = async (email) =>{
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email,{
+    redirectTo: 'http://localhost:5173/resetPassword', // URL local para desarrollo
+  });
+  return { data, error };
+}
+
+//funcion para actualizar la contraseña
+export const updatePassword = async (newPassword) => {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+  return { data, error };
+};
