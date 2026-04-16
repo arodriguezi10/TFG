@@ -8,6 +8,8 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import MainLayout from "./layouts/MainLayout";
+import Profile from "./pages/Profile";
+import PersonalSettings from "./pages/PersonalSettings";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
@@ -25,6 +27,7 @@ import ExerciseSearchFree from "./pages/ExerciseSearchFree";
 import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
+import Subscription from "./pages/Suscription";
 
 
 const App = () => {
@@ -39,6 +42,12 @@ const App = () => {
           <Route path="/forgotPassword" element={<ForgotPassword />} />
 
           <Route path="/resetPassword" element={<ResetPassword />} />
+
+          <Route path="/profile" element={<Profile />} />
+
+          <Route path="/personalSettings" element={<PersonalSettings />} />
+
+          <Route path="/suscription" element={<Subscription />} />
 
           <Route path="/routines1" element={<Routines1 />} />
           
@@ -72,6 +81,7 @@ const App = () => {
               </PrivateRoute>
             }
           >
+            
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/routines4" element={<Routines4 />} />
             <Route path="/" element={<Home />} />
