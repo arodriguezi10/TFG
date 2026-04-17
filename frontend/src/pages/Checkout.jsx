@@ -1,11 +1,361 @@
-import React from 'react';
+import React from "react";
+import Card from "../components/Card";
+import Header from "../components/Header";
+import Button from "../components/Button";
 
 const Checkout = () => {
+
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-amber-500">
-        Formulario de Pago
-      </h1>
+    <div className="min-h-screen bg-background flex flex-col pb-24">
+
+      {/* HEADER */}
+      <section className="w-full flex items-center justify-between">
+        <Header showback subtitle={"suscripción"} title={"Confirmar pago"} />
+      </section>
+
+      {/* PLAN CARDS */}
+      <section className="mx-5 pt-5 flex flex-col gap-3">
+        <p className="font-subheading font-bold text-[16px] text-text-low">TU PLAN</p>
+        {/* PRO PLAN */}
+        <Card>
+          <button className="w-full text-left">
+            <div className="flex flex-col gap-3.5">
+
+              <div className="flex items-start justify-between">
+                <div className="w-full flex items-center justify-between">
+                  <div className="flex gap-3">
+                    <div className="w-[40px] h-[50px] rounded-[10px] bg-orange-bg2 flex items-center justify-center text-[17px]">
+                      ⚡
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <span className="items-center bg-accent2-bg2 border border-accent2 rounded-full px-3.5 py-0.5 text-[16px] text-accent2 font-subheading font-semibold">
+                        & Más popular
+                      </span>
+
+                      <p className="font-heading font-extrabold text-[17px] text-text-high">
+                        Pro
+                      </p>
+                    </div> 
+                  </div>
+
+                  <div className="flex gap-3">
+                    <p className="font-heading font-extrabold text-[17px] text-text-high flex flex-col items-end">
+                        9,99 <br /> 
+                        <span>€</span>
+                        <span className="font-body font-normal text-[16px] text-text-low">al mes</span>
+                    </p>
+                  </div>         
+                </div>
+              </div>
+
+              <div className="flex items-end gap-3">
+                <span className="items-center bg-primary-bg-bg2 border border-primary rounded-full px-3.5 py-0.5 text-[16px] text-primary font-subheading font-semibold">
+                  & Mesual
+                </span>
+
+                <span className="items-center bg-accent2-bg2 border border-accent2 rounded-full px-3.5 py-0.5 text-[16px] text-accent2 font-subheading font-semibold">
+                  & 7 días gratis
+                </span>
+              </div>
+
+              <div className="w-full h-px bg-text-low mb-1.5"></div> {/* línea divisoria horizontal */}
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-accent3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className="font-subheading font-bold text-[16px] text-text-high ">
+                    Hasta 4 rutinas
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-accent3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className="font-subheading font-bold text-[16px] text-text-high ">
+                    Registro del peso corporal
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-accent3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className="font-subheading font-bold text-[16px] text-text-high ">
+                    Rutinas predefinidas por nivel
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-accent3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className="font-subheading font-bold text-[16px] text-text-high ">
+                    Planificación de mesociclos
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-accent3"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <span className="font-subheading font-bold text-[16px] text-text-high ">
+                    Chat directo con el entrenador
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </button>
+        </Card>
+      </section>
+
+      {/* CREDIT CARD */}
+      <section className="mx-5 pt-5 flex flex-col gap-3">
+        <p className="font-subheading font-bold text-[16px] text-text-low">TU PLAN</p>
+
+        <div className="w-full max-w-sm bg-gradient-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
+          {/* Top Row - Icon & Brand */}
+          <div className="flex items-start justify-between mb-5">
+            {/* Card Icon */}
+            <div className="w-12 h-12 bg-gradient-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2"/>
+                <line x1="1" y1="10" x2="23" y2="10"/>
+              </svg>
+            </div>
+            
+            {/* VISA Logo */}
+            <span className="text-white text-2xl font-heading font-extrabold tracking-wider">VISA</span>
+          </div>
+
+          {/* Card Number */}
+          <div className="mb-4">
+            <div className="flex justify-between gap-3 text-white text-xl font-mono tracking-widest">
+              <span>····</span>
+              <span>····</span>
+              <span>····</span>
+              <span className="text-white/60">???</span>
+            </div>
+          </div>
+
+          {/* Bottom Row - Cardholder & Expiry */}
+          <div className="flex justify-between items-end">
+            {/* Titular */}
+            <div>
+              <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
+                Titular
+              </p>
+              <p className="text-white text-sm font-subheading font-bold  tracking-wide">
+                NOMBRE APELLIDO
+              </p>
+            </div>
+
+            {/* Expira */}
+            <div className="text-right">
+              <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
+                Expira
+              </p>
+              <p className="text-white text-sm font-subheading font-bold tracking-wide">
+                MM / AA
+              </p>
+            </div>
+          </div>
+
+          {/* Change Card Link */}
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <button className="flex items-center gap-2 text-accent1 text-sm font-medium">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Cambiar tarjeta
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* DATOS DE PAGO */}
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <p className="font-subheading font-bold text-[16px] text-text-low">DATOS DE PAGO</p>
+
+        <Card>
+          <div className="flex flex-col gap-[15px]">
+              <div className="flex flex-col gap-[5px]">
+                  <label className="font-subheading font-bold text-[16px] text-text-low">NÚMERO DE LA TARJETA</label>
+
+                  <div className="flex items-center gap-[20px]">
+                      <div className="text-text-low text-[20px] flex items-center justify-center">&</div>
+                      <input type="password" placeholder="1234 5678 9101" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="1234 5678 9101"/>
+                  </div>           
+              </div>
+
+              <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+              <div className="flex flex-col gap-[5px]">
+                  <label className="font-subheading font-bold text-[16px] text-text-low">NOMBRE DEL TITULAR</label>
+
+                  <div className="flex items-center gap-[20px]">
+                      <div className="text-text-low text-[20px] flex items-center justify-center">&</div>
+                      <input type="text" placeholder="Como aparece en la tarjeta" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="Santiago Segura"/>
+                  </div>  
+              </div>
+
+              <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+              <div className="flex items-center justify-between gap-[25px]">
+
+                  <div className="flex flex-col gap-[5px]">
+                      <label className="font-subheading font-bold text-[16px] text-text-low">CADUCIDAD</label>
+                      
+                      <div className="flex items-center gap-[20px]">
+                          <input type="text" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="MM / AA"/>
+                      </div>
+                  </div>
+                  
+                  <div className="w-[1px] h-[50px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+                  <div className="flex flex-col gap-[5px]">
+                      <label className="font-subheading font-bold text-[16px] text-text-low">CVV &</label>
+                      <input type="number" placeholder="123" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="123"/>
+                  </div>
+              </div>
+          </div>
+        </Card>            
+      </section>
+
+      {/* RESUMEN DE LA SUSCRIPCIÓN */}
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <p className="font-subheading font-bold text-[16px] text-text-low">RESUMEN DE LA SUSCRIPCIÓN</p>
+
+        <Card>
+          <div className="flex flex-col gap-[10px]">
+
+            <div className="flex items-center justify-between">            
+              <p className="font-subheading font-bold text-[16px] text-text-low">Plan Pro mensual</p>
+
+              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-text-high">9,99 €</p>
+            </div>
+
+            <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+            <div className="flex items-center justify-between">            
+              <p className="font-subheading font-bold text-[16px] text-text-low">Prueba gratuita (7 días)</p>
+
+              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-accent2">-9,99 €</p>
+            </div>
+
+            <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+
+            <div className="flex items-center justify-between">            
+              <p className="font-subheading font-bold text-[16px] text-text-low">IVA (21%)</p>
+
+              <p className="font-body text-[16px] flex items-center justify-center text-text-low">Incluido</p>
+            </div>
+
+            <div className="-mx-[16px] -mb-[23px] mt-[12px] bg-yellow-bg3 rounded-b-[16px] px-[14px] py-[10px] flex items-center justify-between border border-yellow/27">
+              <p className="font-heading font-semibold text-[20px] text-text-high">Precio total</p>
+
+              <p className="font-heading font-extrabold text-[18px] text-orange">9,99 €</p> {/*! PONER EL ICONO */}
+            </div>
+            
+          </div>
+        </Card>
+      </section>
+
+      {/* INFORMACIÓN */}
+      <section className="mt-[22px] pb-5">
+        <p className="font-body text-[16px] text-text-low text-center">
+          Al confirmar acetpas los
+          <span className="text-primary"> Términos de uso </span>
+          y la 
+          <span className="text-primary"> Pólitica de privacidad. </span>
+          Se te cobrará 
+          <span className="text-text-high"> 9,99€ </span>
+          el <br />
+          <span className="text-text-high"> 24 abr 2026 </span> 
+          salvo que canceles antes del <br />fin de periodo.
+        </p>
+      </section>
+
+      {/* STICKY CTA */}
+      <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
+        <Button
+          variant="outlined"
+          text="& Confirmar pago"
+          bgColor={"bg-orange"}
+          textColor={"text-text-high"}
+          borderColor={"border-orange"}
+          w="w-[100%]"
+        />
+
+        <p className="text-center mt-2 text-[11px] text-text-low font-light">
+          & Pago cifrado SSL · Sin compromiso
+        </p>
+      </div>
     </div>
   );
 };

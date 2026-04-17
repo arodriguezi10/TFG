@@ -3,7 +3,7 @@ import Card from '../components/Card';
 import Header from '../components/Header';
 import Button from '../components/Button';
 
-const Subscription = () => {
+const Suscription = () => {
   const [billingPeriod, setBillingPeriod] = useState('mes');
 
   
@@ -378,4 +378,4 @@ const Subscription = () => {
   );
 };
 
-export default Subscription;
+export default Suscription;

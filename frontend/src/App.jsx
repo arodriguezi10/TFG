@@ -10,9 +10,9 @@ import ResetPassword from "./pages/ResetPassword";
 import MainLayout from "./layouts/MainLayout";
 import Profile from "./pages/Profile";
 import PersonalSettings from "./pages/PersonalSettings";
+import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
-import Checkout from "./pages/Checkout";
 import PrivateRoute from "./components/PrivateRoutes";
 import Routines1 from "./pages/Routines1";
 import Routines2 from "./pages/Routines2";
@@ -27,8 +27,7 @@ import ExerciseSearchFree from "./pages/ExerciseSearchFree";
 import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
-import Subscription from "./pages/Suscription";
-
+import Suscription from "./pages/Suscription";
 
 const App = () => {
   return (
@@ -47,21 +46,26 @@ const App = () => {
 
           <Route path="/personalSettings" element={<PersonalSettings />} />
 
-          <Route path="/suscription" element={<Subscription />} />
+          <Route path="/suscription" element={<Suscription />} />
+
+          <Route path="/checkout" element={<Checkout />} />
 
           <Route path="/routines1" element={<Routines1 />} />
-          
+
           <Route path="/routines2" element={<Routines2 />} />
 
           <Route path="/routines3" element={<Routines3 />} />
-          
+
           <Route path="/createRoutines1" element={<CreateRoutines1 />} />
 
           <Route path="/createRoutines2" element={<CreateRoutines2 />} />
 
           <Route path="/createRoutines3" element={<CreateRoutines3 />} />
 
-          <Route path="/exerciseSearchElite" element={<ExerciseSearchElite />} />
+          <Route
+            path="/exerciseSearchElite"
+            element={<ExerciseSearchElite />}
+          />
 
           <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
 
@@ -71,8 +75,10 @@ const App = () => {
 
           <Route path="/configExercisePro" element={<ConfigExercisePro />} />
 
-          <Route path="/ConfigExerciseElite" element={<ConfigExerciseElite />} />
-
+          <Route
+            path="/ConfigExerciseElite"
+            element={<ConfigExerciseElite />}
+          />
 
           <Route
             element={
@@ -81,11 +87,9 @@ const App = () => {
               </PrivateRoute>
             }
           >
-            
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/routines4" element={<Routines4 />} />
             <Route path="/" element={<Home />} />
-            <Route path="/checkout" element={<Checkout />} />
           </Route>
         </Routes>
       </AuthProvider>
