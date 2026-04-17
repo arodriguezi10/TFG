@@ -11,6 +11,7 @@ import MainLayout from "./layouts/MainLayout";
 import Profile from "./pages/Profile";
 import PersonalSettings from "./pages/PersonalSettings";
 import Checkout from "./pages/Checkout";
+import PaymentConfirmation from "./pages/PaymentConfirmation";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoutes";
@@ -49,6 +50,8 @@ const App = () => {
           <Route path="/suscription" element={<Suscription />} />
 
           <Route path="/checkout" element={<Checkout />} />
+
+          <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
 
           <Route path="/routines1" element={<Routines1 />} />
 
