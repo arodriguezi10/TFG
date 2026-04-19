@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
+import { RoutineProvider } from "./context/RoutinesContext";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -25,6 +26,7 @@ import CreateRoutines3 from "./pages/CreateRoutines3";
 import ExerciseSearchElite from "./pages/ExerciseSearchElite";
 import ExerciseSearchPro from "./pages/ExerciseSearchPro";
 import ExerciseSearchFree from "./pages/ExerciseSearchFree";
+import CreatePersonalExercise from "./pages/CreatePersonalExercise";
 import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
@@ -34,67 +36,83 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+        <RoutineProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
 
-          <Route path="/resetPassword" element={<ResetPassword />} />
+            <Route path="/resetPassword" element={<ResetPassword />} />
 
-          <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<Profile />} />
 
-          <Route path="/personalSettings" element={<PersonalSettings />} />
+            <Route path="/personalSettings" element={<PersonalSettings />} />
 
-          <Route path="/suscription" element={<Suscription />} />
+            <Route path="/suscription" element={<Suscription />} />
 
-          <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout" element={<Checkout />} />
 
-          <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
+            <Route
+              path="/paymentConfirmation"
+              element={<PaymentConfirmation />}
+            />
 
-          <Route path="/routines1" element={<Routines1 />} />
+            <Route path="/routines1" element={<Routines1 />} />
 
-          <Route path="/routines2" element={<Routines2 />} />
+            <Route path="/routines2" element={<Routines2 />} />
 
-          <Route path="/routines3" element={<Routines3 />} />
+            <Route path="/routines3" element={<Routines3 />} />
 
-          <Route path="/createRoutines1" element={<CreateRoutines1 />} />
+            <Route path="/createRoutines1" element={<CreateRoutines1 />} />
 
-          <Route path="/createRoutines2" element={<CreateRoutines2 />} />
+            <Route path="/createRoutines2" element={<CreateRoutines2 />} />
 
-          <Route path="/createRoutines3" element={<CreateRoutines3 />} />
+            <Route path="/createRoutines3" element={<CreateRoutines3 />} />
 
-          <Route
-            path="/exerciseSearchElite"
-            element={<ExerciseSearchElite />}
-          />
+            <Route
+              path="/exerciseSearchElite"
+              element={<ExerciseSearchElite />}
+            />
 
-          <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
+            <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
 
-          <Route path="/exerciseSearchFree" element={<ExerciseSearchFree />} />
+            <Route
+              path="/exerciseSearchFree"
+              element={<ExerciseSearchFree />}
+            />
 
-          <Route path="/configExerciseFree" element={<ConfigExerciseFree />} />
+            <Route
+              path="/CreatePersonalExercise"
+              element={<CreatePersonalExercise />}
+            />
 
-          <Route path="/configExercisePro" element={<ConfigExercisePro />} />
+            <Route
+              path="/configExerciseFree"
+              element={<ConfigExerciseFree />}
+            />
 
-          <Route
-            path="/ConfigExerciseElite"
-            element={<ConfigExerciseElite />}
-          />
+            <Route path="/configExercisePro" element={<ConfigExercisePro />} />
 
-          <Route
-            element={
-              <PrivateRoute>
-                <MainLayout />
-              </PrivateRoute>
-            }
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/routines4" element={<Routines4 />} />
-            <Route path="/" element={<Home />} />
-          </Route>
-        </Routes>
+            <Route
+              path="/ConfigExerciseElite"
+              element={<ConfigExerciseElite />}
+            />
+
+            <Route
+              element={
+                <PrivateRoute>
+                  <MainLayout />
+                </PrivateRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/routines4" element={<Routines4 />} />
+              <Route path="/" element={<Home />} />
+            </Route>
+          </Routes>
+        </RoutineProvider>
       </AuthProvider>
     </BrowserRouter>
   );

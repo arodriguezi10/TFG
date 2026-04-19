@@ -1,321 +1,398 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "../services/supabase";
+import { useRoutine } from "../context/RoutinesContext";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Input from "../components/Input";
 
 const ExerciseSearchFree = () => {
-    return (
+  const { addExercise, removeExercise, isExerciseSelected, selectedExercises } =
+    useRoutine();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [customExercises, setCustomExercises] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const isSearchActive =
+    location.pathname === "/exerciseSearchFree" ||
+    !location.pathname.includes("config");
+  const isConfigActive = location.pathname.includes("config");
+
+  useEffect(() => {
+    fetchCustomExercises();
+  }, []);
+
+  const fetchCustomExercises = async () => {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_custom", true)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error al cargar ejercicios personalizados:", error);
+        return;
+      }
+
+      setCustomExercises(data || []);
+    } catch (err) {
+      console.error("Error inesperado:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleExercise = (exercise) => {
+    if (isExerciseSelected(exercise.id)) {
+      removeExercise(exercise.id);
+    } else {
+      addExercise(exercise);
+    }
+  };
+
+  const handleNavigateToConfig = () => {
+    navigate("/configExerciseFree");
+  };
+
+  const handleNavigateToSearch = () => {
+    navigate("/exerciseSearchFree");
+  };
+
+  return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
-        <section className="w-full flex flex-col items-center justify-between">
-            <div className="w-[220px] h-[45px] bg-surf rounded-[16px] border border-text-low p-[10px] gap-[10px] flex items-center">
-                <div className="bg-primary rounded-[16px]">
-                    <p className="font-subheading font-bold text-[16px] text-text-high px-[15px] py-[5px] ">Buscar</p>
-                </div>
+      <section className="w-full flex flex-col items-center justify-between">
+        <div className="w-[220px] h-[45px] bg-surf rounded-[16px] border border-text-low p-[10px] gap-[10px] flex items-center">
+          <button
+            onClick={handleNavigateToSearch}
+            className={`rounded-[16px] transition-colors duration-200 ${
+              isSearchActive ? "bg-primary" : "bg-transparent"
+            }`}
+          >
+            <p
+              className={`font-subheading font-bold text-[16px] px-[15px] py-[5px] ${
+                isSearchActive ? "text-text-high" : "text-text-low"
+              }`}
+            >
+              Buscar
+            </p>
+          </button>
 
-                <div className="bg-primary rounded-[16px]">
-                    <p className="font-subheading font-bold text-[16px] text-text-high px-[15px] py-[5px] ">Cnfigurar</p>
-                </div>
-            </div>
-        </section>
+          <button
+            onClick={handleNavigateToConfig}
+            className={`rounded-[16px] transition-colors duration-200 ${
+              isConfigActive ? "bg-primary" : "bg-transparent"
+            }`}
+          >
+            <p
+              className={`font-subheading font-bold text-[16px] px-[15px] py-[5px] ${
+                isConfigActive ? "text-text-high" : "text-text-low"
+              }`}
+            >
+              Configurar
+            </p>
+          </button>
+        </div>
+      </section>
 
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <div className="flex items-center justify-between">
+          <p className="font-heading font-extrabold text-[18px] text-text-high">
+            Añadir ejercicio
+          </p>
+
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-surface transition-colors"
+          >
+            X
+          </button>
+        </div>
+
+        <div>
+          <Input
+            variant="outlined"
+            p="p-[10px]"
+            placeholder="& Busca un ejercicio"
+            type="text"
+          />
+        </div>
+
+        <div className="flex gap-[5px] overflow-x-auto scrollbar-hide">
+          <button className="bg-primary-bg px-[10px] py-[1px] rounded-[16px] border border-primary font-body text-[16px] text-primary whitespace-nowrap">
+            Todos
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Pecho
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Hombro
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Tríceps
+          </button>
+        </div>
+      </section>
+
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <button
+          onClick={() => navigate("/suscription")}
+          className="h-[77px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+        >
+          <div className="w-[90%] flex items-center justify-center gap-[15px]">
+            <span className="text-primary text-[20px]">👑</span>
+            <p className="font-body text-[16px] text-text-low text-left">
+              Con<span className="text-primary"> Plan Pro </span>
+              desbloqueas 80+ ejercicios intermedios y avanzados
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-[15px] text-primary">
+            →
+          </div>
+        </button>
+
+        <button
+          onClick={() => navigate("/create-personal-exercise")}
+          className="h-[77px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+        >
+          <div className="w-[90%] flex items-center justify-center gap-[15px]">
+            <span className="text-primary text-[20px]">⚡</span>
+            <p className="font-body text-[16px] text-text-low text-left">
+              Crea tus propios ejercicios
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-[15px] text-primary">
+            →
+          </div>
+        </button>
+      </section>
+
+      {/* MIS EJERCICIOS PERSONALIZADOS */}
+      {customExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <p className="font-subheading font-bold text-[16px] text-primary">
+            ⚡ MIS EJERCICIOS
+          </p>
 
-            <div className="flex items-center justify-between">
-                <p className="font-heading font-extrabold text-[18px] text-text-high">Añadir ejercicio</p>
-                
-                <button className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center">
-                    X
-                </button>
-            </div>
-
-            <div>
-                <Input
-                    variant="outlined"
-                    p="p-[10px]"
-                    placeholder="& Busca un ejercicio"
-                    type="text"
-                ></Input>
-            </div>
-
-            <div className="flex gap-[5px]"> {/* Barra de desplazamiento lateral de ejercicios por grupos musculares */}
-                <button className="bg-primary-bg px-[10px] py-[1px] rounded-[16px] border border-primary font-body text-[16px] text-primary">
-                    Todos
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Pecho
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Hombro
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Trícpes
-                </button>
-                {/*
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Espalda
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Bíceps
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Cuádriceps
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Femoral
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Glúteo
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Gemelo
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Core
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Trapecio
-                </button>
-                <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low">
-                    Antebrazo
-                </button>
-                */}
-            </div>
-        </section>
-
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-            
-            <div className="h-[77px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between">
-                <div className="w-[90%] flex items-center justify-center gap-[15px]">
-                    <span className="text-primary">&</span>
-
-                    <p className="font-body text-[16px] text-text-low">Con 
-                        <span className="text-primary"> Plan Pro </span>
-                        desbloqueas 80+ ejercicios intermedios y avanzados</p>
-                </div>
-
-                <div className="flex items-center justify-center gap-[15px] text-primary">
-                    v
-                </div>
-            </div>
-            
-        </section>
-   
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-
-            <p className="font-subheading font-bold text-[16px] text-green">& PRINCIPANTE</p>
-            
+          {loading ? (
             <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
-
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
-
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
-
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
-                                    Principiante
-                                </span>
-
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            + {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
-                </div>
+              <p className="text-text-low text-center">Cargando...</p>
             </Card>
+          ) : (
+            customExercises.map((exercise) => {
+              const isSelected = isExerciseSelected(exercise.id);
+              return (
+                <Card key={exercise.id}>
+                  <div className="flex items-center justify-between gap-[12px]">
+                    <div className="flex items-center gap-[10px]">
+                      <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
+                        ⚡
+                      </span>
 
-            <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
+                      <div className="flex flex-col">
+                        <p className="font-subheading font-bold text-[16px] text-text-high">
+                          {exercise.name}
+                        </p>
 
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
+                        <p className="font-body text-[12px] text-text-low">
+                          {exercise.muscle_group} · {exercise.equipment}
+                        </p>
 
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
+                        <div className="mt-[3px] flex gap-[6px]">
+                          <span
+                            className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
+                              exercise.difficulty_level === "Principiante"
+                                ? "bg-green-bg2 border-accent2 text-accent2"
+                                : exercise.difficulty_level === "Intermedio"
+                                  ? "bg-orange-bg2 border-orange text-orange"
+                                  : "bg-accent1-bg1 border-accent1 text-accent1"
+                            }`}
+                          >
+                            {exercise.difficulty_level}
+                          </span>
 
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
-                                    Principiante
-                                </span>
-
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
+                          <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                            Personalizado
+                          </span>
                         </div>
+                      </div>
                     </div>
-                    
+
                     <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            + {/*! PONER EL ICONO */}
-                        </span>
+                      <button
+                        onClick={() => handleToggleExercise(exercise)}
+                        className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                          isSelected
+                            ? "bg-primary border-primary text-text-high"
+                            : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                        }`}
+                      >
+                        {isSelected ? "✓" : "+"}
+                      </button>
                     </div>
-                </div>
-            </Card>
+                  </div>
+                </Card>
+              );
+            })
+          )}
         </section>
+      )}
 
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50">
+      {/* PRINCIPIANTE */}
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <p className="font-subheading font-bold text-[16px] text-green">
+          💪 PRINCIPIANTE
+        </p>
 
-            <p className="font-subheading font-bold text-[16px] text-orange">& INTERMEDIO</p>
-            
+        {/* Ejercicio 1 */}
+        {(() => {
+          const exercise = {
+            id: 101,
+            name: "Fondos en paralelas",
+            muscle_group: "Pecho",
+            equipment: "Peso corporal",
+            difficulty_level: "Principiante",
+          };
+          const isSelected = isExerciseSelected(exercise.id);
+          return (
             <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
+              <div className="flex items-center justify-between gap-[12px]">
+                <div className="flex items-center gap-[10px]">
+                  <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
+                    💪
+                  </span>
 
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
+                  <div className="flex flex-col">
+                    <p className="font-subheading font-bold text-[16px] text-text-high">
+                      {exercise.name}
+                    </p>
 
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Pecho · Tríceps · Hombro
+                    </p>
 
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-orange-bg2 h-auto px-[10px] rounded-[16px] border border-orange font-body text-[12px] text-orange">
-                                    Intermedio
-                                </span>
+                    <div className="mt-[3px] flex gap-[6px]">
+                      <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
+                        Principiante
+                      </span>
 
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
-                        </div>
+                      <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        Peso corporal
+                      </span>
                     </div>
-                    
-                    <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            & {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
+                  </div>
                 </div>
-            </Card>
 
+                <div>
+                  <button
+                    onClick={() => handleToggleExercise(exercise)}
+                    className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                      isSelected
+                        ? "bg-primary border-primary text-text-high"
+                        : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                    }`}
+                  >
+                    {isSelected ? "✓" : "+"}
+                  </button>
+                </div>
+              </div>
+            </Card>
+          );
+        })()}
+
+        {/* Ejercicio 2 */}
+        {(() => {
+          const exercise = {
+            id: 102,
+            name: "Press de banca",
+            muscle_group: "Pecho",
+            equipment: "Peso libre",
+            difficulty_level: "Principiante",
+          };
+          const isSelected = isExerciseSelected(exercise.id);
+          return (
             <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
+              <div className="flex items-center justify-between gap-[12px]">
+                <div className="flex items-center gap-[10px]">
+                  <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
+                    💪
+                  </span>
 
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
+                  <div className="flex flex-col">
+                    <p className="font-subheading font-bold text-[16px] text-text-high">
+                      {exercise.name}
+                    </p>
 
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Pecho · Tríceps · Hombro
+                    </p>
 
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-orange-bg2 h-auto px-[10px] rounded-[16px] border border-orange font-body text-[12px] text-orange">
-                                    Intermedio
-                                </span>
+                    <div className="mt-[3px] flex gap-[6px]">
+                      <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
+                        Principiante
+                      </span>
 
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
-                        </div>
+                      <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        Peso libre
+                      </span>
                     </div>
-                    
-                    <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            & {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
+                  </div>
                 </div>
-            </Card>
-        </section>
 
-        <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50">
-
-            <p className="font-subheading font-bold text-[16px] text-accent1">& AVANZADO</p>
-            
-            <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
-
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
-
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
-
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-accent1-bg1 h-auto px-[10px] rounded-[16px] border border-accent1 font-body text-[12px] text-accent1">
-                                    Avanzado
-                                </span>
-
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            & {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
+                <div>
+                  <button
+                    onClick={() => handleToggleExercise(exercise)}
+                    className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                      isSelected
+                        ? "bg-primary border-primary text-text-high"
+                        : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                    }`}
+                  >
+                    {isSelected ? "✓" : "+"}
+                  </button>
                 </div>
+              </div>
             </Card>
+          );
+        })()}
+      </section>
 
-            <Card>
-                <div className="flex items-center justify-between gap-[12px]">
-                    
-                    <div className="flex items-center justify-center gap-[10px]">
-                        <span className="bg-primary-bg h-[50px] w-[50px] px-[10px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                            A {/*! PONER EL ICONO */}
-                        </span>
+      {/* INTERMEDIO - bloqueado */}
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+        <p className="font-subheading font-bold text-[16px] text-orange">
+          🔒 INTERMEDIO
+        </p>
+        {/* ... mantén el resto igual ... */}
+      </section>
 
-                        <div className="flex flex-col">
-                            <p className="font-subheading font-bold text-[16px] text-text-high">Fondos en paralelas</p>
+      {/* AVANZADO - bloqueado */}
+      <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+        <p className="font-subheading font-bold text-[16px] text-accent1">
+          🔒 AVANZADO
+        </p>
+        {/* ... mantén el resto igual ... */}
+      </section>
 
-                            <p className="font-body text-[12px] text-text-low">Pecho · Tríceps · Hombro</p>
-
-                            <div className="mt-[3px] flex gap-[10px]">
-                                <span className="bg-accent1-bg1 h-auto px-[10px] rounded-[16px] border border-accent1 font-body text-[12px] text-accent1">
-                                    Avanzado
-                                </span>
-
-                                <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                                    Libre
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <span className="bg-surf h-[32px] w-[32px] px-[10px] rounded-[50px] border border-text-low font-body text-[18px] text-text-low flex items-center justify-center">
-                            & {/*! PONER EL ICONO */}
-                        </span>
-                    </div>
-                </div>
-            </Card>
-        </section>
-
-        <section className="mt-[16px] w-full px-[16px] fixed bottom-1 gap-[10px]">
-            <Button variant="outlined" text="& Añadir x ejercicios a la rutina" bgColor={"bg-primary"} textColor={"text-text-high"} borderColor={"border-primary"} w="w-[100%]"/>
-        </section>
+      {/* BOTÓN STICKY */}
+      <section className="mt-[16px] w-full px-[16px] fixed bottom-1">
+        <Button
+          variant="outlined"
+          text={
+            selectedExercises.length > 0
+              ? `Añadir ${selectedExercises.length} ejercicio${selectedExercises.length > 1 ? "s" : ""}`
+              : "Selecciona ejercicios"
+          }
+          bgColor={"bg-primary"}
+          textColor={"text-text-high"}
+          borderColor={"border-primary"}
+          w="w-[100%]"
+          onClick={() => navigate("/createRoutines1")}
+        />
+      </section>
     </div>
   );
 };
