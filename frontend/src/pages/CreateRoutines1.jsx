@@ -6,11 +6,13 @@ import Button from "../components/Button";
 import Header from "../components/Header";
 
 const CreateRoutines1 = () => {
+
   const navigate = useNavigate();
-  const { selectedExercises, removeExercise } = useRoutine(); // 👈 Obtener ejercicios
+  const { selectedExercises, removeExercise } = useRoutine();
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+
       <section className="w-full flex items-center justify-between">
         <Header showback subtitle={"rutinas"} title={"Crear rutinas"} />
       </section>
@@ -166,7 +168,6 @@ const CreateRoutines1 = () => {
         </div>
       </section>
 
-      {/* SECCIÓN DE EJERCICIOS - MODIFICADA */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <div className="w-[100%] flex gap-[10px] items-center justify-between">
           <div className="flex gap-[10px] items-center">
@@ -189,7 +190,6 @@ const CreateRoutines1 = () => {
         </div>
 
         {selectedExercises.length === 0 ? (
-          // Estado vacío (original)
           <Card>
             <div className="mt-[16px] flex flex-col items-center justify-center gap-[12px]">
               <span className="bg-primary-bg h-[60px] w-[60px] px-[10px] rounded-[16px] border border-primary font-body text-[25px] text-primary flex items-center justify-center">
