@@ -14,11 +14,51 @@ const ExerciseSearchFree = () => {
 
   const [customExercises, setCustomExercises] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
 
   const isSearchActive =
     location.pathname === "/exerciseSearchFree" ||
     !location.pathname.includes("config");
   const isConfigActive = location.pathname.includes("config");
+
+  // Ejercicios predefinidos de nivel PRINCIPIANTE
+  const predefinedExercises = [
+    // PECHO
+    { id: 101, name: "Flexiones", muscle_group: "Pecho", equipment: "Peso corporal", difficulty_level: "Principiante", is_custom: false },
+    { id: 102, name: "Press plano con mancuernas", muscle_group: "Pecho", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
+    
+    // HOMBRO
+    { id: 103, name: "Press militar con mancuernas (sentado)", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
+    { id: 104, name: "Elevaciones laterales con mancuernas", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
+    
+    // TRÍCEPS
+    { id: 105, name: "Extensión de tríceps", muscle_group: "Tríceps", equipment: "Polea", difficulty_level: "Principiante", is_custom: false },
+    
+    // ESPALDA
+    { id: 106, name: "Jalón al pecho", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    { id: 107, name: "Remo unilateral con mancuernas", muscle_group: "Espalda", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
+    { id: 108, name: "Remo Gironda", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    
+    // BÍCEPS
+    { id: 109, name: "Curl de bíceps", muscle_group: "Bíceps", equipment: "Polea", difficulty_level: "Principiante", is_custom: false },
+    
+    // CUÁDRICEPS
+    { id: 110, name: "Prensa", muscle_group: "Cuádriceps", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    { id: 111, name: "Sentadilla Goblet con pesa rusa", muscle_group: "Cuádriceps", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
+    
+    // FEMORAL
+    { id: 112, name: "Curl femoral sentado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    { id: 113, name: "Curl femoral tumbado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    
+    // GEMELO
+    { id: 114, name: "Elevaciones de talones en multipower", muscle_group: "Gemelo", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
+    
+    // CORE
+    { id: 115, name: "Planchas abdominales (Plank)", muscle_group: "Core", equipment: "Peso corporal", difficulty_level: "Principiante", is_custom: false },
+  ];
+
+  const muscleGroups = ["Todos", "Pecho", "Hombro", "Tríceps", "Espalda", "Bíceps", "Cuádriceps", "Femoral", "Gemelo", "Core"];
 
   useEffect(() => {
     fetchCustomExercises();
@@ -62,6 +102,29 @@ const ExerciseSearchFree = () => {
   const handleNavigateToSearch = () => {
     navigate("/exerciseSearchFree");
   };
+
+  const handleCreateExercise = () => {
+    // Verificar límite de 5 ejercicios personalizados para plan FREE
+    if (customExercises.length >= 5) {
+      alert("Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro para crear ilimitados.");
+      return;
+    }
+    navigate("/createPersonalExercise");
+  };
+
+  // Filtrar ejercicios personalizados
+  const filteredCustomExercises = customExercises.filter(exercise => {
+    const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
+    return matchesSearch && matchesMuscle;
+  });
+
+  // Filtrar ejercicios predefinidos
+  const filteredPredefinedExercises = predefinedExercises.filter(exercise => {
+    const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
+    return matchesSearch && matchesMuscle;
+  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
@@ -113,49 +176,34 @@ const ExerciseSearchFree = () => {
           </button>
         </div>
 
+        {/* BUSCADOR */}
         <div>
           <Input
             variant="outlined"
             p="p-[10px]"
-            placeholder="& Busca un ejercicio"
+            placeholder="Busca un ejercicio"
             type="text"
+            name="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
+        {/* FILTROS POR GRUPO MUSCULAR */}
         <div className="flex gap-[5px] overflow-x-auto scrollbar-hide">
-          <button className="bg-primary-bg px-[10px] py-[1px] rounded-[16px] border border-primary font-body text-[16px] text-primary whitespace-nowrap">
-            Todos
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Pecho
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Hombro
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Tríceps
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Espalda
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Bíceps
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Cuádriceps
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Femoral
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Gemelo
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Glúteo
-          </button>
-          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
-            Core
-          </button>
+          {muscleGroups.map((muscle) => (
+            <button
+              key={muscle}
+              onClick={() => setSelectedMuscleFilter(muscle)}
+              className={`px-[10px] py-[1px] rounded-[16px] border font-body text-[16px] whitespace-nowrap transition-colors ${
+                selectedMuscleFilter === muscle
+                  ? "bg-primary-bg border-primary text-primary"
+                  : "bg-surf border-text-low text-text-low"
+              }`}
+            >
+              {muscle}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -177,13 +225,13 @@ const ExerciseSearchFree = () => {
         </button>
 
         <button
-          onClick={() => navigate("/createPersonalExercise")}
+          onClick={handleCreateExercise}
           className="h-[70px] rounded-[16px] bg-primary border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
-            <span className="text-text-high text-[20px]">& </span>
+            <span className="text-text-high text-[20px]">⚡</span>
             <p className="font-body text-[16px] text-text-high">
-              Crea tus propios ejercicios
+              Crea tus propios ejercicios {customExercises.length >= 5 && <span className="text-text-low">({customExercises.length}/5 - Límite alcanzado)</span>}
             </p>
           </div>
           <div className="flex items-center justify-center gap-[15px] text-text-high">
@@ -193,10 +241,10 @@ const ExerciseSearchFree = () => {
       </section>
 
       {/* MIS EJERCICIOS PERSONALIZADOS */}
-      {customExercises.length > 0 && (
+      {filteredCustomExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
           <p className="font-subheading font-bold text-[16px] text-primary">
-            ⚡ MIS EJERCICIOS
+            ⚡ MIS EJERCICIOS ({customExercises.length}/5)
           </p>
 
           {loading ? (
@@ -204,7 +252,7 @@ const ExerciseSearchFree = () => {
               <p className="text-text-low text-center">Cargando...</p>
             </Card>
           ) : (
-            customExercises.map((exercise) => {
+            filteredCustomExercises.map((exercise) => {
               const isSelected = isExerciseSelected(exercise.id);
               return (
                 <Card key={exercise.id}>
@@ -300,131 +348,96 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
-      {/* PRINCIPIANTE */}
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-        <p className="font-subheading font-bold text-[16px] text-green">
-          💪 PRINCIPIANTE
-        </p>
+      {/* EJERCICIOS PREDEFINIDOS - PRINCIPIANTE */}
+      {filteredPredefinedExercises.length > 0 && (
+        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <p className="font-subheading font-bold text-[16px] text-green">
+            💪 PRINCIPIANTE
+          </p>
 
-        {/* Ejercicio 1 */}
-        {(() => {
-          const exercise = {
-            id: 101,
-            name: "Fondos en paralelas",
-            muscle_group: "Pecho",
-            equipment: "Peso corporal",
-            difficulty_level: "Principiante",
-          };
-          const isSelected = isExerciseSelected(exercise.id);
-          return (
-            <Card>
-              <div className="flex items-center justify-between gap-[12px]">
-                <div className="flex items-center gap-[10px]">
-                  <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                    💪
-                  </span>
+          {filteredPredefinedExercises.map((exercise) => {
+            const isSelected = isExerciseSelected(exercise.id);
+            return (
+              <Card key={exercise.id}>
+                <div className="flex items-center justify-between gap-[12px]">
+                  <div className="flex items-center gap-[10px]">
+                    <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
+                      💪
+                    </span>
 
-                  <div className="flex flex-col">
-                    <p className="font-subheading font-bold text-[16px] text-text-high">
-                      {exercise.name}
-                    </p>
+                    <div className="flex flex-col">
+                      <p className="font-subheading font-bold text-[16px] text-text-high">
+                        {exercise.name}
+                      </p>
 
-                    <p className="font-body text-[12px] text-text-low">
-                      Pecho · Tríceps · Hombro
-                    </p>
+                      <p className="font-body text-[12px] text-text-low">
+                        {exercise.muscle_group} · {exercise.equipment}
+                      </p>
 
-                    <div className="mt-[3px] flex gap-[6px]">
-                      <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
-                        Principiante
-                      </span>
+                      <div className="mt-[3px] flex gap-[6px]">
+                        <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
+                          Principiante
+                        </span>
 
-                      <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                        Peso corporal
-                      </span>
+                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                          {exercise.equipment}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div>
-                  <button
-                    onClick={() => handleToggleExercise(exercise)}
-                    className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
-                      isSelected
-                        ? "bg-primary border-primary text-text-high"
-                        : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
-                    }`}
-                  >
-                    {isSelected ? "✓" : "+"}
-                  </button>
-                </div>
-              </div>
-            </Card>
-          );
-        })()}
-
-        {/* Ejercicio 2 */}
-        {(() => {
-          const exercise = {
-            id: 102,
-            name: "Press de banca",
-            muscle_group: "Pecho",
-            equipment: "Peso libre",
-            difficulty_level: "Principiante",
-          };
-          const isSelected = isExerciseSelected(exercise.id);
-          return (
-            <Card>
-              <div className="flex items-center justify-between gap-[12px]">
-                <div className="flex items-center gap-[10px]">
-                  <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
-                    💪
-                  </span>
-
-                  <div className="flex flex-col">
-                    <p className="font-subheading font-bold text-[16px] text-text-high">
-                      {exercise.name}
-                    </p>
-
-                    <p className="font-body text-[12px] text-text-low">
-                      Pecho · Tríceps · Hombro
-                    </p>
-
-                    <div className="mt-[3px] flex gap-[6px]">
-                      <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
-                        Principiante
-                      </span>
-
-                      <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                        Peso libre
-                      </span>
-                    </div>
+                  <div>
+                    <button
+                      onClick={() => handleToggleExercise(exercise)}
+                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                        isSelected
+                          ? "bg-primary border-primary text-text-high"
+                          : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                      }`}
+                    >
+                      {isSelected ? "✓" : "+"}
+                    </button>
                   </div>
                 </div>
+              </Card>
+            );
+          })}
+        </section>
+      )}
 
-                <div>
-                  <button
-                    onClick={() => handleToggleExercise(exercise)}
-                    className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
-                      isSelected
-                        ? "bg-primary border-primary text-text-high"
-                        : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
-                    }`}
-                  >
-                    {isSelected ? "✓" : "+"}
-                  </button>
-                </div>
-              </div>
-            </Card>
-          );
-        })()}
-      </section>
+      {/* MENSAJE SI NO HAY RESULTADOS */}
+      {filteredCustomExercises.length === 0 && filteredPredefinedExercises.length === 0 && (
+        <section className="mt-[16px] w-full px-[16px]">
+          <Card>
+            <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
+              <span className="text-[48px]">🔍</span>
+              <p className="font-heading font-bold text-[18px] text-text-high text-center">
+                No se encontraron ejercicios
+              </p>
+              <p className="font-body text-[14px] text-text-low text-center">
+                Intenta con otra búsqueda o filtro
+              </p>
+            </div>
+          </Card>
+        </section>
+      )}
 
       {/* INTERMEDIO - bloqueado */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-orange">
           🔒 INTERMEDIO
         </p>
-        {/* ... mantén el resto igual ... */}
+        <Card>
+          <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+            <span className="text-[40px]">🔒</span>
+            <p className="font-heading font-bold text-[16px] text-text-high text-center">
+              Nivel bloqueado
+            </p>
+            <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de nivel intermedio
+            </p>
+          </div>
+        </Card>
       </section>
 
       {/* AVANZADO - bloqueado */}
@@ -432,7 +445,17 @@ const ExerciseSearchFree = () => {
         <p className="font-subheading font-bold text-[16px] text-accent1">
           🔒 AVANZADO
         </p>
-        {/* ... mantén el resto igual ... */}
+        <Card>
+          <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+            <span className="text-[40px]">🔒</span>
+            <p className="font-heading font-bold text-[16px] text-text-high text-center">
+              Nivel bloqueado
+            </p>
+            <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de nivel avanzado
+            </p>
+          </div>
+        </Card>
       </section>
 
       {/* BOTÓN STICKY */}
