@@ -54,10 +54,7 @@ const App = () => {
 
             <Route path="/checkout" element={<Checkout />} />
 
-            <Route
-              path="/paymentConfirmation"
-              element={<PaymentConfirmation />}
-            />
+            <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
 
             <Route path="/routines1" element={<Routines1 />} />
 
@@ -71,34 +68,19 @@ const App = () => {
 
             <Route path="/createRoutines3" element={<CreateRoutines3 />} />
 
-            <Route
-              path="/exerciseSearchElite"
-              element={<ExerciseSearchElite />}
-            />
+            <Route path="/exerciseSearchElite" element={<ExerciseSearchElite />} />
 
             <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
 
-            <Route
-              path="/exerciseSearchFree"
-              element={<ExerciseSearchFree />}
-            />
+            <Route path="/exerciseSearchFree" element={<ExerciseSearchFree />} />
 
-            <Route
-              path="/CreatePersonalExercise"
-              element={<CreatePersonalExercise />}
-            />
+            <Route path="/createPersonalExercise" element={<CreatePersonalExercise />} />
 
-            <Route
-              path="/configExerciseFree"
-              element={<ConfigExerciseFree />}
-            />
+            <Route path="/configExerciseFree" element={<ConfigExerciseFree />} />
 
             <Route path="/configExercisePro" element={<ConfigExercisePro />} />
 
-            <Route
-              path="/ConfigExerciseElite"
-              element={<ConfigExerciseElite />}
-            />
+            <Route path="/configExerciseElite" element={<ConfigExerciseElite />} />
 
             <Route
               element={

@@ -109,7 +109,7 @@ const CreatePersonalExercise = () => {
       {/* FORMULARIO */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <Card>
-          <div className="flex flex-col gap-[15px]">
+          <div className="flex flex-col gap-[10px]">
             
             {/* Nombre del ejercicio */}
             <div className="flex flex-col gap-[5px]">
@@ -236,7 +236,7 @@ const CreatePersonalExercise = () => {
 
       {/* PREVIEW CARD */}
       {formData.name && (
-        <section className="mt-[16px] w-full px-[16px]">
+        <section className="mt-[16px] w-full px-[16px] pb-[80px]">
           <p className="font-subheading font-bold text-[14px] text-text-low mb-[10px] uppercase">
             Vista previa
           </p>

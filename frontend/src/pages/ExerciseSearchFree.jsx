@@ -177,7 +177,7 @@ const ExerciseSearchFree = () => {
         </button>
 
         <button
-          onClick={() => navigate("/create-personal-exercise")}
+          onClick={() => navigate("/createPersonalExercise")}
           className="h-[70px] rounded-[16px] bg-primary border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
