@@ -66,10 +66,13 @@ const Routines1 = () => {
       {/* Botón principal que navega */}
       <section className="mt-[30px] flex flex-col gap-[10px]">
         <Button
-          text="Crear rutina"
-          color="bg-primary"
-          variant="filled"
-          onClick={handleCreateRoutine} // 👈 Añadir onClick
+          variant="outlined"
+          text="& Crear rutina"
+          bgColor={"bg-primary"}
+          textColor={"text-text-high"}
+          borderColor={"border-primary"}
+          w="w-[100%]"
+          onClick={handleCreateRoutine}
         />
       </section>
 

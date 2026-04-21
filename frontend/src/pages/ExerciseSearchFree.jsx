@@ -135,19 +135,40 @@ const ExerciseSearchFree = () => {
           <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
             Tríceps
           </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Espalda
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Bíceps
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Cuádriceps
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Femoral
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Gemelo
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Glúteo
+          </button>
+          <button className="bg-surf px-[10px] py-[1px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low whitespace-nowrap">
+            Core
+          </button>
         </div>
       </section>
 
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <button
           onClick={() => navigate("/suscription")}
-          className="h-[77px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+          className="h-[80px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
             <span className="text-primary text-[20px]">👑</span>
             <p className="font-body text-[16px] text-text-low text-left">
-              Con<span className="text-primary"> Plan Pro </span>
-              desbloqueas 80+ ejercicios intermedios y avanzados
+              Amplía tus posibilidades con el <span className="text-primary"> Plan Pro. </span>
+              +80 ejercicios de nivel intermedio y avanzado.
             </p>
           </div>
           <div className="flex items-center justify-center gap-[15px] text-primary">
@@ -157,15 +178,15 @@ const ExerciseSearchFree = () => {
 
         <button
           onClick={() => navigate("/create-personal-exercise")}
-          className="h-[77px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+          className="h-[70px] rounded-[16px] bg-primary border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
-            <span className="text-primary text-[20px]">⚡</span>
-            <p className="font-body text-[16px] text-text-low text-left">
+            <span className="text-text-high text-[20px]">& </span>
+            <p className="font-body text-[16px] text-text-high">
               Crea tus propios ejercicios
             </p>
           </div>
-          <div className="flex items-center justify-center gap-[15px] text-primary">
+          <div className="flex items-center justify-center gap-[15px] text-text-high">
             →
           </div>
         </button>
@@ -222,16 +243,53 @@ const ExerciseSearchFree = () => {
                       </div>
                     </div>
 
-                    <div>
+                    {/* Botones de acción */}
+                    <div className="flex flex-col items-center gap-[8px]">
+                      {/* Botón seleccionar/deseleccionar */}
                       <button
                         onClick={() => handleToggleExercise(exercise)}
-                        className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                        className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                           isSelected
                             ? "bg-primary border-primary text-text-high"
                             : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
                         }`}
+                        title={isSelected ? "Quitar de la selección" : "Añadir a la selección"}
                       >
                         {isSelected ? "✓" : "+"}
+                      </button>
+                      {/* Botón eliminar permanente */}
+                      <button
+                        onClick={async () => {
+                          if (window.confirm(`¿Eliminar "${exercise.name}" permanentemente?`)) {
+                            try {
+                              const { error } = await supabase
+                                .from('exercises')
+                                .delete()
+                                .eq('id', exercise.id);
+
+                              if (error) {
+                                console.error('Error al eliminar:', error);
+                                alert('Error al eliminar el ejercicio');
+                                return;
+                              }
+
+                              // Actualizar la lista local
+                              setCustomExercises(customExercises.filter(ex => ex.id !== exercise.id));
+                              
+                              // Si estaba seleccionado, quitarlo de la selección también
+                              if (isSelected) {
+                                removeExercise(exercise.id);
+                              }
+                            } catch (err) {
+                              console.error('Error inesperado:', err);
+                              alert('Error inesperado al eliminar');
+                            }
+                          }
+                        }}
+                        className="h-[32px] w-[32px] rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
+                        title="Eliminar ejercicio permanentemente"
+                      >
+                        X
                       </button>
                     </div>
                   </div>
@@ -290,7 +348,7 @@ const ExerciseSearchFree = () => {
                 <div>
                   <button
                     onClick={() => handleToggleExercise(exercise)}
-                    className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                    className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                       isSelected
                         ? "bg-primary border-primary text-text-high"
                         : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
@@ -346,7 +404,7 @@ const ExerciseSearchFree = () => {
                 <div>
                   <button
                     onClick={() => handleToggleExercise(exercise)}
-                    className={`h-[40px] w-[40px] rounded-[12px] border flex items-center justify-center text-[20px] transition-colors ${
+                    className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                       isSelected
                         ? "bg-primary border-primary text-text-high"
                         : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
