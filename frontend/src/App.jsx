@@ -56,11 +56,13 @@ const App = () => {
 
             <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
 
-            <Route path="/routines1" element={<Routines1 />} />
+            
 
             <Route path="/routines2" element={<Routines2 />} />
 
             <Route path="/routines3" element={<Routines3 />} />
+
+            <Route path="/routines4" element={<Routines4 />} />
 
             <Route path="/createRoutines1" element={<CreateRoutines1 />} />
 
@@ -90,7 +92,7 @@ const App = () => {
               }
             >
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/routines4" element={<Routines4 />} />
+              <Route path="/routines1" element={<Routines1 />} />
               <Route path="/" element={<Home />} />
             </Route>
           </Routes>
