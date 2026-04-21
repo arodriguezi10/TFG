@@ -411,7 +411,7 @@ const ExerciseSearchFree = () => {
           <Card>
             <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
               <span className="text-[48px]">🔍</span>
-              <p className="font-heading font-bold text-[18px] text-text-high text-center">
+              <p  className="font-heading font-bold text-[18px] text-text-high text-center">
                 No se encontraron ejercicios
               </p>
               <p className="font-body text-[14px] text-text-low text-center">
@@ -440,7 +440,7 @@ const ExerciseSearchFree = () => {
         </Card>
       </section>
 
-      {/* AVANZADO - bloqueado */}
+      {/* AVANZADO - bloqueado  */}
       <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-accent1">
           🔒 AVANZADO
