@@ -22,7 +22,7 @@ const Header = ({ subtitle, title, showback, onBackClick, children }) => {
                     ←
                 </button>
             ) : (
-                <div className="w-[40px]"></div>
+                <div className="w-10"></div>
             )}
 
             <div className="flex flex-col items-center justify-center">
@@ -34,7 +34,7 @@ const Header = ({ subtitle, title, showback, onBackClick, children }) => {
                 </h1>
             </div>
 
-            <div className="flex gap-[10px]">
+            <div className="flex gap-2.5">
                 {children}
             </div>
         </div>
