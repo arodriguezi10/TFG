@@ -7,7 +7,7 @@ const Button = ({ text, bgColor, textColor, borderColor, w, variant = "filled", 
                                           ${variant === "filled" ? textColor : `bg-[text-high]" text ${textColor}`}
                                           ${variant === "filled" ? borderColor : `bg-[bg-primary]" border ${borderColor}`}
                                           ${variant === "filled" ? w : `w-full" w ${w}`}
-                                          h-auto py-[15px] px-[15px] gap-[10px] font-heading text-[20px] rounded-[16px]`}>
+                                          h-auto py-3.75 px-3.75 gap-2.5 font-heading text-[20px] rounded-[16px]`}>
         {text}
     </button>
   );

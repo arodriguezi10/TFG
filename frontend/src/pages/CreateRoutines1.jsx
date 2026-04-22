@@ -194,7 +194,7 @@ const CreateRoutines1 = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
       <section className="w-full flex items-center justify-between">
-        <Header showback subtitle={"Routines1.jsx"} title={"Crear rutinas"} />
+        <Header showback subtitle={"Rutinas"} title={"Crear rutinas"} />
       </section>
 
       {error && (

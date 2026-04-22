@@ -13,11 +13,11 @@ const Header = ({ subtitle, title, showback, onBackClick, children }) => {
     };
 
     return (
-        <div className="w-full px-[16px] flex items-center justify-between">
+        <div className="w-full px-4 flex items-center justify-between">
             {showback ? (
                 <button 
                     onClick={handleBackClick} 
-                    className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center cursor-pointer hover:bg-surface transition-colors"
+                    className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center cursor-pointer hover:bg-surface transition-colors"
                 >
                     ←
                 </button>
