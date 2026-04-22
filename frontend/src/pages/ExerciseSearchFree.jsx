@@ -104,24 +104,31 @@ const ExerciseSearchFree = () => {
     }
   };
 
-  const insertPredefinedExercisesIfNeeded = async () => {
-    try {
-      const { data: existing, error: checkError } = await supabase
-        .from('exercises')
-        .select('id')
-        .eq('is_custom', false)
-        .limit(1);
+ const insertPredefinedExercisesIfNeeded = async () => {
+  try {
+    // Verificar si ya existen ejercicios predefinidos
+    const { data: existing, error: checkError } = await supabase
+      .from('exercises')
+      .select('name')
+      .eq('is_custom', false)
+      .eq('difficulty_level', 'Principiante');
 
-      if (checkError) {
-        console.error('Error al verificar ejercicios:', checkError);
-        return;
-      }
+    if (checkError) {
+      console.error('Error al verificar ejercicios:', checkError);
+      return;
+    }
 
-      if (existing && existing.length > 0) {
-        return;
-      }
+    // Si ya existen 15 ejercicios predefinidos, no insertar más
+    if (existing && existing.length >= 15) {
+      console.log('Ejercicios predefinidos ya existen');
+      return;
+    }
 
-      const exercisesToInsert = predefinedExercises.map(exercise => ({
+    // Solo insertar los que no existen
+    const existingNames = existing.map(e => e.name);
+    const exercisesToInsert = predefinedExercises
+      .filter(exercise => !existingNames.includes(exercise.name))
+      .map(exercise => ({
         name: exercise.name,
         muscle_group: exercise.muscle_group,
         equipment: exercise.equipment,
@@ -130,17 +137,24 @@ const ExerciseSearchFree = () => {
         user_id: null
       }));
 
-      const { error: insertError } = await supabase
-        .from('exercises')
-        .insert(exercisesToInsert);
-
-      if (insertError) {
-        console.error('Error al insertar ejercicios predefinidos:', insertError);
-      }
-    } catch (err) {
-      console.error('Error inesperado al insertar predefinidos:', err);
+    if (exercisesToInsert.length === 0) {
+      console.log('No hay ejercicios nuevos para insertar');
+      return;
     }
-  };
+
+    const { error: insertError } = await supabase
+      .from('exercises')
+      .insert(exercisesToInsert);
+
+    if (insertError) {
+      console.error('Error al insertar ejercicios predefinidos:', insertError);
+    } else {
+      console.log(`${exercisesToInsert.length} ejercicios insertados correctamente`);
+    }
+  } catch (err) {
+    console.error('Error inesperado al insertar predefinidos:', err);
+  }
+};
 
   const handleToggleExercise = (exercise) => {
     if (isExerciseSelected(exercise.id)) {
