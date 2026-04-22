@@ -110,7 +110,7 @@ const ConfigExerciseFree = () => {
           <section key={exercise.id} className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
             <Card>
               <div className="flex items-center gap-[15px]">
-                <p className="bg-primary-bg h-[35px] w-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary text-center flex items-center justify-center">
+                <p className="bg-primary-bg min-w-[35px] h-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary text-center flex items-center justify-center px-[8px]">
                   {index + 1}
                 </p>
 
