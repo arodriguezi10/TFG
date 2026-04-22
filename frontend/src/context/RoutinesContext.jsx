@@ -1,21 +1,20 @@
-// @refresh reset
 import React, { createContext, useState, useContext } from 'react';
 
 const RoutineContext = createContext();
 
-export const useRoutine = () => {
+export function useRoutine() {
   const context = useContext(RoutineContext);
   if (!context) {
     throw new Error('useRoutine debe usarse dentro de RoutineProvider');
   }
   return context;
-};
+}
 
-export const RoutineProvider = ({ children }) => {
+export function RoutineProvider({ children }) {
   const [selectedExercises, setSelectedExercises] = useState([]);
+  const [routineConfiguration, setRoutineConfiguration] = useState(null);
 
   const addExercise = (exercise) => {
-    // Evitar duplicados
     if (!selectedExercises.find(ex => ex.id === exercise.id)) {
       setSelectedExercises([...selectedExercises, exercise]);
     }
@@ -33,17 +32,29 @@ export const RoutineProvider = ({ children }) => {
     return selectedExercises.some(ex => ex.id === exerciseId);
   };
 
+  
+  const saveRoutineConfiguration = (config) => {
+    setRoutineConfiguration(config);
+  };
+
+  const clearRoutineConfiguration = () => {
+    setRoutineConfiguration(null);
+  };
+
+  const value = {
+    selectedExercises,
+    addExercise,
+    removeExercise,
+    clearExercises,
+    isExerciseSelected,
+    routineConfiguration,     
+    saveRoutineConfiguration, 
+    clearRoutineConfiguration 
+  };
+
   return (
-    <RoutineContext.Provider
-      value={{
-        selectedExercises,
-        addExercise,
-        removeExercise,
-        clearExercises,
-        isExerciseSelected,
-      }}
-    >
+    <RoutineContext.Provider value={value}>
       {children}
     </RoutineContext.Provider>
   );
-};
+}

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import { useRoutine } from "../context/RoutinesContext";
 
 const ConfigExerciseFree = () => {
-  const { selectedExercises, removeExercise } = useRoutine();
+  const navigate = useNavigate();
+  const { selectedExercises, removeExercise, saveRoutineConfiguration } = useRoutine();
 
   const [exercisesSeries, setExercisesSeries] = useState(() => {
     const initialSeries = {};
@@ -82,6 +84,24 @@ const ConfigExerciseFree = () => {
         return newState;
       });
     }
+  };
+
+  const handleSaveRoutine = () => {
+    const routineData = {
+      exercises: selectedExercises,
+      series: exercisesSeries,
+      rest: exercisesRest,
+      timestamp: new Date().toISOString()
+    };
+
+    // Guardar en el contexto
+    saveRoutineConfiguration(routineData);
+
+    // Log para debug
+    console.log("Configuración guardada:", routineData);
+
+    // Navegar a la pantalla de crear rutina
+    navigate("/createRoutines1");
   };
 
   return (
@@ -205,35 +225,35 @@ const ConfigExerciseFree = () => {
               <hr className="text-text-low -mx-[16px] mt-[5px] mb-[5px]" />
 
               {/* Técnicas bloqueadas */}
-            <div className="flex gap-[8px] mt-[8px] items-center">
+              <div className="flex gap-[8px] mt-[8px] items-center">
                 <p className="font-body text-[12px] text-text-low flex-shrink-0">Técnica</p>
                 
                 <div className="flex gap-[8px] overflow-x-auto scrollbar-hide">
-                    <button className="bg-orange-bg2 px-[10px] py-[1px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[10px] py-[1px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 Dropset
-                    </button>
+                  </button>
 
-                    <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 Rest-pause
-                    </button>
+                  </button>
 
-                    <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 Topset
-                    </button>
+                  </button>
 
-                    <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 TS/BO
-                    </button>
+                  </button>
 
-                    <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 Parciales
-                    </button>
+                  </button>
 
-                    <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
+                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
                     🔒 Myo-reps
-                    </button>
+                  </button>
                 </div>
-            </div>
+              </div>
 
               <hr className="text-text-low -mx-[16px] mt-[8px] mb-[5px]" />
 
@@ -259,38 +279,38 @@ const ConfigExerciseFree = () => {
       )}
 
       {/* Card de upgrade (solo si hay ejercicios) */}
-        {selectedExercises.length > 0 && (
+      {selectedExercises.length > 0 && (
         <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
-            <button
+          <button
             onClick={() => window.location.href = '/suscription'}
             className="w-full"
-            >
+          >
             <Card variant="outlined">
-                <div className="flex items-center justify-between gap-[12px] cursor-pointer hover:bg-surface/50 transition-colors rounded-[16px] -m-[16px] p-[16px]">
+              <div className="flex items-center justify-between gap-[12px] cursor-pointer hover:bg-surface/50 transition-colors rounded-[16px] -m-[16px] p-[16px]">
                 <div className="flex items-center justify-center gap-[10px]">
-                    <span className="bg-brown-bg h-[55px] w-[55px] px-[16px] rounded-[12px] border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
+                  <span className="bg-brown-bg h-[55px] w-[55px] px-[16px] rounded-[12px] border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
                     👑
-                    </span>
+                  </span>
 
-                    <div className="flex flex-col">
+                  <div className="flex flex-col">
                     <p className="font-heading font-semibold text-[20px] text-text-high leading-tight text-left">
-                        Desbloquea RIR y técnicas avanzadas
+                      Desbloquea RIR y técnicas avanzadas
                     </p>
 
                     <p className="font-body text-[12px] text-text-low text-left">
-                        Con <span className="text-orange">Plan Élite</span> activa control de intensidad por RIR, Dropsets, Rest-pause y más funciones.
+                      Con <span className="text-orange">Plan Élite</span> activa control de intensidad por RIR, Dropsets, Rest-pause y más funciones.
                     </p>
-                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-center text-orange text-[20px]">
-                    →
+                  →
                 </div>
-                </div>
+              </div>
             </Card>
-            </button>
+          </button>
         </section>
-        )}
+      )}
 
       {/* Botón guardar (solo si hay ejercicios) */}
       {selectedExercises.length > 0 && (
@@ -302,12 +322,7 @@ const ConfigExerciseFree = () => {
             textColor={"text-text-high"}
             borderColor={"border-primary"}
             w="w-[100%]"
-            onClick={() => {
-              console.log("Ejercicios:", selectedExercises);
-              console.log("Series:", exercisesSeries);
-              console.log("Descansos:", exercisesRest);
-              alert("Rutina guardada! (Ver consola para datos)");
-            }}
+            onClick={handleSaveRoutine}
           />
         </section>
       )}
