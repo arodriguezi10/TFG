@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [hasRoutine, setHasRoutine] = useState(false);
+  const [nextRoutine, setNextRoutine] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -41,30 +41,63 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
-      // Verificar si tiene rutinas
+      // Obtener la primera rutina del usuario con sus ejercicios
       const { data: routines, error } = await supabase
-        .from("routines") // 👈 Cambia por el nombre de tu tabla de rutinas
-        .select("*")
+        .from("routines")
+        .select(`
+          *,
+          routine_exercises (
+            id,
+            target_sets
+          )
+        `)
         .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
         .limit(1);
 
       if (error) {
         console.error("Error al consultar rutinas:", error);
-        setHasRoutine(false);
+        setNextRoutine(null);
+      } else if (routines && routines.length > 0) {
+        setNextRoutine(routines[0]);
       } else {
-        setHasRoutine(routines && routines.length > 0);
+        setNextRoutine(null);
       }
     } catch (error) {
       console.error("Error:", error);
-      setHasRoutine(false);
+      setNextRoutine(null);
     } finally {
       setLoading(false);
     }
   };
 
   const handleStartRoutine = () => {
-    navigate("/routines1"); //
+    navigate("/routines1");
   };
+
+  const parseMuscles = (musclesJson) => {
+    try {
+      const muscles = JSON.parse(musclesJson);
+      if (Array.isArray(muscles) && muscles.length > 0) {
+        return muscles.slice(0, 3).join(" · ");
+      }
+      return "Sin especificar";
+    } catch {
+      return "Sin especificar";
+    }
+  };
+
+  const getRoutineStats = () => {
+    if (!nextRoutine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
+
+    const exerciseCount = nextRoutine.routine_exercises?.length || 0;
+    const totalSets = nextRoutine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const duration = nextRoutine.estimated_duration_min || 0;
+
+    return { exerciseCount, totalSets, duration };
+  };
+
+  const stats = getRoutineStats();
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
@@ -92,8 +125,8 @@ const Dashboard = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent1"></div>
             </div>
           </Card>
-        ) : hasRoutine ? (
-          // SI HAY RUTINA - Contenido normal
+        ) : nextRoutine ? (
+          // SI HAY RUTINA - Contenido dinámico
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
               · SIGUIENTE EN TU CICLO
@@ -101,22 +134,22 @@ const Dashboard = () => {
 
             <div className="mt-[16px]">
               <p className="font-heading font-extrabold text-text-high text-[28px]">
-                Push A
+                {nextRoutine.name}
               </p>
 
               <div className="flex space-x-2">
                 <span className="bg-surf h-[30px] py-[2px] px-[10px] rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  8 ejercicios
+                  {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
                 </span>
                 <span className="bg-surf h-[30px] py-[2px] px-[10px] rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  Pecho · Hombro · Tríceps
+                  {parseMuscles(nextRoutine.target_muscle_groups)}
                 </span>
               </div>
             </div>
 
             <div className="mt-[16px] w-[95%] flex items-center justify-between">
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
-                120
+                {stats.duration}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
                   MINUTOS
                 </span>
@@ -124,7 +157,7 @@ const Dashboard = () => {
 
               <div className="w-[1px] h-[40px] bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
-                8
+                {stats.exerciseCount}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
                   EJERCICIOS
                 </span>
@@ -132,7 +165,7 @@ const Dashboard = () => {
 
               <div className="w-[1px] h-[40px] bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
-                3x
+                {stats.totalSets}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
                   SERIES
                 </span>

@@ -34,7 +34,7 @@ const MainLayout = () => {
             <span className="text-xs md:text-base font-medium">Panel</span>
           </Link>
           <Link
-            to="/routines4"
+            to="/routines1"
             className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
           >
             <span className="text-xl">&</span>
