@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import { useRoutine } from "../context/RoutinesContext";
 import Card from "../components/Card";
@@ -7,67 +8,55 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 
 const ExerciseSearchFree = () => {
-  const { addExercise, removeExercise, isExerciseSelected, selectedExercises } =
-    useRoutine();
+  const { user } = useContext(AuthContext);
+  const { addExercise, removeExercise, isExerciseSelected, selectedExercises } = useRoutine();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [customExercises, setCustomExercises] = useState([]);
-  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]); // 👈 NUEVO
+  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
 
-  const isSearchActive =
-    location.pathname === "/exerciseSearchFree" ||
-    !location.pathname.includes("config");
+  const isSearchActive = location.pathname === "/exerciseSearchFree" || !location.pathname.includes("config");
   const isConfigActive = location.pathname.includes("config");
 
-  // Ejercicios predefinidos de nivel PRINCIPIANTE (para insertar en DB)
   const predefinedExercises = [
-    // PECHO
-    { id: 101, name: "Flexiones", muscle_group: "Pecho", equipment: "Peso corporal", difficulty_level: "Principiante", is_custom: false },
-    { id: 102, name: "Press plano con mancuernas", muscle_group: "Pecho", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
-    
-    // HOMBRO
-    { id: 103, name: "Press militar con mancuernas (sentado)", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
-    { id: 104, name: "Elevaciones laterales con mancuernas", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
-    
-    // TRÍCEPS
-    { id: 105, name: "Extensión de tríceps", muscle_group: "Tríceps", equipment: "Polea", difficulty_level: "Principiante", is_custom: false },
-    
-    // ESPALDA
-    { id: 106, name: "Jalón al pecho", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    { id: 107, name: "Remo unilateral con mancuernas", muscle_group: "Espalda", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
-    { id: 108, name: "Remo Gironda", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    
-    // BÍCEPS
-    { id: 109, name: "Curl de bíceps", muscle_group: "Bíceps", equipment: "Polea", difficulty_level: "Principiante", is_custom: false },
-    
-    // CUÁDRICEPS
-    { id: 110, name: "Prensa", muscle_group: "Cuádriceps", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    { id: 111, name: "Sentadilla Goblet con pesa rusa", muscle_group: "Cuádriceps", equipment: "Peso libre", difficulty_level: "Principiante", is_custom: false },
-    
-    // FEMORAL
-    { id: 112, name: "Curl femoral sentado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    { id: 113, name: "Curl femoral tumbado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    
-    // GEMELO
-    { id: 114, name: "Elevaciones de talones en multipower", muscle_group: "Gemelo", equipment: "Máquina", difficulty_level: "Principiante", is_custom: false },
-    
-    // CORE
-    { id: 115, name: "Planchas abdominales (Plank)", muscle_group: "Core", equipment: "Peso corporal", difficulty_level: "Principiante", is_custom: false },
+    { name: "Flexiones", muscle_group: "Pecho", equipment: "Peso corporal", difficulty_level: "Principiante" },
+    { name: "Press plano con mancuernas", muscle_group: "Pecho", equipment: "Peso libre", difficulty_level: "Principiante" },
+    { name: "Press militar con mancuernas (sentado)", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante" },
+    { name: "Elevaciones laterales con mancuernas", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante" },
+    { name: "Extensión de tríceps", muscle_group: "Tríceps", equipment: "Polea", difficulty_level: "Principiante" },
+    { name: "Jalón al pecho", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Remo unilateral con mancuernas", muscle_group: "Espalda", equipment: "Peso libre", difficulty_level: "Principiante" },
+    { name: "Remo Gironda", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Curl de bíceps", muscle_group: "Bíceps", equipment: "Polea", difficulty_level: "Principiante" },
+    { name: "Prensa", muscle_group: "Cuádriceps", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Sentadilla Goblet con pesa rusa", muscle_group: "Cuádriceps", equipment: "Peso libre", difficulty_level: "Principiante" },
+    { name: "Curl femoral sentado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Curl femoral tumbado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Elevaciones de talones en multipower", muscle_group: "Gemelo", equipment: "Máquina", difficulty_level: "Principiante" },
+    { name: "Planchas abdominales (Plank)", muscle_group: "Core", equipment: "Peso corporal", difficulty_level: "Principiante" },
   ];
 
   const muscleGroups = ["Todos", "Pecho", "Hombro", "Tríceps", "Espalda", "Bíceps", "Cuádriceps", "Femoral", "Gemelo", "Core"];
 
   useEffect(() => {
-    fetchCustomExercises();
-    insertPredefinedExercisesIfNeeded(); // 👈 NUEVO
-    fetchPredefinedExercises(); // 👈 NUEVO
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
+
+  const loadData = async () => {
+    await insertPredefinedExercisesIfNeeded();
+    await fetchPredefinedExercises();
+    await fetchCustomExercises();
+  };
 
   const fetchCustomExercises = async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
 
@@ -75,22 +64,24 @@ const ExerciseSearchFree = () => {
         .from("exercises")
         .select("*")
         .eq("is_custom", true)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error al cargar ejercicios personalizados:", error);
+        setCustomExercises([]);
         return;
       }
 
       setCustomExercises(data || []);
     } catch (err) {
       console.error("Error inesperado:", err);
+      setCustomExercises([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 👇 NUEVA FUNCIÓN: Cargar ejercicios predefinidos desde la DB
   const fetchPredefinedExercises = async () => {
     try {
       const { data, error } = await supabase
@@ -102,19 +93,19 @@ const ExerciseSearchFree = () => {
 
       if (error) {
         console.error("Error al cargar ejercicios predefinidos:", error);
+        setPredefinedExercisesFromDB([]);
         return;
       }
 
       setPredefinedExercisesFromDB(data || []);
     } catch (err) {
       console.error("Error inesperado:", err);
+      setPredefinedExercisesFromDB([]);
     }
   };
 
-  // 👇 NUEVA FUNCIÓN: Insertar ejercicios predefinidos si no existen
   const insertPredefinedExercisesIfNeeded = async () => {
     try {
-      // Verificar si ya existen ejercicios predefinidos
       const { data: existing, error: checkError } = await supabase
         .from('exercises')
         .select('id')
@@ -126,15 +117,10 @@ const ExerciseSearchFree = () => {
         return;
       }
 
-      // Si ya existen, no hacer nada
       if (existing && existing.length > 0) {
-        console.log('✅ Ejercicios predefinidos ya existen');
         return;
       }
 
-      // Si NO existen, insertarlos
-      console.log('📥 Insertando ejercicios predefinidos...');
-      
       const exercisesToInsert = predefinedExercises.map(exercise => ({
         name: exercise.name,
         muscle_group: exercise.muscle_group,
@@ -150,9 +136,6 @@ const ExerciseSearchFree = () => {
 
       if (insertError) {
         console.error('Error al insertar ejercicios predefinidos:', insertError);
-      } else {
-        console.log('✅ Ejercicios predefinidos insertados correctamente');
-        fetchPredefinedExercises(); // Recargar después de insertar
       }
     } catch (err) {
       console.error('Error inesperado al insertar predefinidos:', err);
@@ -183,19 +166,54 @@ const ExerciseSearchFree = () => {
     navigate("/createPersonalExercise");
   };
 
-  // Filtrar ejercicios personalizados
+  const handleDeleteExercise = async (exercise) => {
+    if (!user) return;
+
+    if (window.confirm(`¿Eliminar "${exercise.name}" permanentemente?`)) {
+      try {
+        const { error } = await supabase
+          .from('exercises')
+          .delete()
+          .eq('id', exercise.id)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error al eliminar:', error);
+          alert('Error al eliminar el ejercicio');
+          return;
+        }
+
+        if (isExerciseSelected(exercise.id)) {
+          removeExercise(exercise.id);
+        }
+
+        await fetchCustomExercises();
+      } catch (err) {
+        console.error('Error inesperado:', err);
+        alert('Error inesperado al eliminar');
+      }
+    }
+  };
+
   const filteredCustomExercises = customExercises.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
     return matchesSearch && matchesMuscle;
   });
 
-  // 👇 CAMBIO: Filtrar ejercicios predefinidos desde la DB
   const filteredPredefinedExercises = predefinedExercisesFromDB.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
     return matchesSearch && matchesMuscle;
   });
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="font-body text-text-low">Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
@@ -309,7 +327,6 @@ const ExerciseSearchFree = () => {
         </button>
       </section>
 
-      {/* MIS EJERCICIOS PERSONALIZADOS */}
       {filteredCustomExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
           <p className="font-subheading font-bold text-[16px] text-primary">
@@ -373,31 +390,7 @@ const ExerciseSearchFree = () => {
                         {isSelected ? "✓" : "+"}
                       </button>
                       <button
-                        onClick={async () => {
-                          if (window.confirm(`¿Eliminar "${exercise.name}" permanentemente?`)) {
-                            try {
-                              const { error } = await supabase
-                                .from('exercises')
-                                .delete()
-                                .eq('id', exercise.id);
-
-                              if (error) {
-                                console.error('Error al eliminar:', error);
-                                alert('Error al eliminar el ejercicio');
-                                return;
-                              }
-
-                              setCustomExercises(customExercises.filter(ex => ex.id !== exercise.id));
-                              
-                              if (isSelected) {
-                                removeExercise(exercise.id);
-                              }
-                            } catch (err) {
-                              console.error('Error inesperado:', err);
-                              alert('Error inesperado al eliminar');
-                            }
-                          }
-                        }}
+                        onClick={() => handleDeleteExercise(exercise)}
                         className="h-[32px] w-[32px] rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
                         title="Eliminar ejercicio permanentemente"
                       >
@@ -412,7 +405,6 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
-      {/* EJERCICIOS PREDEFINIDOS - PRINCIPIANTE */}
       {filteredPredefinedExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
           <p className="font-subheading font-bold text-[16px] text-accent2">
@@ -469,8 +461,7 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
-      {/* MENSAJE SI NO HAY RESULTADOS */}
-      {filteredCustomExercises.length === 0 && filteredPredefinedExercises.length === 0 && (
+      {filteredCustomExercises.length === 0 && filteredPredefinedExercises.length === 0 && !loading && (
         <section className="mt-[16px] w-full px-[16px]">
           <Card>
             <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
@@ -486,7 +477,6 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
-      {/* INTERMEDIO - bloqueado */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-orange">
           🔒 INTERMEDIO
@@ -504,7 +494,6 @@ const ExerciseSearchFree = () => {
         </Card>
       </section>
 
-      {/* AVANZADO - bloqueado */}
       <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-accent1">
           🔒 AVANZADO
@@ -522,7 +511,6 @@ const ExerciseSearchFree = () => {
         </Card>
       </section>
 
-      {/* BOTÓN STICKY */}
       <section className="mt-[16px] w-full px-[16px] fixed bottom-1">
         <Button
           variant="outlined"
