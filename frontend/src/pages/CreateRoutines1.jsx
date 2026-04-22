@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
@@ -11,6 +11,9 @@ const CreateRoutines1 = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { selectedExercises, removeExercise, routineConfiguration, clearExercises, clearRoutineConfiguration } = useRoutine();
+
+  // Bandera para evitar guardar en el primer render
+  const isInitialMount = useRef(true);
 
   // Estados del formulario
   const [routineName, setRoutineName] = useState("");
@@ -37,6 +40,42 @@ const CreateRoutines1 = () => {
     "Cuádriceps", "Femoral", "Glúteo", "Gemelo", 
     "Core", "Trapecios", "Antebrazo"
   ];
+
+  // CARGAR datos de localStorage SOLO AL MONTAR
+  useEffect(() => {
+    const savedData = localStorage.getItem('createRoutineFormData');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        setRoutineName(parsedData.routineName || "");
+        setDescription(parsedData.description || "");
+        setSelectedType(parsedData.selectedType || "");
+        setSelectedDays(parsedData.selectedDays || []);
+        setDuration(parsedData.duration || 45);
+        setSelectedMuscles(parsedData.selectedMuscles || []);
+      } catch (error) {
+        console.error('Error al cargar datos guardados:', error);
+      }
+    }
+  }, []);
+
+  // GUARDAR datos en localStorage cada vez que cambian (EXCEPTO en el primer render)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const formData = {
+      routineName,
+      description,
+      selectedType,
+      selectedDays,
+      duration,
+      selectedMuscles
+    };
+    localStorage.setItem('createRoutineFormData', JSON.stringify(formData));
+  }, [routineName, description, selectedType, selectedDays, duration, selectedMuscles]);
 
   // Funciones de manejo
   const handleTypeClick = (type) => {
@@ -147,9 +186,10 @@ const CreateRoutines1 = () => {
         console.log('Ejercicios insertados correctamente');
       }
 
-      // 3. Limpiar todo y navegar
+      // 3. Limpiar todo (contexto + localStorage) y navegar
       clearRoutineConfiguration();
       clearExercises();
+      localStorage.removeItem('createRoutineFormData');
       alert('¡Rutina guardada exitosamente!');
       navigate("/routines1");
 
