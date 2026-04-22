@@ -12,10 +12,8 @@ const CreateRoutines1 = () => {
   const { user } = useContext(AuthContext);
   const { selectedExercises, removeExercise, routineConfiguration, clearExercises, clearRoutineConfiguration } = useRoutine();
 
-  // Bandera para evitar guardar en el primer render
   const isInitialMount = useRef(true);
 
-  // Estados del formulario
   const [routineName, setRoutineName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -41,7 +39,6 @@ const CreateRoutines1 = () => {
     "Core", "Trapecios", "Antebrazo"
   ];
 
-  // CARGAR datos de localStorage SOLO AL MONTAR
   useEffect(() => {
     const savedData = localStorage.getItem('createRoutineFormData');
     if (savedData) {
@@ -59,7 +56,6 @@ const CreateRoutines1 = () => {
     }
   }, []);
 
-  // GUARDAR datos en localStorage cada vez que cambian (EXCEPTO en el primer render)
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -77,7 +73,6 @@ const CreateRoutines1 = () => {
     localStorage.setItem('createRoutineFormData', JSON.stringify(formData));
   }, [routineName, description, selectedType, selectedDays, duration, selectedMuscles]);
 
-  // Funciones de manejo
   const handleTypeClick = (type) => {
     setSelectedType(type);
   };
@@ -105,9 +100,7 @@ const CreateRoutines1 = () => {
     }
   };
 
-  // Guardar rutina en Supabase
   const handleSaveRoutine = async () => {
-    // Validaciones
     if (!routineName.trim()) {
       setError("El nombre de la rutina es obligatorio");
       return;
@@ -132,7 +125,6 @@ const CreateRoutines1 = () => {
       setLoading(true);
       setError("");
 
-      // 1. Insertar la rutina
       const { data: routineData, error: routineError } = await supabase
         .from('routines')
         .insert([{
@@ -155,7 +147,6 @@ const CreateRoutines1 = () => {
 
       console.log('Rutina creada:', routineData);
 
-      // 2. Insertar los ejercicios con su configuración
       if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
         const exercisesToInsert = selectedExercises.map((exercise, index) => {
           const series = routineConfiguration.series[exercise.id] || [];
@@ -186,7 +177,6 @@ const CreateRoutines1 = () => {
         console.log('Ejercicios insertados correctamente');
       }
 
-      // 3. Limpiar todo (contexto + localStorage) y navegar
       clearRoutineConfiguration();
       clearExercises();
       localStorage.removeItem('createRoutineFormData');
@@ -204,10 +194,9 @@ const CreateRoutines1 = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
       <section className="w-full flex items-center justify-between">
-        <Header showback subtitle={"rutinas"} title={"Crear rutinas"} />
+        <Header showback subtitle={"Routines1.jsx"} title={"Crear rutinas"} />
       </section>
 
-      {/* ERROR MESSAGE */}
       {error && (
         <section className="mt-[16px] w-full px-[16px]">
           <div className="rounded-[16px] bg-red/10 border border-red p-[14px]">
@@ -216,7 +205,6 @@ const CreateRoutines1 = () => {
         </section>
       )}
 
-      {/* INFORMACIÓN BÁSICA */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-text-low text-[16px]">
           INFORMACIÓN BÁSICA
@@ -262,7 +250,6 @@ const CreateRoutines1 = () => {
         </Card>
       </section>
 
-      {/* TIPO DE ENTRENAMIENTO */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           TIPO DE ENTRENAMIENTO
@@ -303,7 +290,6 @@ const CreateRoutines1 = () => {
         </Card>
       </section>
 
-      {/* DÍA Y DURACIÓN */}
       <section className="mt-[16px] w-full px-[16px] w-full flex gap-[10px]">
         <div className="w-full flex flex-col">
           <p className="font-subheading font-bold text-[16px] text-text-low">
@@ -378,7 +364,6 @@ const CreateRoutines1 = () => {
         </div>
       </section>
 
-      {/* EJERCICIOS */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <div className="w-[100%] flex gap-[10px] items-center justify-between">
           <div className="flex gap-[10px] items-center">
@@ -433,43 +418,42 @@ const CreateRoutines1 = () => {
             {selectedExercises.map((exercise, index) => (
               <Card key={exercise.id}>
                 <div className="flex items-center gap-[12px]">
-                  <div className="bg-primary-bg min-w-[35px] h-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary flex items-center justify-center flex-shrink-0 px-[8px]">
-                    {index + 1}
-                  </div>
-
-                  <div className="flex-1 flex items-center gap-[10px]">
+                  <div className="flex flex-col items-center gap-[4px]">
+                    <div className="bg-primary-bg min-w-[35px] h-[24px] rounded-[8px] border border-primary font-heading font-bold text-[14px] text-primary flex items-center justify-center flex-shrink-0 px-[8px]">
+                      {index + 1}
+                    </div>
                     <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
                       {exercise.is_custom ? '⚡' : '💪'}
                     </span>
+                  </div>
 
-                    <div className="flex flex-col flex-1">
-                      <p className="font-subheading font-bold text-[16px] text-text-high">
-                        {exercise.name}
-                      </p>
+                  <div className="flex flex-col flex-1">
+                    <p className="font-subheading font-bold text-[16px] text-text-high">
+                      {exercise.name}
+                    </p>
 
-                      <p className="font-body text-[12px] text-text-low">
-                        {exercise.muscle_group} · {exercise.equipment || 'Sin equipo'}
-                      </p>
+                    <p className="font-body text-[12px] text-text-low">
+                      {exercise.muscle_group} · {exercise.equipment || 'Sin equipo'}
+                    </p>
 
-                      <div className="mt-[3px] flex gap-[6px]">
-                        <span
-                          className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
-                            exercise.difficulty_level === "Principiante"
-                              ? "bg-green-bg2 border-accent2 text-accent2"
-                              : exercise.difficulty_level === "Intermedio"
-                                ? "bg-orange-bg2 border-orange text-orange"
-                                : "bg-accent1-bg1 border-accent1 text-accent1"
-                          }`}
-                        >
-                          {exercise.difficulty_level}
+                    <div className="mt-[3px] flex gap-[6px]">
+                      <span
+                        className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
+                          exercise.difficulty_level === "Principiante"
+                            ? "bg-green-bg2 border-accent2 text-accent2"
+                            : exercise.difficulty_level === "Intermedio"
+                              ? "bg-orange-bg2 border-orange text-orange"
+                              : "bg-accent1-bg1 border-accent1 text-accent1"
+                        }`}
+                      >
+                        {exercise.difficulty_level}
+                      </span>
+
+                      {exercise.is_custom && (
+                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                          Personalizado
                         </span>
-
-                        {exercise.is_custom && (
-                          <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
-                            Personalizado
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
 
@@ -486,7 +470,6 @@ const CreateRoutines1 = () => {
         )}
       </section>
 
-      {/* GRUPOS MUSCULARES */}
       <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           GRUPOS MUSCULARES
@@ -563,7 +546,6 @@ const CreateRoutines1 = () => {
         </Card>
       </section>
 
-      {/* BOTÓN GUARDAR */}
       <section className="mt-[16px] w-full px-[16px] fixed bottom-1 gap-[10px]">
         <Button
           variant="outlined"
