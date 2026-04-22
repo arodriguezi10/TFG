@@ -100,24 +100,24 @@ const Dashboard = () => {
   const stats = getRoutineStats();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
-      <section className="w-[100%] px-[16px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5">
+      <section className="w-full px-4">
         <p className="font-body text-[12px] text-text-low">{today}</p>
 
         <div className="flex justify-between items-center">
-          <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight mt-[5px]">
+          <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight mt-1.25">
             Hola,
             <span className="text-accent1">{name}</span>
           </h1>
 
-          <h1 className="bg-accent1 h-[55px] w-[55px] rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
+          <h1 className="bg-accent1 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
             F
           </h1>
         </div>
       </section>
 
       {/* SECTION QUE CAMBIA SEGÚN SI HAY RUTINAS O NO */}
-      <section className="mt-[16px] flex flex-col px-[16px] items-center justify-center leading-tight">
+      <section className="mt-4 flex flex-col px-4 items-center justify-center leading-tight">
         {loading ? (
           // Estado de carga
           <Card>
@@ -132,22 +132,22 @@ const Dashboard = () => {
               · SIGUIENTE EN TU CICLO
             </p>
 
-            <div className="mt-[16px]">
+            <div className="mt-4">
               <p className="font-heading font-extrabold text-text-high text-[28px]">
                 {nextRoutine.name}
               </p>
 
               <div className="flex space-x-2">
-                <span className="bg-surf h-[30px] py-[2px] px-[10px] rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
+                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                   {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
                 </span>
-                <span className="bg-surf h-[30px] py-[2px] px-[10px] rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
+                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                   {parseMuscles(nextRoutine.target_muscle_groups)}
                 </span>
               </div>
             </div>
 
-            <div className="mt-[16px] w-[95%] flex items-center justify-between">
+            <div className="mt-4 w-[95%] flex items-center justify-between">
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.duration}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
@@ -155,7 +155,7 @@ const Dashboard = () => {
                 </span>
               </p>
 
-              <div className="w-[1px] h-[40px] bg-text-low"></div>
+              <div className="w-px h-10 bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.exerciseCount}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
@@ -163,7 +163,7 @@ const Dashboard = () => {
                 </span>
               </p>
 
-              <div className="w-[1px] h-[40px] bg-text-low"></div>
+              <div className="w-px h-10 bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.totalSets}
                 <span className="font-subheading font-semibold text-[14px] text-text-low">
@@ -172,7 +172,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="mt-[16px] flex items-center">
+            <div className="mt-4 flex items-center">
               <Button
                 variant="outlined"
                 text="& Empezar entrenamiento"
@@ -231,39 +231,39 @@ const Dashboard = () => {
         )}
       </section>
 
-      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px]">
+      <section className="mt-4 flex flex-col px-4 gap-3">
         <p className="font-subheading font-bold text-text-high text-[16px]">
           ¿TODO MARCADO HOY?
         </p>
 
-        <div className="flex gap-[15px]">
+        <div className="flex gap-3.75">
           <Card>
-            <div className="bg-surf h-[30px] w-[30px] rounded-[8px] border border-white/27 flex justify-center">
+            <div className="bg-surf h-7.5 w-7.5 rounded-[8px] border border-white/27 flex justify-center">
               &
             </div>
-            <p className="font-subheading font-semibold text-text-high text-[14px] mt-[5px]">
+            <p className="font-subheading font-semibold text-text-high text-[14px] mt-1.25">
               Pre-entreno
             </p>
-            <p className="font-subheading font-semibold text-text-low text-[14px] mt-[5px]">
+            <p className="font-subheading font-semibold text-text-low text-[14px] mt-1.25">
               Carbohidratos
             </p>
           </Card>
           <Card>
-            <div className="bg-surf h-[30px] w-[30px] rounded-[8px] border border-white/27 flex justify-center">
+            <div className="bg-surf h-7.5 w-7.5 rounded-[8px] border border-white/27 flex justify-center">
               &
             </div>
-            <p className="font-subheading font-semibold text-text-high text-[14px] mt-[5px]">
+            <p className="font-subheading font-semibold text-text-high text-[14px] mt-1.25">
               Post-entreno
             </p>
-            <p className="font-subheading font-semibold text-text-low text-[14px] mt-[5px]">
+            <p className="font-subheading font-semibold text-text-low text-[14px] mt-1.25">
               Proteína
             </p>
           </Card>
         </div>
       </section>
 
-      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px] items-center leading-tight">
-        <div className="w-[100%] flex justify-between">
+      <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
+        <div className="w-full flex justify-between">
           <p className="font-subheading font-bold text-text-high text-[16px]">
             PESO DE HOY
           </p>
@@ -277,9 +277,9 @@ const Dashboard = () => {
             PESO DEL DÍA HOY
           </p>
 
-          <div className="flex mt-[10px] items-center justify-between">
-            <div className="flex gap-[5px]">
-              <div className="w-[153px] h-[60px] rounded-[16px] border border-text-high flex items-center justify-center">
+          <div className="flex mt-2.5 items-center justify-between">
+            <div className="flex gap-1.25">
+              <div className="w-38.25 h-15 rounded-[16px] border border-text-high flex items-center justify-center">
                 <p className="font-heading font-bold text-text-high text-[50px]">
                   75
                   <span className="font-heading font-bold text-text-low text-[50px]">
@@ -293,7 +293,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            <div className="bg-surf rounded-[16px] py-[5px] px-[12px] border border-accent2">
+            <div className="bg-surf rounded-[16px] py-1.25 px-3 border border-accent2">
               <p className="font-heading font-bold text-accent2 text-[22px]">
                 -1,8
               </p>
@@ -303,20 +303,20 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="mt-[5px]">
-            <span className="bg-surf rounded-[16px] py-[2px] px-[12px] border border-accent2 font-subheading font-semibold text-[16px] text-accent2">
+          <div className="mt-1.25">
+            <span className="bg-surf rounded-[16px] py-0.5 px-3 border border-accent2 font-subheading font-semibold text-[16px] text-accent2">
               & 0,4 kg esta semana
             </span>
           </div>
 
-          <div className="w-full h-[65px] bg-surf rounded-[12px] mt-[10px] flex items-center justify-center">
+          <div className="w-full h-16.25 bg-surf rounded-x1 mt-2.5 flex items-center justify-center">
             <p className="text-text-low text-[12px]">Gráfica de peso</p>
           </div>
         </Card>
       </section>
 
-      <section className="mt-[16px] flex flex-col px-[16px] gap-[12px] items-center leading-tight">
-        <div className="w-[100%] flex justify-between">
+      <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
+        <div className="w-full flex justify-between">
           <p className="font-subheading font-bold text-text-high text-[16px]">
             ESTA SEMANA
           </p>
@@ -330,8 +330,8 @@ const Dashboard = () => {
             ENERO 2026
           </p>
 
-          <div className="flex items-center justify-between mt-[16px]">
-            <div className="flex flex-col items-center gap-[7px]">
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 L
               </p>
@@ -341,7 +341,7 @@ const Dashboard = () => {
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center gap-[7px]">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 M
               </p>
@@ -351,7 +351,7 @@ const Dashboard = () => {
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center gap-[7px]">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 X
               </p>
@@ -361,7 +361,7 @@ const Dashboard = () => {
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center gap-[7px]">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 J
               </p>
@@ -371,17 +371,17 @@ const Dashboard = () => {
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center justify-center gap-[7px]">
+            <div className="flex flex-col items-center justify-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 V
               </p>
-              <p className="bg-accent1 h-[22px] w-[33px] rounded-[8px] font-heading font-bold text-text-high text-[16px] flex items-center justify-center">
+              <p className="bg-accent1 h-5.5 w-8.25 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center">
                 13
               </p>
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center gap-[7px]">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 S
               </p>
@@ -391,7 +391,7 @@ const Dashboard = () => {
               <p>·</p>
             </div>
 
-            <div className="flex flex-col items-center gap-[7px]">
+            <div className="flex flex-col items-center gap-1.75">
               <p className="font-subheading font-bold text-text-low text-[16px]">
                 D
               </p>
