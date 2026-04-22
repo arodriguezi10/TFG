@@ -1,22 +1,182 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
 import { useRoutine } from "../context/RoutinesContext";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 
 const CreateRoutines1 = () => {
-
   const navigate = useNavigate();
-  const { selectedExercises, removeExercise } = useRoutine();
+  const { user } = useContext(AuthContext);
+  const { selectedExercises, removeExercise, routineConfiguration, clearExercises, clearRoutineConfiguration } = useRoutine();
+
+  // Estados del formulario
+  const [routineName, setRoutineName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [duration, setDuration] = useState(45);
+  const [selectedMuscles, setSelectedMuscles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const trainingTypes = ["Push", "Pull", "Legs", "Upper", "Lower", "Cardio", "Otro"];
+  const days = [
+    { short: "L", full: "Lunes" },
+    { short: "M", full: "Martes" },
+    { short: "X", full: "Miércoles" },
+    { short: "J", full: "Jueves" },
+    { short: "V", full: "Viernes" },
+    { short: "S", full: "Sábado" },
+    { short: "D", full: "Domingo" }
+  ];
+  const muscleGroups = [
+    "Pecho", "Hombro", "Tríceps", "Espalda", "Bíceps", 
+    "Cuádriceps", "Femoral", "Glúteo", "Gemelo", 
+    "Core", "Trapecios", "Antebrazo"
+  ];
+
+  // Funciones de manejo
+  const handleTypeClick = (type) => {
+    setSelectedType(type);
+  };
+
+  const handleDayClick = (day) => {
+    if (selectedDays.includes(day.full)) {
+      setSelectedDays(selectedDays.filter(d => d !== day.full));
+    } else {
+      setSelectedDays([...selectedDays, day.full]);
+    }
+  };
+
+  const handleMuscleClick = (muscle) => {
+    if (selectedMuscles.includes(muscle)) {
+      setSelectedMuscles(selectedMuscles.filter(m => m !== muscle));
+    } else {
+      setSelectedMuscles([...selectedMuscles, muscle]);
+    }
+  };
+
+  const handleDurationChange = (increment) => {
+    const newDuration = duration + increment;
+    if (newDuration >= 15 && newDuration <= 180) {
+      setDuration(newDuration);
+    }
+  };
+
+  // Guardar rutina en Supabase
+  const handleSaveRoutine = async () => {
+    // Validaciones
+    if (!routineName.trim()) {
+      setError("El nombre de la rutina es obligatorio");
+      return;
+    }
+
+    if (selectedExercises.length === 0) {
+      setError("Debes añadir al menos un ejercicio");
+      return;
+    }
+
+    if (!selectedType) {
+      setError("Selecciona un tipo de entrenamiento");
+      return;
+    }
+
+    if (selectedDays.length === 0) {
+      setError("Selecciona al menos un día");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      // 1. Insertar la rutina
+      const { data: routineData, error: routineError } = await supabase
+        .from('routines')
+        .insert([{
+          user_id: user.id,
+          name: routineName.trim(),
+          description: description.trim() || null,
+          training_type: selectedType,
+          assigned_days: JSON.stringify(selectedDays),
+          estimated_duration_min: duration,
+          target_muscle_groups: JSON.stringify(selectedMuscles)
+        }])
+        .select()
+        .single();
+
+      if (routineError) {
+        console.error('Error al crear rutina:', routineError);
+        setError('Error al guardar la rutina');
+        return;
+      }
+
+      console.log('Rutina creada:', routineData);
+
+      // 2. Insertar los ejercicios con su configuración
+      if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
+        const exercisesToInsert = selectedExercises.map((exercise, index) => {
+          const series = routineConfiguration.series[exercise.id] || [];
+          const restSeconds = parseInt(routineConfiguration.rest[exercise.id]) || 90;
+
+          return {
+            routine_id: routineData.id,
+            exercise_id: exercise.id,
+            order_index: index + 1,
+            target_sets: series.length,
+            target_reps: JSON.stringify(series.map(s => s.reps)),
+            rest_seconds: restSeconds,
+            target_rir: null,
+            intensity_technique: null
+          };
+        });
+
+        const { error: exercisesError } = await supabase
+          .from('routine_exercises')
+          .insert(exercisesToInsert);
+
+        if (exercisesError) {
+          console.error('Error al insertar ejercicios:', exercisesError);
+          setError('Error al guardar los ejercicios de la rutina');
+          return;
+        }
+
+        console.log('Ejercicios insertados correctamente');
+      }
+
+      // 3. Limpiar todo y navegar
+      clearRoutineConfiguration();
+      clearExercises();
+      alert('¡Rutina guardada exitosamente!');
+      navigate("/routines");
+
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      setError('Error inesperado al guardar');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
-
       <section className="w-full flex items-center justify-between">
         <Header showback subtitle={"rutinas"} title={"Crear rutinas"} />
       </section>
 
+      {/* ERROR MESSAGE */}
+      {error && (
+        <section className="mt-[16px] w-full px-[16px]">
+          <div className="rounded-[16px] bg-red/10 border border-red p-[14px]">
+            <p className="font-body text-[13px] text-red">{error}</p>
+          </div>
+        </section>
+      )}
+
+      {/* INFORMACIÓN BÁSICA */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-text-low text-[16px]">
           INFORMACIÓN BÁSICA
@@ -29,39 +189,40 @@ const CreateRoutines1 = () => {
             </label>
 
             <div className="flex gap-[15px]">
-              <p className="text-text-low">&</p>
-
+              <p className="text-text-low">📋</p>
               <input
-                className="font-body text-[16px] text-text-low bg-transparent border-none outline-none w-full"
+                className="font-body text-[16px] text-text-high bg-transparent border-none outline-none w-full"
                 type="text"
                 placeholder="Ej: Push A, Piernas Fuerza..."
+                value={routineName}
+                onChange={(e) => setRoutineName(e.target.value)}
               />
             </div>
           </div>
+
           <div className="w-full h-[1px] bg-text-low mt-[15px]"></div>
+
           <div className="mt-[15px] flex flex-col justify-between">
             <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
               DESCRIPCIÓN
-              <span className="font-subheading font-semibold text-[12px]">
-                {" "}
-                (opcional)
-              </span>
+              <span className="font-subheading font-semibold text-[12px]"> (opcional)</span>
             </label>
 
             <div className="flex gap-[15px]">
-              <p className="text-text-low">&</p>
-
+              <p className="text-text-low">📝</p>
               <textarea
-                className="w-full font-body text-[16px] text-text-low bg-transparent border-none outline-none resize-none"
-                type="text"
+                className="w-full font-body text-[16px] text-text-high bg-transparent border-none outline-none resize-none"
                 placeholder="Ej: Rutina de empuje enfocada en pecho"
                 rows="3"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           </div>
         </Card>
       </section>
 
+      {/* TIPO DE ENTRENAMIENTO */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           TIPO DE ENTRENAMIENTO
@@ -69,38 +230,40 @@ const CreateRoutines1 = () => {
 
         <Card>
           <div className="flex gap-[10px] items-center justify-center">
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Push
-            </button>
-
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Pull
-            </button>
-
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Legs
-            </button>
+            {trainingTypes.slice(0, 3).map((type) => (
+              <button
+                key={type}
+                onClick={() => handleTypeClick(type)}
+                className={`px-[10px] py-[3px] rounded-[16px] border font-body text-[16px] transition-colors ${
+                  selectedType === type
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "bg-surface border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
+
           <div className="mt-[10px] flex gap-[10px] items-center justify-center">
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Upper
-            </button>
-
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Lower
-            </button>
-
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Cardio
-            </button>
-
-            <button className="bg-surface px-[10px] py-[3px] rounded-[16px] border border-text-low font-body text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Otro
-            </button>
+            {trainingTypes.slice(3).map((type) => (
+              <button
+                key={type}
+                onClick={() => handleTypeClick(type)}
+                className={`px-[10px] py-[3px] rounded-[16px] border font-body text-[16px] transition-colors ${
+                  selectedType === type
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "bg-surface border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
           </div>
         </Card>
       </section>
 
+      {/* DÍA Y DURACIÓN */}
       <section className="mt-[16px] w-full px-[16px] w-full flex gap-[10px]">
         <div className="w-full flex flex-col">
           <p className="font-subheading font-bold text-[16px] text-text-low">
@@ -108,34 +271,35 @@ const CreateRoutines1 = () => {
           </p>
           <Card>
             <div className="flex gap-[10px]">
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                L
-              </button>
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                M
-              </button>
-
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                X
-              </button>
-
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                J
-              </button>
+              {days.slice(0, 4).map((day) => (
+                <button
+                  key={day.short}
+                  onClick={() => handleDayClick(day)}
+                  className={`h-[35px] w-[35px] rounded-[8px] border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
+                    selectedDays.includes(day.full)
+                      ? "bg-primary-bg border-primary text-primary"
+                      : "bg-surface border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {day.short}
+                </button>
+              ))}
             </div>
 
             <div className="mt-[10px] flex gap-[10px] flex items-center justify-center">
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                V
-              </button>
-
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                S
-              </button>
-
-              <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-                D
-              </button>
+              {days.slice(4).map((day) => (
+                <button
+                  key={day.short}
+                  onClick={() => handleDayClick(day)}
+                  className={`h-[35px] w-[35px] rounded-[8px] border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
+                    selectedDays.includes(day.full)
+                      ? "bg-primary-bg border-primary text-primary"
+                      : "bg-surface border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {day.short}
+                </button>
+              ))}
             </div>
           </Card>
         </div>
@@ -148,18 +312,24 @@ const CreateRoutines1 = () => {
             <div className="flex flex-col">
               <div>
                 <p className="font-heading font-bold text-[22px] text-primary">
-                  45
+                  {duration}
                   <span className="font-body text-[16px] text-text-low ml-[5px]">
                     min
                   </span>
                 </p>
               </div>
               <div className="mt-[10px] flex justify-end align-end gap-[10px]">
-                <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-primary hover:text-text-high transition-colors">
+                <button
+                  onClick={() => handleDurationChange(-5)}
+                  className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-primary hover:text-text-high transition-colors"
+                >
                   -
                 </button>
 
-                <button className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-primary hover:text-text-high transition-colors">
+                <button
+                  onClick={() => handleDurationChange(5)}
+                  className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-primary hover:text-text-high transition-colors"
+                >
                   +
                 </button>
               </div>
@@ -168,6 +338,7 @@ const CreateRoutines1 = () => {
         </div>
       </section>
 
+      {/* EJERCICIOS */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <div className="w-[100%] flex gap-[10px] items-center justify-between">
           <div className="flex gap-[10px] items-center">
@@ -209,7 +380,7 @@ const CreateRoutines1 = () => {
               <Button
                 onClick={() => navigate("/exerciseSearchFree")}
                 variant="outlined"
-                text="& Añadir ejercicios"
+                text="Añadir ejercicios"
                 bgColor={"bg-primary-bg"}
                 textColor={"text-primary"}
                 borderColor={"border-primary"}
@@ -218,17 +389,14 @@ const CreateRoutines1 = () => {
             </div>
           </Card>
         ) : (
-          // Lista de ejercicios seleccionados
           <div className="flex flex-col gap-[10px]">
             {selectedExercises.map((exercise, index) => (
               <Card key={exercise.id}>
                 <div className="flex items-center gap-[12px]">
-                  {/* Número de orden */}
-                  <div className="bg-primary-bg h-[35px] w-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary flex items-center justify-center flex-shrink-0">
+                  <div className="bg-primary-bg min-w-[35px] h-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary flex items-center justify-center flex-shrink-0 px-[8px]">
                     {index + 1}
                   </div>
 
-                  {/* Info del ejercicio */}
                   <div className="flex-1 flex items-center gap-[10px]">
                     <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
                       {exercise.is_custom ? '⚡' : '💪'}
@@ -265,7 +433,6 @@ const CreateRoutines1 = () => {
                     </div>
                   </div>
 
-                  {/* Botón eliminar */}
                   <button
                     onClick={() => removeExercise(exercise.id)}
                     className="bg-surf h-[35px] w-[35px] rounded-[8px] border border-red flex items-center justify-center text-red text-[20px] hover:bg-red/10 transition-colors flex-shrink-0"
@@ -279,6 +446,7 @@ const CreateRoutines1 = () => {
         )}
       </section>
 
+      {/* GRUPOS MUSCULARES */}
       <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           GRUPOS MUSCULARES
@@ -286,75 +454,86 @@ const CreateRoutines1 = () => {
 
         <Card>
           <p className="font-subheading font-semibold text-[12px] text-text-low">
-            & SELECCIONA LOS QUE TRABAJES
+            SELECCIONA LOS QUE TRABAJES
           </p>
 
           <div className="mt-[10px] flex gap-[10px] items-center justify-center">
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Pecho
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Hombro
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Tríceps
-            </button>
+            {muscleGroups.slice(0, 3).map((muscle) => (
+              <button
+                key={muscle}
+                onClick={() => handleMuscleClick(muscle)}
+                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                  selectedMuscles.includes(muscle)
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {muscle}
+              </button>
+            ))}
           </div>
 
           <div className="mt-[10px] flex gap-[10px] items-center justify-center">
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Espalda
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Bíceps
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Cuádricep
-            </button>
+            {muscleGroups.slice(3, 6).map((muscle) => (
+              <button
+                key={muscle}
+                onClick={() => handleMuscleClick(muscle)}
+                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                  selectedMuscles.includes(muscle)
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {muscle}
+              </button>
+            ))}
           </div>
 
           <div className="mt-[10px] flex gap-[10px] items-center justify-center">
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Femoral
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Glúteo
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Gemelo
-            </button>
+            {muscleGroups.slice(6, 9).map((muscle) => (
+              <button
+                key={muscle}
+                onClick={() => handleMuscleClick(muscle)}
+                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                  selectedMuscles.includes(muscle)
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {muscle}
+              </button>
+            ))}
           </div>
 
           <div className="mt-[10px] flex gap-[10px] items-center justify-center">
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Core
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Trapecios
-            </button>
-
-            <button className="w-[98px] px-[10px] py-[5px] rounded-[8px] border border-text-low font-subheading text-[16px] text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary transition-colors">
-              Antebrazo
-            </button>
+            {muscleGroups.slice(9).map((muscle) => (
+              <button
+                key={muscle}
+                onClick={() => handleMuscleClick(muscle)}
+                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                  selectedMuscles.includes(muscle)
+                    ? "bg-primary-bg border-primary text-primary"
+                    : "border-text-low text-text-low hover:bg-primary-bg hover:border-primary hover:text-primary"
+                }`}
+              >
+                {muscle}
+              </button>
+            ))}
           </div>
         </Card>
       </section>
 
+      {/* BOTÓN GUARDAR */}
       <section className="mt-[16px] w-full px-[16px] fixed bottom-1 gap-[10px]">
         <Button
           variant="outlined"
-          text="& Guardar rutina"
+          text={loading ? "Guardando..." : "Guardar rutina"}
           bgColor={"bg-primary"}
           textColor={"text-text-high"}
           borderColor={"border-primary"}
           w="w-[100%]"
+          onClick={handleSaveRoutine}
+          disabled={loading}
         />
       </section>
     </div>

@@ -1,11 +1,58 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
 const Routines1 = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   
+  const [routines, setRoutines] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchRoutines();
+    }
+  }, [user]);
+
+  const fetchRoutines = async () => {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('routines')
+        .select(`
+          *,
+          routine_exercises (
+            id,
+            exercise_id,
+            order_index,
+            target_sets,
+            exercises (
+              name,
+              muscle_group
+            )
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error al cargar rutinas:', error);
+        return;
+      }
+
+      setRoutines(data || []);
+    } catch (err) {
+      console.error('Error inesperado:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateRoutine = () => {
     navigate("/createRoutines1");
   };
@@ -14,8 +61,77 @@ const Routines1 = () => {
     navigate("/suscription");
   };
 
+  const handleDeleteRoutine = async (routineId) => {
+    if (window.confirm("¿Eliminar esta rutina permanentemente?")) {
+      try {
+        const { error } = await supabase
+          .from('routines')
+          .delete()
+          .eq('id', routineId);
+
+        if (error) {
+          console.error('Error al eliminar rutina:', error);
+          alert('Error al eliminar la rutina');
+          return;
+        }
+
+        // Actualizar la lista local
+        setRoutines(routines.filter(r => r.id !== routineId));
+        alert('Rutina eliminada correctamente');
+      } catch (err) {
+        console.error('Error inesperado:', err);
+        alert('Error inesperado al eliminar');
+      }
+    }
+  };
+
+
+  // Calcular estadísticas de una rutina
+  const getRoutineStats = (routine) => {
+    const exerciseCount = routine.routine_exercises?.length || 0;
+    const totalSets = routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const duration = routine.estimated_duration_min || 0;
+    
+    return { exerciseCount, totalSets, duration };
+  };
+
+  // Parsear días asignados
+  const parseDays = (daysJson) => {
+    try {
+      const days = JSON.parse(daysJson);
+      if (Array.isArray(days) && days.length > 0) {
+        return days.map(d => d.substring(0, 3)).join(', ');
+      }
+      return 'No asignado';
+    } catch {
+      return 'No asignado';
+    }
+  };
+
+  // Parsear grupos musculares
+  const parseMuscles = (musclesJson) => {
+    try {
+      const muscles = JSON.parse(musclesJson);
+      if (Array.isArray(muscles) && muscles.length > 0) {
+        return muscles.slice(0, 3).join(', ') + (muscles.length > 3 ? '...' : '');
+      }
+      return 'Sin especificar';
+    } catch {
+      return 'Sin especificar';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="font-body text-text-low">Cargando rutinas...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
+      {/* HEADER */}
       <section className="w-[100%] flex items-center justify-between">
         <div className="flex flex-col gap-[5px]">
           <div className="flex gap-[15px]">
@@ -31,58 +147,183 @@ const Routines1 = () => {
 
         <div className="flex gap-[10px]">
           <div className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
-            ← {/*! PONER EL ICONO */}
+            🔍
           </div>
 
           <div className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
-            ← {/*! PONER EL ICONO */}
+            ⚙️
           </div>
 
-          {/* Botón rosa superior que navega */}
           <button
             onClick={handleCreateRoutine}
             className="bg-accent1 h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
           >
-            ← {/*! PONER EL ICONO */}
+            +
           </button>
         </div>
       </section>
 
-      <section className="mt-[50px] flex flex-col items-center justify-center gap-[15px]">
-        <span className="bg-surf h-[110px] w-[110px] px-[10px] rounded-[35px] font-body text-[45px] text-primary flex items-center justify-center">
-          & {/*! PONER EL ICONO */}
-        </span>
+      {/* ESTADO VACÍO O LISTA DE RUTINAS */}
+      {routines.length === 0 ? (
+        <>
+          <section className="mt-[50px] flex flex-col items-center justify-center gap-[15px]">
+            <span className="bg-surf h-[110px] w-[110px] px-[10px] rounded-[35px] font-body text-[45px] text-primary flex items-center justify-center">
+              📋
+            </span>
 
-        <p className="mt-[20px] bg-surf px-[14px] py-[2px] rounded-[16px] border border-text-low font-subheading font-semibold text-[16px] text-text-low">
-          Sin rutinas todavía
-        </p>
+            <p className="mt-[20px] bg-surf px-[14px] py-[2px] rounded-[16px] border border-text-low font-subheading font-semibold text-[16px] text-text-low">
+              Sin rutinas todavía
+            </p>
 
-        <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center justify-center text-center">
-          Empieza a contruir tu
-          <span className="text-accent1">entrenamiento</span>
-        </p>
+            <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center justify-center text-center">
+              Empieza a construir tu
+              <span className="text-accent1">entrenamiento</span>
+            </p>
 
-        <p className="font-body text-[16px] text-text-low text-center">
-          Crea tu primera rutina y diseña cada sesión con los ejercicios que
-          necestas.
-        </p>
-      </section>
+            <p className="font-body text-[16px] text-text-low text-center">
+              Crea tu primera rutina y diseña cada sesión con los ejercicios que
+              necesitas.
+            </p>
+          </section>
 
-      {/* Botón principal que navega */}
-      <section className="mt-[30px] flex flex-col gap-[10px]">
-        <Button
-          variant="outlined"
-          text="& Crear rutina"
-          bgColor={"bg-primary"}
-          textColor={"text-text-high"}
-          borderColor={"border-primary"}
-          w="w-[100%]"
-          onClick={handleCreateRoutine}
-        />
-      </section>
+          <section className="mt-[30px] flex flex-col gap-[10px]">
+            <Button
+              variant="outlined"
+              text="Crear rutina"
+              bgColor={"bg-primary"}
+              textColor={"text-text-high"}
+              borderColor={"border-primary"}
+              w="w-[100%]"
+              onClick={handleCreateRoutine}
+            />
+          </section>
+        </>
+      ) : (
+        <>
+          {/* LISTA DE RUTINAS */}
+          <section className="mt-[24px] flex flex-col gap-[12px]">
+            {routines.map((routine) => {
+              const stats = getRoutineStats(routine);
+              
+              return (
+                <Card key={routine.id}>
+                  <div className="flex flex-col gap-[12px]">
+                    {/* Header de la rutina */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-[8px] mb-[4px]">
+                          <h3 className="font-heading font-bold text-[20px] text-text-high">
+                            {routine.name}
+                          </h3>
+                          {routine.training_type && (
+                            <span className="bg-primary-bg px-[8px] py-[2px] rounded-[12px] border border-primary font-body text-[11px] text-primary">
+                              {routine.training_type}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {routine.description && (
+                          <p className="font-body text-[13px] text-text-low mb-[8px]">
+                            {routine.description}
+                          </p>
+                        )}
 
-      {/* Card de progresión - clickeable que navega a suscripción */}
-      <section className="mt-[16px]">
+                        <div className="flex gap-[12px] text-[12px] text-text-low">
+                          <span>📅 {parseDays(routine.assigned_days)}</span>
+                          <span>⏱️ {stats.duration} min</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleDeleteRoutine(routine.id)}
+                        className="bg-surf h-[32px] w-[32px] rounded-[8px] border border-red flex items-center justify-center text-red text-[16px] hover:bg-red/10 transition-colors flex-shrink-0"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+
+                    <hr className="border-text-low" />
+
+                    {/* Estadísticas */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-[16px]">
+                        <div className="text-center">
+                          <p className="font-heading font-bold text-[20px] text-primary">
+                            {stats.exerciseCount}
+                          </p>
+                          <p className="font-body text-[11px] text-text-low">
+                            Ejercicios
+                          </p>
+                        </div>
+
+                        <div className="w-[1px] bg-text-low"></div>
+
+                        <div className="text-center">
+                          <p className="font-heading font-bold text-[20px] text-primary">
+                            {stats.totalSets}
+                          </p>
+                          <p className="font-body text-[11px] text-text-low">
+                            Series
+                          </p>
+                        </div>
+
+                        <div className="w-[1px] bg-text-low"></div>
+
+                        <div className="text-center">
+                          <p className="font-heading font-bold text-[20px] text-primary">
+                            {stats.duration}
+                          </p>
+                          <p className="font-body text-[11px] text-text-low">
+                            Minutos
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          // Aquí puedes navegar a una pantalla de detalle o edición
+                          console.log('Ver rutina:', routine.id);
+                        }}
+                        className="bg-primary h-[36px] px-[16px] rounded-[8px] font-body text-[13px] text-text-high hover:bg-primary/80 transition-colors"
+                      >
+                        Ver
+                      </button>
+                    </div>
+
+                    {/* Grupos musculares */}
+                    {routine.target_muscle_groups && (
+                      <div className="bg-surface rounded-[8px] p-[10px]">
+                        <p className="font-body text-[11px] text-text-low mb-[4px]">
+                          Grupos musculares:
+                        </p>
+                        <p className="font-body text-[12px] text-text-high">
+                          {parseMuscles(routine.target_muscle_groups)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </section>
+
+          {/* Botón crear nueva rutina */}
+          <section className="mt-[16px] flex flex-col gap-[10px]">
+            <Button
+              variant="outlined"
+              text="+ Crear nueva rutina"
+              bgColor={"bg-primary-bg"}
+              textColor={"text-primary"}
+              borderColor={"border-primary"}
+              w="w-[100%]"
+              onClick={handleCreateRoutine}
+            />
+          </section>
+        </>
+      )}
+
+      {/* CARD DE PROGRESIÓN */}
+      <section className="mt-[16px] pb-[16px]">
         <button 
           onClick={handleNavigateToSubscription}
           className="w-full cursor-pointer"

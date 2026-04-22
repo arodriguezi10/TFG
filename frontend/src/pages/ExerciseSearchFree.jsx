@@ -13,6 +13,7 @@ const ExerciseSearchFree = () => {
   const location = useLocation();
 
   const [customExercises, setCustomExercises] = useState([]);
+  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]); // 👈 NUEVO
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
@@ -22,7 +23,7 @@ const ExerciseSearchFree = () => {
     !location.pathname.includes("config");
   const isConfigActive = location.pathname.includes("config");
 
-  // Ejercicios predefinidos de nivel PRINCIPIANTE
+  // Ejercicios predefinidos de nivel PRINCIPIANTE (para insertar en DB)
   const predefinedExercises = [
     // PECHO
     { id: 101, name: "Flexiones", muscle_group: "Pecho", equipment: "Peso corporal", difficulty_level: "Principiante", is_custom: false },
@@ -62,6 +63,8 @@ const ExerciseSearchFree = () => {
 
   useEffect(() => {
     fetchCustomExercises();
+    insertPredefinedExercisesIfNeeded(); // 👈 NUEVO
+    fetchPredefinedExercises(); // 👈 NUEVO
   }, []);
 
   const fetchCustomExercises = async () => {
@@ -87,6 +90,75 @@ const ExerciseSearchFree = () => {
     }
   };
 
+  // 👇 NUEVA FUNCIÓN: Cargar ejercicios predefinidos desde la DB
+  const fetchPredefinedExercises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Principiante")
+        .order("muscle_group", { ascending: true });
+
+      if (error) {
+        console.error("Error al cargar ejercicios predefinidos:", error);
+        return;
+      }
+
+      setPredefinedExercisesFromDB(data || []);
+    } catch (err) {
+      console.error("Error inesperado:", err);
+    }
+  };
+
+  // 👇 NUEVA FUNCIÓN: Insertar ejercicios predefinidos si no existen
+  const insertPredefinedExercisesIfNeeded = async () => {
+    try {
+      // Verificar si ya existen ejercicios predefinidos
+      const { data: existing, error: checkError } = await supabase
+        .from('exercises')
+        .select('id')
+        .eq('is_custom', false)
+        .limit(1);
+
+      if (checkError) {
+        console.error('Error al verificar ejercicios:', checkError);
+        return;
+      }
+
+      // Si ya existen, no hacer nada
+      if (existing && existing.length > 0) {
+        console.log('✅ Ejercicios predefinidos ya existen');
+        return;
+      }
+
+      // Si NO existen, insertarlos
+      console.log('📥 Insertando ejercicios predefinidos...');
+      
+      const exercisesToInsert = predefinedExercises.map(exercise => ({
+        name: exercise.name,
+        muscle_group: exercise.muscle_group,
+        equipment: exercise.equipment,
+        difficulty_level: exercise.difficulty_level,
+        is_custom: false,
+        user_id: null
+      }));
+
+      const { error: insertError } = await supabase
+        .from('exercises')
+        .insert(exercisesToInsert);
+
+      if (insertError) {
+        console.error('Error al insertar ejercicios predefinidos:', insertError);
+      } else {
+        console.log('✅ Ejercicios predefinidos insertados correctamente');
+        fetchPredefinedExercises(); // Recargar después de insertar
+      }
+    } catch (err) {
+      console.error('Error inesperado al insertar predefinidos:', err);
+    }
+  };
+
   const handleToggleExercise = (exercise) => {
     if (isExerciseSelected(exercise.id)) {
       removeExercise(exercise.id);
@@ -104,7 +176,6 @@ const ExerciseSearchFree = () => {
   };
 
   const handleCreateExercise = () => {
-    // Verificar límite de 5 ejercicios personalizados para plan FREE
     if (customExercises.length >= 5) {
       alert("Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro para crear ilimitados.");
       return;
@@ -119,8 +190,8 @@ const ExerciseSearchFree = () => {
     return matchesSearch && matchesMuscle;
   });
 
-  // Filtrar ejercicios predefinidos
-  const filteredPredefinedExercises = predefinedExercises.filter(exercise => {
+  // 👇 CAMBIO: Filtrar ejercicios predefinidos desde la DB
+  const filteredPredefinedExercises = predefinedExercisesFromDB.filter(exercise => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
     return matchesSearch && matchesMuscle;
@@ -176,7 +247,6 @@ const ExerciseSearchFree = () => {
           </button>
         </div>
 
-        {/* BUSCADOR */}
         <div>
           <Input
             variant="outlined"
@@ -189,7 +259,6 @@ const ExerciseSearchFree = () => {
           />
         </div>
 
-        {/* FILTROS POR GRUPO MUSCULAR */}
         <div className="flex gap-[5px] overflow-x-auto scrollbar-hide">
           {muscleGroups.map((muscle) => (
             <button
@@ -291,9 +360,7 @@ const ExerciseSearchFree = () => {
                       </div>
                     </div>
 
-                    {/* Botones de acción */}
                     <div className="flex flex-col items-center gap-[8px]">
-                      {/* Botón seleccionar/deseleccionar */}
                       <button
                         onClick={() => handleToggleExercise(exercise)}
                         className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
@@ -305,7 +372,6 @@ const ExerciseSearchFree = () => {
                       >
                         {isSelected ? "✓" : "+"}
                       </button>
-                      {/* Botón eliminar permanente */}
                       <button
                         onClick={async () => {
                           if (window.confirm(`¿Eliminar "${exercise.name}" permanentemente?`)) {
@@ -321,10 +387,8 @@ const ExerciseSearchFree = () => {
                                 return;
                               }
 
-                              // Actualizar la lista local
                               setCustomExercises(customExercises.filter(ex => ex.id !== exercise.id));
                               
-                              // Si estaba seleccionado, quitarlo de la selección también
                               if (isSelected) {
                                 removeExercise(exercise.id);
                               }
@@ -337,7 +401,7 @@ const ExerciseSearchFree = () => {
                         className="h-[32px] w-[32px] rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
                         title="Eliminar ejercicio permanentemente"
                       >
-                        X
+                        🗑️
                       </button>
                     </div>
                   </div>
@@ -351,7 +415,7 @@ const ExerciseSearchFree = () => {
       {/* EJERCICIOS PREDEFINIDOS - PRINCIPIANTE */}
       {filteredPredefinedExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-          <p className="font-subheading font-bold text-[16px] text-green">
+          <p className="font-subheading font-bold text-[16px] text-accent2">
             💪 PRINCIPIANTE
           </p>
 
@@ -361,7 +425,7 @@ const ExerciseSearchFree = () => {
               <Card key={exercise.id}>
                 <div className="flex items-center justify-between gap-[12px]">
                   <div className="flex items-center gap-[10px]">
-                    <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-text-high flex items-center justify-center">
+                    <span className="bg-green-bg2 h-[50px] w-[50px] rounded-[12px] border border-accent2 font-heading font-extrabold text-[18px] text-accent2 flex items-center justify-center">
                       💪
                     </span>
 
@@ -411,7 +475,7 @@ const ExerciseSearchFree = () => {
           <Card>
             <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
               <span className="text-[48px]">🔍</span>
-              <p  className="font-heading font-bold text-[18px] text-text-high text-center">
+              <p className="font-heading font-bold text-[18px] text-text-high text-center">
                 No se encontraron ejercicios
               </p>
               <p className="font-body text-[14px] text-text-low text-center">
@@ -440,7 +504,7 @@ const ExerciseSearchFree = () => {
         </Card>
       </section>
 
-      {/* AVANZADO - bloqueado  */}
+      {/* AVANZADO - bloqueado */}
       <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-accent1">
           🔒 AVANZADO
