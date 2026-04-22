@@ -32,7 +32,6 @@ export function RoutineProvider({ children }) {
     return selectedExercises.some(ex => ex.id === exerciseId);
   };
 
-  
   const saveRoutineConfiguration = (config) => {
     setRoutineConfiguration(config);
   };
@@ -43,11 +42,13 @@ export function RoutineProvider({ children }) {
 
   const value = {
     selectedExercises,
+    setSelectedExercises,
     addExercise,
     removeExercise,
     clearExercises,
     isExerciseSelected,
-    routineConfiguration,     
+    routineConfiguration,
+    setRoutineConfiguration,
     saveRoutineConfiguration, 
     clearRoutineConfiguration 
   };

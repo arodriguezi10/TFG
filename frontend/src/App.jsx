@@ -17,6 +17,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoutes";
 import Routines1 from "./pages/Routines1";
+import EditRoutine from "./pages/EditRoutine";
 import Routines2 from "./pages/Routines2";
 import Routines3 from "./pages/Routines3";
 import Routines4 from "./pages/Routines4";
@@ -56,7 +57,7 @@ const App = () => {
 
             <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
 
-            
+            <Route path="/editRoutine/:id" element={<EditRoutine />} />
 
             <Route path="/routines2" element={<Routines2 />} />
 
