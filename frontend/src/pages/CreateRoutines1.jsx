@@ -151,7 +151,7 @@ const CreateRoutines1 = () => {
       clearRoutineConfiguration();
       clearExercises();
       alert('¡Rutina guardada exitosamente!');
-      navigate("/routines");
+      navigate("/routines1");
 
     } catch (err) {
       console.error('Error inesperado:', err);
