@@ -1,14 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router-dom"; // 👈 Añadir esto
+import { useNavigate } from "react-router-dom"; 
 
 const Header = ({ subtitle, title, showback, onBackClick, children }) => {
-    const navigate = useNavigate(); // 👈 Añadir esto
+    const navigate = useNavigate(); 
 
     const handleBackClick = () => {
         if (onBackClick) {
-            onBackClick(); // Si se pasa una función personalizada, úsala
+            onBackClick(); 
         } else {
-            navigate(-1); // Si no, vuelve a la página anterior por defecto
+            navigate(-1); 
         }
     };
 
@@ -16,7 +16,7 @@ const Header = ({ subtitle, title, showback, onBackClick, children }) => {
         <div className="w-full px-[16px] flex items-center justify-between">
             {showback ? (
                 <button 
-                    onClick={handleBackClick} // 👈 Añadir onClick
+                    onClick={handleBackClick} 
                     className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center cursor-pointer hover:bg-surface transition-colors"
                 >
                     ←
