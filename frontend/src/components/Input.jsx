@@ -13,7 +13,7 @@ const Input = ({
   return (
     <div className="w-full py-1.25">
       {label && (
-        <label className="text-text-low font-subheading font-bold uppercase text-[12px] mb-1.25 block">
+        <label className="text-text-low font-subheading font-bold uppercase text-[16px] mb-1.25 block">
           {label}
         </label>
       )}
