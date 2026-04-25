@@ -17,7 +17,6 @@ const ExecuteRoutine = () => {
   const [sessionTime, setSessionTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
 
-  // Estado para tracking de series completadas y datos ingresados
   const [exerciseData, setExerciseData] = useState({});
 
   useEffect(() => {
@@ -35,79 +34,76 @@ const ExecuteRoutine = () => {
   }, [isTimerRunning]);
 
   const loadRoutineData = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data: routineData, error } = await supabase
-      .from('routines')
-      .select(`
-        *,
-        routine_exercises (
-          id,
-          exercise_id,
-          order_index,
-          target_sets,
-          target_reps,
-          target_weight,
-          target_rir,
-          rest_seconds,
-          exercises (
+      const { data: routineData, error } = await supabase
+        .from('routines')
+        .select(`
+          *,
+          routine_exercises (
             id,
-            name,
-            muscle_group,
-            equipment
+            exercise_id,
+            order_index,
+            target_sets,
+            target_reps,
+            target_weight,
+            target_rir,
+            rest_seconds,
+            exercises (
+              id,
+              name,
+              muscle_group,
+              equipment
+            )
           )
-        )
-      `)
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single();
+        `)
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .single();
 
-    if (error) throw error;
+      if (error) throw error;
 
-    setRoutine(routineData);
+      setRoutine(routineData);
 
-    // Ordenar ejercicios por order_index
-    const sortedExercises = routineData.routine_exercises
-      .sort((a, b) => a.order_index - b.order_index)
-      .map(re => ({
-        ...re.exercises,
-        routineExerciseId: re.id,
-        targetSets: re.target_sets,
-        // ✅ Ya no uses JSON.parse, los datos ya vienen como arrays
-        targetReps: Array.isArray(re.target_reps) ? re.target_reps : [],
-        targetWeight: Array.isArray(re.target_weight) ? re.target_weight : [],
-        targetRIR: Array.isArray(re.target_rir) ? re.target_rir : [],
-        restSeconds: re.rest_seconds || 90,
-        orderIndex: re.order_index
-      }));
+      const sortedExercises = routineData.routine_exercises
+        .sort((a, b) => a.order_index - b.order_index)
+        .map(re => ({
+          ...re.exercises,
+          routineExerciseId: re.id,
+          targetSets: re.target_sets,
+          targetReps: Array.isArray(re.target_reps) ? re.target_reps : [],
+          targetWeight: Array.isArray(re.target_weight) ? re.target_weight : [],
+          targetRIR: Array.isArray(re.target_rir) ? re.target_rir : [],
+          restSeconds: re.rest_seconds || "90", // ✅ Mantener como string
+          orderIndex: re.order_index
+        }));
 
-    setExercises(sortedExercises);
+      setExercises(sortedExercises);
 
-    // Inicializar estructura de datos para cada ejercicio
-    const initialData = {};
-    sortedExercises.forEach(exercise => {
-      initialData[exercise.id] = exercise.targetReps.map((reps, idx) => ({
-        serieNumber: idx + 1,
-        targetReps: reps,
-        targetWeight: exercise.targetWeight[idx] || 0,
-        targetRIR: exercise.targetRIR[idx] || 0,
-        actualReps: '',
-        actualWeight: '',
-        actualRIR: '',
-        completed: false
-      }));
-    });
-    setExerciseData(initialData);
+      const initialData = {};
+      sortedExercises.forEach(exercise => {
+        initialData[exercise.id] = exercise.targetReps.map((reps, idx) => ({
+          serieNumber: idx + 1,
+          targetReps: reps,
+          targetWeight: exercise.targetWeight[idx] || 0,
+          targetRIR: exercise.targetRIR[idx] || 0,
+          actualReps: '',
+          actualWeight: '',
+          actualRIR: '',
+          completed: false
+        }));
+      });
+      setExerciseData(initialData);
 
-  } catch (error) {
-    console.error('Error cargando rutina:', error);
-    alert('Error al cargar la rutina');
-    navigate('/dashboard');
-  } finally {
-    setLoading(false);
-  }
-};
+    } catch (error) {
+      console.error('Error cargando rutina:', error);
+      alert('Error al cargar la rutina');
+      navigate('/dashboard');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -115,13 +111,28 @@ const ExecuteRoutine = () => {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  const formatRestTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    if (mins > 0) {
-      return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+  const formatRestTime = (restValue) => {
+    // Si no hay valor, usar 1:30 por defecto
+    if (!restValue) return "1:30";
+    
+    const value = String(restValue).trim();
+    
+    // Si ya tiene formato "m:ss" o "mm:ss", devolverlo tal cual
+    if (value.includes(':')) {
+      return value;
     }
-    return `${secs}s`;
+    
+    // Si es un número, convertir a formato m:ss
+    const totalSeconds = parseFloat(value) || 0;
+    
+    if (totalSeconds < 60) {
+      return `${totalSeconds}`;
+    }
+    
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = Math.floor(totalSeconds % 60);
+    
+    return `${mins}:${String(secs).padStart(2, '0')}`;
   };
 
   const toggleExercise = (exerciseId) => {
@@ -208,7 +219,6 @@ const ExecuteRoutine = () => {
 
       if (error) throw error;
 
-      // Preparar datos de ejercicios con nombres
       const enrichedExerciseData = {};
       exercises.forEach(exercise => {
         enrichedExerciseData[exercise.id] = exerciseData[exercise.id].map(serie => ({
@@ -217,7 +227,6 @@ const ExecuteRoutine = () => {
         }));
       });
 
-      // Navegar a WorkoutSummary con datos
       navigate('/WorkoutSumary', {
         state: {
           routineName: routine.name,
@@ -248,7 +257,6 @@ const ExecuteRoutine = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-[100px]">
-      {/* HEADER */}
       <section className="w-full px-4 pt-4 pb-3 sticky top-0 bg-background z-50 border-b border-text-low/20">
         <div className="flex items-center justify-between mb-3">
           <button
@@ -276,7 +284,6 @@ const ExecuteRoutine = () => {
           </button>
         </div>
 
-        {/* TIMER Y CONTROLES */}
         <div className="flex items-center gap-3">
           <div className="flex-1 bg-surf border border-text-low rounded-xl px-4 py-3 flex items-center gap-3">
             <div className="text-accent1 text-[20px]">⏱️</div>
@@ -296,7 +303,6 @@ const ExecuteRoutine = () => {
           </button>
         </div>
 
-        {/* BARRA DE PROGRESO */}
         <div className="mt-3">
           <div className="w-full h-2 bg-surf rounded-full overflow-hidden">
             <div 
@@ -310,7 +316,6 @@ const ExecuteRoutine = () => {
         </div>
       </section>
 
-      {/* LISTA DE EJERCICIOS */}
       <section className="px-4 mt-4 flex flex-col gap-3">
         {exercises.map((exercise, index) => {
           const isExpanded = expandedExercise === exercise.id;
@@ -319,7 +324,6 @@ const ExecuteRoutine = () => {
 
           return (
             <Card key={exercise.id}>
-              {/* HEADER DEL EJERCICIO */}
               <button
                 onClick={() => toggleExercise(exercise.id)}
                 className="w-full flex items-center gap-3"
@@ -346,10 +350,8 @@ const ExecuteRoutine = () => {
                 </div>
               </button>
 
-              {/* CONTENIDO EXPANDIDO */}
               {isExpanded && (
                 <div className="mt-4 pt-4 border-t border-text-low">
-                  {/* DESCANSO */}
                   <div className="flex items-center justify-center gap-2 mb-4 text-[13px] text-text-low">
                     <span>⏳</span>
                     <span>Descanso entre series:</span>
@@ -358,9 +360,7 @@ const ExecuteRoutine = () => {
                     </span>
                   </div>
 
-                  {/* TABLA DE SERIES */}
                   <div className="space-y-2">
-                    {/* HEADER */}
                     <div className="grid grid-cols-[60px_1fr_1fr_1fr_40px] gap-2 text-[11px] font-subheading font-semibold text-text-low uppercase tracking-wide text-center">
                       <div>#</div>
                       <div>REPS</div>
@@ -369,7 +369,6 @@ const ExecuteRoutine = () => {
                       <div></div>
                     </div>
 
-                    {/* SERIES */}
                     {series.map((serie, serieIndex) => (
                       <div 
                         key={serieIndex}
@@ -379,12 +378,10 @@ const ExecuteRoutine = () => {
                             : 'bg-surf border border-text-low'
                         }`}
                       >
-                        {/* NÚMERO DE SERIE */}
                         <div className="font-heading font-bold text-[14px] text-text-high text-center">
                           S{serie.serieNumber}
                         </div>
 
-                        {/* REPS */}
                         <div className="relative">
                           <input
                             type="number"
@@ -396,7 +393,6 @@ const ExecuteRoutine = () => {
                           />
                         </div>
 
-                        {/* PESO */}
                         <div>
                           <input
                             type="number"
@@ -409,7 +405,6 @@ const ExecuteRoutine = () => {
                           />
                         </div>
 
-                        {/* RIR - BLOQUEADO */}
                         <div className="relative">
                           <input
                             type="text"
@@ -422,7 +417,6 @@ const ExecuteRoutine = () => {
                           </div>
                         </div>
 
-                        {/* CHECKBOX */}
                         <button
                           onClick={() => toggleSerieComplete(exercise.id, serieIndex)}
                           disabled={!isSerieComplete(exercise.id, serieIndex)}
@@ -446,7 +440,6 @@ const ExecuteRoutine = () => {
         })}
       </section>
 
-      {/* BOTÓN FINALIZAR */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
         <Button
           variant="outlined"

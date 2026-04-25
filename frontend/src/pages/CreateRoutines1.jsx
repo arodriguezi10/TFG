@@ -150,7 +150,7 @@ const CreateRoutines1 = () => {
       if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
         const exercisesToInsert = selectedExercises.map((exercise, index) => {
           const series = routineConfiguration.series[exercise.id] || [];
-          const restSeconds = parseFloat(routineConfiguration.rest[exercise.id]?.replace(',', '.')) || 90;
+          const restSeconds = routineConfiguration.rest[exercise.id] || "90";
 
           // Extraer target_reps y target_weight de las series
           const targetReps = series.map(s => parseInt(s.reps) || 0);

@@ -163,24 +163,6 @@ const updateRest = (exerciseId, value) => {
     return true;
   };
 
-  const parseRestToSeconds = (restValue) => {
-  if (!restValue || restValue.trim() === "") return 90;
-  
-  const value = restValue.trim();
-  
-  // Si contiene ":" es formato mm:ss o m:ss
-  if (value.includes(':')) {
-    const parts = value.split(':');
-    const minutes = parseInt(parts[0]) || 0;
-    const seconds = parseInt(parts[1]) || 0;
-    return (minutes * 60) + seconds;
-  }
-  
-  // Si es solo número, asumimos segundos
-  const numValue = parseFloat(value.replace(',', '.'));
-  return numValue || 90;
-};
-
 const handleSaveRoutine = () => {
   if (!validateConfiguration()) {
     return;
@@ -198,7 +180,7 @@ const handleSaveRoutine = () => {
         return parseFloat(weight) || 0;
       }),
       target_rir: series.map(() => 0),
-      rest_seconds: parseRestToSeconds(exercisesRest[exercise.id]) 
+      rest_seconds: exercisesRest[exercise.id] || "90" // ✅ Guardar string directo, SIN parseRestToSeconds
     };
   });
 
