@@ -18,6 +18,8 @@ import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoutes";
 import Routines1 from "./pages/Routines1";
 import EditRoutine from "./pages/EditRoutine";
+import ExecuteRoutine from "./pages/ExecuteRoutine";
+import WorkoutSumary from "./pages/WorkoutSumary";
 import Routines2 from "./pages/Routines2";
 import Routines3 from "./pages/Routines3";
 import Routines4 from "./pages/Routines4";
@@ -60,6 +62,10 @@ const App = () => {
             <Route path="/editRoutine/:id" element={<EditRoutine />} />
 
             <Route path="/routines2" element={<Routines2 />} />
+
+            <Route path="/executeRoutine/:id" element={<ExecuteRoutine />} />
+
+            <Route path="/WorkoutSumary" element={<WorkoutSumary />} />
 
             <Route path="/routines3" element={<Routines3 />} />
 

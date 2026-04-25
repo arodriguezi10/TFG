@@ -20,7 +20,7 @@ const Dashboard = () => {
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [nextRoutine, setNextRoutine] = useState(null);
+  const [todayRoutine, setTodayRoutine] = useState(null);
   const [preWorkout, setPreWorkout] = useState(false);
   const [postWorkout, setPostWorkout] = useState(false);
 
@@ -32,10 +32,17 @@ const Dashboard = () => {
   const [monthlyChange, setMonthlyChange] = useState(null);
   const [last7Days, setLast7Days] = useState([]);
 
+  // Estados para calendario
+  const [weekDays, setWeekDays] = useState([]);
+  const [completedSessions, setCompletedSessions] = useState([]);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+
   useEffect(() => {
     loadData();
     loadDailyChecks();
     loadWeightData();
+    loadWeekData();
   }, []);
 
   useEffect(() => {
@@ -44,11 +51,93 @@ const Dashboard = () => {
       if (now.getHours() === 0 && now.getMinutes() === 0) {
         resetDailyChecks();
         loadWeightData();
+        loadWeekData();
+        loadData(); // Recargar rutina del día
       }
     }, 60000);
 
     return () => clearInterval(checkMidnight);
   }, []);
+
+  const loadWeekData = async () => {
+    try {
+      // Generar array de los 7 días de la semana actual (Lunes a Domingo)
+      const currentWeek = getCurrentWeekDays();
+      setWeekDays(currentWeek);
+
+      // Obtener sesiones completadas de esta semana
+      const startOfWeek = currentWeek[0].fullDate;
+      const endOfWeek = currentWeek[6].fullDate;
+
+      const { data: sessions } = await supabase
+        .from('workout_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('session_date', startOfWeek)
+        .lte('session_date', endOfWeek)
+        .order('session_date', { ascending: true });
+
+      setCompletedSessions(sessions || []);
+    } catch (error) {
+      console.error('Error cargando datos de la semana:', error);
+    }
+  };
+
+  const getCurrentWeekDays = () => {
+    const today = new Date();
+    const currentDay = today.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+    
+    // Ajustar para que la semana empiece en Lunes
+    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+    
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + mondayOffset + i);
+      
+      const dayStr = date.toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase();
+      const dayNum = date.getDate();
+      const fullDate = date.toISOString().split('T')[0];
+      const isToday = fullDate === new Date().toISOString().split('T')[0];
+      
+      weekDays.push({
+        dayStr,
+        dayNum,
+        fullDate,
+        isToday
+      });
+    }
+    
+    return weekDays;
+  };
+
+  const isDateCompleted = (dateStr) => {
+    return completedSessions.some(session => session.session_date === dateStr);
+  };
+
+  const getSessionForDate = (dateStr) => {
+    return completedSessions.find(session => session.session_date === dateStr);
+  };
+
+  const handleDayClick = (day) => {
+    // Solo permitir click en días completados
+    const session = getSessionForDate(day.fullDate);
+    
+    if (session) {
+      // Día completado - mostrar resumen
+      setSelectedDay(day);
+      setSelectedSession(session);
+    } else {
+      // Día sin completar - no hacer nada
+      setSelectedDay(null);
+      setSelectedSession(null);
+    }
+  };
+
+  const getTodayDayName = () => {
+    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return days[new Date().getDay()];
+  };
 
   const loadData = async () => {
     try {
@@ -62,6 +151,7 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
+      // Obtener todas las rutinas del usuario
       const { data: routines, error } = await supabase
         .from("routines")
         .select(`
@@ -72,20 +162,31 @@ const Dashboard = () => {
           )
         `)
         .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error al consultar rutinas:", error);
-        setNextRoutine(null);
-      } else if (routines && routines.length > 0) {
-        setNextRoutine(routines[0]);
-      } else {
-        setNextRoutine(null);
+        setTodayRoutine(null);
+        return;
       }
+
+      // Buscar la rutina que corresponde al día de hoy
+      const todayDayName = getTodayDayName();
+      
+      const routineForToday = routines?.find(routine => {
+        try {
+          const assignedDays = JSON.parse(routine.assigned_days || '[]');
+          return assignedDays.includes(todayDayName);
+        } catch {
+          return false;
+        }
+      });
+
+      setTodayRoutine(routineForToday || null);
+
     } catch (error) {
       console.error("Error:", error);
-      setNextRoutine(null);
+      setTodayRoutine(null);
     } finally {
       setLoading(false);
     }
@@ -95,7 +196,6 @@ const Dashboard = () => {
     try {
       const todayDate = new Date().toISOString().split('T')[0];
 
-      // Obtener peso de hoy
       const { data: todayData } = await supabase
         .from('weight_logs')
         .select('*')
@@ -105,7 +205,6 @@ const Dashboard = () => {
 
       setTodayWeight(todayData);
 
-      // Obtener últimos 30 días para cálculos
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().split('T')[0];
@@ -117,7 +216,6 @@ const Dashboard = () => {
         .gte('log_date', thirtyDaysAgoDate)
         .order('log_date', { ascending: false });
 
-      // Calcular variación semanal
       if (recentWeights && recentWeights.length > 0) {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -132,7 +230,6 @@ const Dashboard = () => {
           setWeeklyChange(change);
         }
 
-        // Calcular variación mensual
         const weightThirtyDaysAgo = recentWeights[recentWeights.length - 1];
         if (todayData && weightThirtyDaysAgo) {
           const change = todayData.weight - weightThirtyDaysAgo.weight;
@@ -140,7 +237,6 @@ const Dashboard = () => {
         }
       }
 
-      // Obtener últimos 7 días para el gráfico
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
       const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
@@ -152,7 +248,6 @@ const Dashboard = () => {
         .gte('log_date', sevenDaysAgoDate)
         .order('log_date', { ascending: true });
 
-      // Crear array de 7 días con pesos (null si no hay dato)
       const last7DaysArray = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
@@ -189,7 +284,6 @@ const Dashboard = () => {
     const todayDate = new Date().toISOString().split('T')[0];
 
     try {
-      // Intentar actualizar si ya existe, sino insertar
       const { data: existing } = await supabase
         .from('weight_logs')
         .select('id')
@@ -198,7 +292,6 @@ const Dashboard = () => {
         .single();
 
       if (existing) {
-        // Actualizar peso existente
         const { error } = await supabase
           .from('weight_logs')
           .update({ 
@@ -209,7 +302,6 @@ const Dashboard = () => {
 
         if (error) throw error;
       } else {
-        // Insertar nuevo registro
         const { error } = await supabase
           .from('weight_logs')
           .insert({
@@ -271,7 +363,12 @@ const Dashboard = () => {
   };
 
   const handleStartRoutine = () => {
-    navigate("/routines1");
+    if (todayRoutine) {
+      // Navegar a la pantalla de ejecución de rutina (próximamente)
+      navigate(`/executeRoutine/${todayRoutine.id}`);
+    } else {
+      navigate("/routines1");
+    }
   };
 
   const handleNavigateToProfile = () => {
@@ -291,23 +388,21 @@ const Dashboard = () => {
   };
 
   const getRoutineStats = () => {
-    if (!nextRoutine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
+    if (!todayRoutine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
 
-    const exerciseCount = nextRoutine.routine_exercises?.length || 0;
-    const totalSets = nextRoutine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
-    const duration = nextRoutine.estimated_duration_min || 0;
+    const exerciseCount = todayRoutine.routine_exercises?.length || 0;
+    const totalSets = todayRoutine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const duration = todayRoutine.estimated_duration_min || 0;
 
     return { exerciseCount, totalSets, duration };
   };
 
-  // Función para formatear el peso
   const formatWeight = (weight) => {
     const integerPart = Math.floor(weight);
     const decimalPart = ((weight % 1) * 100).toFixed(0).padStart(2, '0');
     return { integer: integerPart, decimal: decimalPart };
   };
 
-  // Función para renderizar el gráfico simple de línea
   const renderWeightChart = () => {
     if (last7Days.length === 0) return null;
 
@@ -385,15 +480,15 @@ const Dashboard = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent1"></div>
             </div>
           </Card>
-        ) : nextRoutine ? (
+        ) : todayRoutine ? (
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
-              · SIGUIENTE EN TU CICLO
+              · RUTINA DE HOY
             </p>
 
             <div className="mt-4">
               <p className="font-heading font-extrabold text-text-high text-[28px]">
-                {nextRoutine.name}
+                {todayRoutine.name}
               </p>
 
               <div className="flex space-x-2">
@@ -401,7 +496,7 @@ const Dashboard = () => {
                   {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
                 </span>
                 <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  {parseMuscles(nextRoutine.target_muscle_groups)}
+                  {parseMuscles(todayRoutine.target_muscle_groups)}
                 </span>
               </div>
             </div>
@@ -439,44 +534,31 @@ const Dashboard = () => {
                 textColor={"text-text-high"}
                 borderColor={"border-accent1"}
                 w="w-[100%]"
+                onClick={handleStartRoutine}
               />
             </div>
           </Card>
         ) : (
           <Card>
             <div className="flex flex-col items-center text-center py-8">
-              <div className="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-accent1/20 to-accent2/20 border border-accent1/30 flex items-center justify-center">
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-accent1"
-                >
-                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                  <polyline points="14 2 14 8 20 8" />
-                </svg>
+              <div className="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-accent2/20 to-accent3/20 border border-accent2/30 flex items-center justify-center">
+                <span className="text-[40px]">😴</span>
               </div>
 
               <h3 className="font-heading font-extrabold text-xl text-text-high mb-2 tracking-tight">
-                Sin rutinas activas
+                Día de descanso
               </h3>
 
               <p className="text-text-low text-sm font-light leading-relaxed mb-6 max-w-xs">
-                Crea tu primera rutina para empezar a entrenar y alcanzar tus
-                objetivos.
+                No tienes rutinas programadas para hoy. ¡Aprovecha para recuperar!
               </p>
 
               <Button
                 variant="outlined"
-                text="Crear mi primera rutina"
-                bgColor="bg-accent1"
+                text="Ver mis rutinas"
+                bgColor="bg-surf"
                 textColor="text-text-high"
-                borderColor="border-accent1"
+                borderColor="border-text-low"
                 w="w-full"
                 onClick={handleStartRoutine}
               />
@@ -646,6 +728,7 @@ const Dashboard = () => {
         </Card>
       </section>
 
+      {/* CALENDARIO SEMANAL */}
       <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
         <div className="w-full flex justify-between">
           <p className="font-subheading font-bold text-text-high text-[16px]">
@@ -660,81 +743,63 @@ const Dashboard = () => {
         </div>
 
         <Card>
-          <p className="font-subheading font-bold text-text-low text-[16px]">
-            ENERO 2026
+          <p className="font-subheading font-bold text-text-low text-[16px] mb-4">
+            {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase()}
           </p>
 
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                L
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                &
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                M
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                10
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                X
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                &
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                J
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                12
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center justify-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                V
-              </p>
-              <p className="bg-accent1 h-5.5 w-8.25 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center">
-                13
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                S
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                14
-              </p>
-              <p>·</p>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.75">
-              <p className="font-subheading font-bold text-text-low text-[16px]">
-                D
-              </p>
-              <p className="font-heading font-bold text-text-low text-[16px]">
-                15
-              </p>
-              <p>·</p>
-            </div>
+          <div className="flex items-center justify-between">
+            {weekDays.map((day, index) => {
+              const isCompleted = isDateCompleted(day.fullDate);
+              
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleDayClick(day)}
+                  className={`flex flex-col items-center gap-1.75 transition-all ${
+                    isCompleted ? 'cursor-pointer' : 'cursor-default'
+                  }`}
+                  disabled={!isCompleted}
+                >
+                  <p className="font-subheading font-bold text-text-low text-[16px]">
+                    {day.dayStr}
+                  </p>
+                  
+                  <div className={`h-5.5 min-w-[33px] px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${
+                    isCompleted 
+                      ? 'bg-accent1' 
+                      : day.isToday 
+                        ? 'bg-transparent border-2 border-accent1 text-accent1' 
+                        : 'bg-transparent text-text-low'
+                  }`}>
+                    {day.dayNum}
+                  </div>
+                  
+                  <p className="text-[14px]">
+                    {isCompleted ? '✓' : '·'}
+                  </p>
+                </button>
+              );
+            })}
           </div>
+
+          {/* RESUMEN DE DÍA SELECCIONADO */}
+          {selectedDay && selectedSession && (
+            <div className="mt-4 pt-4 border-t border-text-low">
+              <p className="font-heading font-bold text-text-high text-[18px] mb-2">
+                {selectedSession.routine_name}
+              </p>
+              <div className="flex gap-3 text-[14px] text-text-low">
+                <span>⏱️ {selectedSession.duration_minutes || 0} min</span>
+                <span>💪 {selectedSession.exercises_completed || 0} ejercicios</span>
+                <span>🔢 {selectedSession.total_sets || 0} series</span>
+              </div>
+              {selectedSession.notes && (
+                <p className="mt-2 text-[13px] text-text-low italic">
+                  "{selectedSession.notes}"
+                </p>
+              )}
+            </div>
+          )}
         </Card>
       </section>
     </div>
