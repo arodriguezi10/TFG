@@ -10,29 +10,40 @@ import { useContext, useState, useEffect } from "react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  /*mostrar la fecha actual */
   const today = new Date().toLocaleDateString("es-ES", {
     weekday: "long",
     day: "numeric",
     month: "long",
   });
 
-  /*mostrar el el first_name del usuario en pantalla */
   const { user } = useContext(AuthContext);
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [nextRoutine, setNextRoutine] = useState(null);
+  const [preWorkout, setPreWorkout] = useState(false);
+  const [postWorkout, setPostWorkout] = useState(false);
 
   useEffect(() => {
     loadData();
+    loadDailyChecks();
+  }, []);
+
+  useEffect(() => {
+    const checkMidnight = setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0) {
+        resetDailyChecks();
+      }
+    }, 60000);
+
+    return () => clearInterval(checkMidnight);
   }, []);
 
   const loadData = async () => {
     try {
       setLoading(true);
 
-      // Obtener nombre del usuario
       const { data: userData } = await supabase
         .from("users")
         .select("first_name")
@@ -41,7 +52,6 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
-      // Obtener la primera rutina del usuario con sus ejercicios
       const { data: routines, error } = await supabase
         .from("routines")
         .select(`
@@ -71,8 +81,51 @@ const Dashboard = () => {
     }
   };
 
+  const loadDailyChecks = () => {
+    const today = new Date().toDateString();
+    const savedDate = localStorage.getItem('dailyChecksDate');
+    
+    if (savedDate === today) {
+      const preWorkoutStatus = localStorage.getItem('preWorkout') === 'true';
+      const postWorkoutStatus = localStorage.getItem('postWorkout') === 'true';
+      setPreWorkout(preWorkoutStatus);
+      setPostWorkout(postWorkoutStatus);
+    } else {
+      resetDailyChecks();
+    }
+  };
+
+  const resetDailyChecks = () => {
+    setPreWorkout(false);
+    setPostWorkout(false);
+    const today = new Date().toDateString();
+    localStorage.setItem('dailyChecksDate', today);
+    localStorage.setItem('preWorkout', 'false');
+    localStorage.setItem('postWorkout', 'false');
+  };
+
+  const handlePreWorkoutToggle = () => {
+    if (window.confirm('¿Confirmas que has completado tu pre-entreno?')) {
+      const newStatus = !preWorkout;
+      setPreWorkout(newStatus);
+      localStorage.setItem('preWorkout', String(newStatus));
+    }
+  };
+
+  const handlePostWorkoutToggle = () => {
+    if (window.confirm('¿Confirmas que has completado tu post-entreno?')) {
+      const newStatus = !postWorkout;
+      setPostWorkout(newStatus);
+      localStorage.setItem('postWorkout', String(newStatus));
+    }
+  };
+
   const handleStartRoutine = () => {
     navigate("/routines1");
+  };
+
+  const handleNavigateToProfile = () => {
+    navigate("/profile");
   };
 
   const parseMuscles = (musclesJson) => {
@@ -110,23 +163,23 @@ const Dashboard = () => {
             <span className="text-accent1">{name}</span>
           </h1>
 
-          <h1 className="bg-accent1 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
+          <button
+            onClick={handleNavigateToProfile}
+            className="bg-accent1 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high cursor-pointer hover:opacity-80 transition-opacity"
+          >
             F
-          </h1>
+          </button>
         </div>
       </section>
 
-      {/* SECTION QUE CAMBIA SEGÚN SI HAY RUTINAS O NO */}
       <section className="mt-4 flex flex-col px-4 items-center justify-center leading-tight">
         {loading ? (
-          // Estado de carga
           <Card>
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent1"></div>
             </div>
           </Card>
         ) : nextRoutine ? (
-          // SI HAY RUTINA - Contenido dinámico
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
               · SIGUIENTE EN TU CICLO
@@ -184,10 +237,8 @@ const Dashboard = () => {
             </div>
           </Card>
         ) : (
-          // SI NO HAY RUTINA - Pantalla vacía
           <Card>
             <div className="flex flex-col items-center text-center py-8">
-              {/* Icono */}
               <div className="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-accent1/20 to-accent2/20 border border-accent1/30 flex items-center justify-center">
                 <svg
                   width="40"
@@ -205,18 +256,15 @@ const Dashboard = () => {
                 </svg>
               </div>
 
-              {/* Título */}
               <h3 className="font-heading font-extrabold text-xl text-text-high mb-2 tracking-tight">
                 Sin rutinas activas
               </h3>
 
-              {/* Descripción */}
               <p className="text-text-low text-sm font-light leading-relaxed mb-6 max-w-xs">
                 Crea tu primera rutina para empezar a entrenar y alcanzar tus
                 objetivos.
               </p>
 
-              {/* Botón */}
               <Button
                 variant="outlined"
                 text="Crear mi primera rutina"
@@ -237,28 +285,51 @@ const Dashboard = () => {
         </p>
 
         <div className="flex gap-3.75">
-          <Card>
-            <div className="bg-surf h-7.5 w-7.5 rounded-[8px] border border-white/27 flex justify-center">
-              &
-            </div>
-            <p className="font-subheading font-semibold text-text-high text-[14px] mt-1.25">
-              Pre-entreno
-            </p>
-            <p className="font-subheading font-semibold text-text-low text-[14px] mt-1.25">
-              Carbohidratos
-            </p>
-          </Card>
-          <Card>
-            <div className="bg-surf h-7.5 w-7.5 rounded-[8px] border border-white/27 flex justify-center">
-              &
-            </div>
-            <p className="font-subheading font-semibold text-text-high text-[14px] mt-1.25">
-              Post-entreno
-            </p>
-            <p className="font-subheading font-semibold text-text-low text-[14px] mt-1.25">
-              Proteína
-            </p>
-          </Card>
+          <button
+            onClick={handlePreWorkoutToggle}
+            className="flex-1 cursor-pointer"
+          >
+            <Card>
+              <div className={`h-7.5 w-7.5 rounded-[8px] border flex justify-center items-center transition-colors ${
+                preWorkout 
+                  ? 'bg-accent1 border-accent1 text-text-high' 
+                  : 'bg-surf border-white/27 text-text-low'
+              }`}>
+                {preWorkout ? '✓' : '&'}
+              </div>
+              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
+                preWorkout ? 'text-accent1' : 'text-text-high'
+              }`}>
+                Pre-entreno
+              </p>
+              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
+                Carbohidratos
+              </p>
+            </Card>
+          </button>
+
+          <button
+            onClick={handlePostWorkoutToggle}
+            className="flex-1 cursor-pointer"
+          >
+            <Card>
+              <div className={`h-7.5 w-7.5 rounded-[8px] border flex justify-center items-center transition-colors ${
+                postWorkout 
+                  ? 'bg-accent1 border-accent1 text-text-high' 
+                  : 'bg-surf border-white/27 text-text-low'
+              }`}>
+                {postWorkout ? '✓' : '&'}
+              </div>
+              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
+                postWorkout ? 'text-accent1' : 'text-text-high'
+              }`}>
+                Post-entreno
+              </p>
+              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
+                Proteína
+              </p>
+            </Card>
+          </button>
         </div>
       </section>
 
@@ -267,9 +338,12 @@ const Dashboard = () => {
           <p className="font-subheading font-bold text-text-high text-[16px]">
             PESO DE HOY
           </p>
-          <p className="font-subheading font-bold text-primary text-[16px]">
+          <button
+            onClick={() => navigate('#')}
+            className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
+          >
             Historial &
-          </p>
+          </button>
         </div>
 
         <Card>
@@ -320,9 +394,12 @@ const Dashboard = () => {
           <p className="font-subheading font-bold text-text-high text-[16px]">
             ESTA SEMANA
           </p>
-          <p className="font-subheading font-bold text-primary text-[16px]">
+          <button
+            onClick={() => navigate('#')}
+            className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
+          >
             Ver todo &
-          </p>
+          </button>
         </div>
 
         <Card>
