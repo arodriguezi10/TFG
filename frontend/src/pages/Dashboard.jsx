@@ -24,9 +24,18 @@ const Dashboard = () => {
   const [preWorkout, setPreWorkout] = useState(false);
   const [postWorkout, setPostWorkout] = useState(false);
 
+  // Estados para peso
+  const [todayWeight, setTodayWeight] = useState(null);
+  const [weightInput, setWeightInput] = useState("");
+  const [showWeightInput, setShowWeightInput] = useState(false);
+  const [weeklyChange, setWeeklyChange] = useState(null);
+  const [monthlyChange, setMonthlyChange] = useState(null);
+  const [last7Days, setLast7Days] = useState([]);
+
   useEffect(() => {
     loadData();
     loadDailyChecks();
+    loadWeightData();
   }, []);
 
   useEffect(() => {
@@ -34,6 +43,7 @@ const Dashboard = () => {
       const now = new Date();
       if (now.getHours() === 0 && now.getMinutes() === 0) {
         resetDailyChecks();
+        loadWeightData();
       }
     }, 60000);
 
@@ -78,6 +88,146 @@ const Dashboard = () => {
       setNextRoutine(null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadWeightData = async () => {
+    try {
+      const todayDate = new Date().toISOString().split('T')[0];
+
+      // Obtener peso de hoy
+      const { data: todayData } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('log_date', todayDate)
+        .single();
+
+      setTodayWeight(todayData);
+
+      // Obtener últimos 30 días para cálculos
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().split('T')[0];
+
+      const { data: recentWeights } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('log_date', thirtyDaysAgoDate)
+        .order('log_date', { ascending: false });
+
+      // Calcular variación semanal
+      if (recentWeights && recentWeights.length > 0) {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+
+        const weightSevenDaysAgo = recentWeights.find(
+          w => w.log_date <= sevenDaysAgoDate
+        );
+
+        if (todayData && weightSevenDaysAgo) {
+          const change = todayData.weight - weightSevenDaysAgo.weight;
+          setWeeklyChange(change);
+        }
+
+        // Calcular variación mensual
+        const weightThirtyDaysAgo = recentWeights[recentWeights.length - 1];
+        if (todayData && weightThirtyDaysAgo) {
+          const change = todayData.weight - weightThirtyDaysAgo.weight;
+          setMonthlyChange(change);
+        }
+      }
+
+      // Obtener últimos 7 días para el gráfico
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+      const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+
+      const { data: last7DaysData } = await supabase
+        .from('weight_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('log_date', sevenDaysAgoDate)
+        .order('log_date', { ascending: true });
+
+      // Crear array de 7 días con pesos (null si no hay dato)
+      const last7DaysArray = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const weightLog = last7DaysData?.find(w => w.log_date === dateStr);
+        last7DaysArray.push({
+          date: dateStr,
+          weight: weightLog?.weight || null,
+          dayName: date.toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase()
+        });
+      }
+
+      setLast7Days(last7DaysArray);
+
+    } catch (error) {
+      console.error('Error cargando datos de peso:', error);
+    }
+  };
+
+  const handleSaveWeight = async () => {
+    if (!weightInput || isNaN(weightInput)) {
+      alert('Por favor ingresa un peso válido');
+      return;
+    }
+
+    const weight = parseFloat(weightInput);
+    if (weight <= 0 || weight > 500) {
+      alert('El peso debe estar entre 0 y 500 kg');
+      return;
+    }
+
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    try {
+      // Intentar actualizar si ya existe, sino insertar
+      const { data: existing } = await supabase
+        .from('weight_logs')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('log_date', todayDate)
+        .single();
+
+      if (existing) {
+        // Actualizar peso existente
+        const { error } = await supabase
+          .from('weight_logs')
+          .update({ 
+            weight: weight,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existing.id);
+
+        if (error) throw error;
+      } else {
+        // Insertar nuevo registro
+        const { error } = await supabase
+          .from('weight_logs')
+          .insert({
+            user_id: user.id,
+            weight: weight,
+            log_date: todayDate
+          });
+
+        if (error) throw error;
+      }
+
+      setShowWeightInput(false);
+      setWeightInput("");
+      await loadWeightData();
+      alert('✅ Peso guardado correctamente');
+    } catch (error) {
+      console.error('Error guardando peso:', error);
+      alert('❌ Error al guardar el peso');
     }
   };
 
@@ -148,6 +298,62 @@ const Dashboard = () => {
     const duration = nextRoutine.estimated_duration_min || 0;
 
     return { exerciseCount, totalSets, duration };
+  };
+
+  // Función para formatear el peso
+  const formatWeight = (weight) => {
+    const integerPart = Math.floor(weight);
+    const decimalPart = ((weight % 1) * 100).toFixed(0).padStart(2, '0');
+    return { integer: integerPart, decimal: decimalPart };
+  };
+
+  // Función para renderizar el gráfico simple de línea
+  const renderWeightChart = () => {
+    if (last7Days.length === 0) return null;
+
+    const validWeights = last7Days.filter(d => d.weight !== null).map(d => d.weight);
+    if (validWeights.length === 0) {
+      return (
+        <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 flex items-center justify-center">
+          <p className="text-text-low text-[12px]">Sin datos suficientes para gráfico</p>
+        </div>
+      );
+    }
+
+    const minWeight = Math.min(...validWeights);
+    const maxWeight = Math.max(...validWeights);
+    const range = maxWeight - minWeight || 1;
+
+    return (
+      <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 p-3 flex items-end justify-between gap-1">
+        {last7Days.map((day, index) => {
+          const height = day.weight 
+            ? ((day.weight - minWeight) / range) * 100 
+            : 0;
+          
+          return (
+            <div key={index} className="flex flex-col items-center flex-1 gap-1">
+              <div className="w-full flex items-end justify-center" style={{ height: '40px' }}>
+                {day.weight ? (
+                  <div 
+                    className="w-full bg-accent1 rounded-t-sm transition-all"
+                    style={{ 
+                      height: `${Math.max(height, 10)}%`,
+                      minHeight: '4px'
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-1 bg-text-low/20 rounded-full" />
+                )}
+              </div>
+              <span className="text-[10px] text-text-low font-semibold">
+                {day.dayName}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   const stats = getRoutineStats();
@@ -347,45 +553,96 @@ const Dashboard = () => {
         </div>
 
         <Card>
-          <p className="font-subheading font-bold text-text-low text-[16px]">
-            PESO DEL DÍA HOY
-          </p>
+          <div className="flex justify-between items-center mb-3">
+            <p className="font-subheading font-bold text-text-low text-[16px]">
+              PESO DEL DÍA HOY
+            </p>
+            <button
+              onClick={() => setShowWeightInput(!showWeightInput)}
+              className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm"
+            >
+              {todayWeight ? '✏️' : '+'}
+            </button>
+          </div>
 
-          <div className="flex mt-2.5 items-center justify-between">
-            <div className="flex gap-1.25">
-              <div className="w-38.25 h-15 rounded-[16px] border border-text-high flex items-center justify-center">
-                <p className="font-heading font-bold text-text-high text-[50px]">
-                  75
-                  <span className="font-heading font-bold text-text-low text-[50px]">
-                    ,36
+          {showWeightInput && (
+            <div className="mb-4 p-3 bg-surf rounded-xl border border-text-low">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="75,5"
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
+                  className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2.5 text-text-high text-[16px] font-heading font-semibold outline-none focus:border-accent1 transition-colors"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveWeight}
+                  className="shrink-0 bg-accent1 text-text-high px-4 py-2.5 rounded-lg font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-sm"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          )}
+
+          {todayWeight ? (
+            <>
+              <div className="flex mt-2 items-center justify-between">
+                <div className="flex items-baseline gap-2">
+                  <div className="flex items-baseline">
+                    <span className="font-heading font-extrabold text-[64px] text-text-high leading-none tracking-tight">
+                      {formatWeight(todayWeight.weight).integer}
+                    </span>
+                    <span className="font-heading font-bold text-[32px] text-text-low leading-none">
+                      ,{formatWeight(todayWeight.weight).decimal}
+                    </span>
+                  </div>
+                  <span className="font-heading font-bold text-[24px] text-text-low mb-1">
+                    kg
                   </span>
-                </p>
+                </div>
+
+                {monthlyChange !== null && (
+                  <div className="bg-surf rounded-xl py-2 px-3.5 border border-accent2 shadow-sm">
+                    <p className="font-heading font-extrabold text-accent2 text-[20px] leading-tight">
+                      {monthlyChange > 0 ? '+' : ''}{monthlyChange.toFixed(1)}
+                    </p>
+                    <p className="font-subheading font-semibold text-text-low text-[11px] leading-tight mt-0.5">
+                      kg/mes
+                    </p>
+                  </div>
+                )}
               </div>
 
-              <p className="font-heading font-bold text-text-low  text-[22px]">
-                kg
+              {weeklyChange !== null && (
+                <div className="mt-3">
+                  <span className="inline-flex items-center bg-surf rounded-xl py-1.5 px-3.5 border border-accent2 font-subheading font-semibold text-[14px] text-accent2 shadow-sm">
+                    <span className="mr-1.5">📊</span>
+                    {weeklyChange > 0 ? '+' : ''}{weeklyChange.toFixed(1)} kg esta semana
+                  </span>
+                </div>
+              )}
+
+              {renderWeightChart()}
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <div className="w-16 h-16 mb-4 rounded-full bg-accent1/10 border border-accent1/30 flex items-center justify-center">
+                <span className="text-[32px]">⚖️</span>
+              </div>
+              <p className="text-text-low text-[14px] mb-4 font-subheading">
+                No has registrado tu peso hoy
               </p>
+              <button
+                onClick={() => setShowWeightInput(true)}
+                className="bg-accent1 text-text-high px-6 py-2.5 rounded-xl font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-md"
+              >
+                Registrar peso
+              </button>
             </div>
-
-            <div className="bg-surf rounded-[16px] py-1.25 px-3 border border-accent2">
-              <p className="font-heading font-bold text-accent2 text-[22px]">
-                -1,8
-              </p>
-              <p className="font-subheading font-semibold text-text-low text-[12px]">
-                kg/mes
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-1.25">
-            <span className="bg-surf rounded-[16px] py-0.5 px-3 border border-accent2 font-subheading font-semibold text-[16px] text-accent2">
-              & 0,4 kg esta semana
-            </span>
-          </div>
-
-          <div className="w-full h-16.25 bg-surf rounded-x1 mt-2.5 flex items-center justify-center">
-            <p className="text-text-low text-[12px]">Gráfica de peso</p>
-          </div>
+          )}
         </Card>
       </section>
 
