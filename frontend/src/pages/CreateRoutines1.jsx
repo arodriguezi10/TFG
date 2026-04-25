@@ -150,16 +150,25 @@ const CreateRoutines1 = () => {
       if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
         const exercisesToInsert = selectedExercises.map((exercise, index) => {
           const series = routineConfiguration.series[exercise.id] || [];
-          const restSeconds = parseInt(routineConfiguration.rest[exercise.id]) || 90;
+          const restSeconds = parseFloat(routineConfiguration.rest[exercise.id]?.replace(',', '.')) || 90;
+
+          // Extraer target_reps y target_weight de las series
+          const targetReps = series.map(s => parseInt(s.reps) || 0);
+          const targetWeight = series.map(s => {
+            const weight = s.weight?.replace(',', '.') || '0';
+            return parseFloat(weight) || 0;
+          });
+          const targetRIR = series.map(() => 0); // RIR en 0 para plan free
 
           return {
             routine_id: routineData.id,
             exercise_id: exercise.id,
             order_index: index + 1,
             target_sets: series.length,
-            target_reps: JSON.stringify(series.map(s => s.reps)),
+            target_reps: targetReps,    
+            target_weight: targetWeight,
+            target_rir: targetRIR,      
             rest_seconds: restSeconds,
-            target_rir: null,
             intensity_technique: null
           };
         });

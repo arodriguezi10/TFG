@@ -38,36 +38,7 @@ const ConfigExerciseFree = () => {
     return initialRest;
   });
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
 
-    setExercisesSeries(prev => {
-      const updated = { ...prev };
-      selectedExercises.forEach(exercise => {
-        if (!updated[exercise.id]) {
-          updated[exercise.id] = [
-            { id: 1, reps: "", weight: "" },
-            { id: 2, reps: "", weight: "" },
-            { id: 3, reps: "", weight: "" }
-          ];
-        }
-      });
-      return updated;
-    });
-
-    setExercisesRest(prev => {
-      const updated = { ...prev };
-      selectedExercises.forEach(exercise => {
-        if (!updated[exercise.id]) {
-          updated[exercise.id] = "";
-        }
-      });
-      return updated;
-    });
-  }, [selectedExercises]);
 
   useEffect(() => {
     if (!isInitialMount.current) {
@@ -135,14 +106,15 @@ const ConfigExerciseFree = () => {
     }));
   };
 
-  const updateRest = (exerciseId, value) => {
-    if (!validateNumberInput(value, true)) return;
-    
-    setExercisesRest(prev => ({
-      ...prev,
-      [exerciseId]: value
-    }));
-  };
+const updateRest = (exerciseId, value) => {
+  // Permitir números, decimales, comas, puntos y dos puntos para formato mm:ss
+  if (!/^[\d:,.\s]*$/.test(value)) return;
+  
+  setExercisesRest(prev => ({
+    ...prev,
+    [exerciseId]: value
+  }));
+};
 
   const handleRemoveExercise = (exerciseId) => {
     const exercise = selectedExercises.find(ex => ex.id === exerciseId);
@@ -191,22 +163,56 @@ const ConfigExerciseFree = () => {
     return true;
   };
 
-  const handleSaveRoutine = () => {
-    if (!validateConfiguration()) {
-      return;
-    }
+  const parseRestToSeconds = (restValue) => {
+  if (!restValue || restValue.trim() === "") return 90;
+  
+  const value = restValue.trim();
+  
+  // Si contiene ":" es formato mm:ss o m:ss
+  if (value.includes(':')) {
+    const parts = value.split(':');
+    const minutes = parseInt(parts[0]) || 0;
+    const seconds = parseInt(parts[1]) || 0;
+    return (minutes * 60) + seconds;
+  }
+  
+  // Si es solo número, asumimos segundos
+  const numValue = parseFloat(value.replace(',', '.'));
+  return numValue || 90;
+};
 
-    const routineData = {
-      exercises: selectedExercises,
-      series: exercisesSeries,
-      rest: exercisesRest,
-      timestamp: new Date().toISOString()
+const handleSaveRoutine = () => {
+  if (!validateConfiguration()) {
+    return;
+  }
+
+  const transformedExercises = selectedExercises.map(exercise => {
+    const series = exercisesSeries[exercise.id] || [];
+    
+    return {
+      exercise_id: exercise.id,
+      exercise: exercise,
+      target_reps: series.map(s => parseInt(s.reps) || 0),
+      target_weight: series.map(s => {
+        const weight = s.weight.replace(',', '.');
+        return parseFloat(weight) || 0;
+      }),
+      target_rir: series.map(() => 0),
+      rest_seconds: parseRestToSeconds(exercisesRest[exercise.id]) 
     };
+  });
 
-    saveRoutineConfiguration(routineData);
-    console.log("Configuración guardada:", routineData);
-    navigate("/createRoutines1");
+  const routineData = {
+    exercises: transformedExercises,
+    series: exercisesSeries,
+    rest: exercisesRest,
+    timestamp: new Date().toISOString()
   };
+
+  saveRoutineConfiguration(routineData);
+  console.log("Configuración guardada:", routineData);
+  navigate("/createRoutines1");
+};
 
   const isInputFilled = (value) => {
     return value && value.trim() !== "";
@@ -268,16 +274,16 @@ const ConfigExerciseFree = () => {
 
                   <input
                     type="text"
-                    inputMode="decimal"
+                    inputMode="text"
                     name={`descanso-${exercise.id}`}
                     value={exercisesRest[exercise.id] || ""}
                     onChange={(e) => updateRest(exercise.id, e.target.value)}
-                    className={`w-[57px] h-[29px] rounded-[8px] border font-heading font-bold text-[22px] text-center ${
+                    className={`w-[70px] h-[29px] rounded-[8px] border font-heading font-bold text-[18px] text-center ${
                       isInputFilled(exercisesRest[exercise.id])
                         ? "bg-accent2 border-accent2 text-background"
                         : "bg-green-bg2 border-accent2 text-accent2"
                     }`}
-                    placeholder="90"
+                    placeholder="1:30"
                   />
                 </div>
               </div>

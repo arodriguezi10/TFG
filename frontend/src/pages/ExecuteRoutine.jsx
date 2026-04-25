@@ -35,72 +35,79 @@ const ExecuteRoutine = () => {
   }, [isTimerRunning]);
 
   const loadRoutineData = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const { data: routineData, error } = await supabase
-        .from('routines')
-        .select(`
-          *,
-          routine_exercises (
+    const { data: routineData, error } = await supabase
+      .from('routines')
+      .select(`
+        *,
+        routine_exercises (
+          id,
+          exercise_id,
+          order_index,
+          target_sets,
+          target_reps,
+          target_weight,
+          target_rir,
+          rest_seconds,
+          exercises (
             id,
-            exercise_id,
-            order_index,
-            target_sets,
-            target_reps,
-            rest_seconds,
-            exercises (
-              id,
-              name,
-              muscle_group,
-              equipment
-            )
+            name,
+            muscle_group,
+            equipment
           )
-        `)
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
+        )
+      `)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single();
 
-      if (error) throw error;
+    if (error) throw error;
 
-      setRoutine(routineData);
+    setRoutine(routineData);
 
-      // Ordenar ejercicios por order_index
-      const sortedExercises = routineData.routine_exercises
-        .sort((a, b) => a.order_index - b.order_index)
-        .map(re => ({
-          ...re.exercises,
-          routineExerciseId: re.id,
-          targetSets: re.target_sets,
-          targetReps: JSON.parse(re.target_reps || '[]'),
-          restSeconds: re.rest_seconds || 90,
-          orderIndex: re.order_index
-        }));
+    // Ordenar ejercicios por order_index
+    const sortedExercises = routineData.routine_exercises
+      .sort((a, b) => a.order_index - b.order_index)
+      .map(re => ({
+        ...re.exercises,
+        routineExerciseId: re.id,
+        targetSets: re.target_sets,
+        // ✅ Ya no uses JSON.parse, los datos ya vienen como arrays
+        targetReps: Array.isArray(re.target_reps) ? re.target_reps : [],
+        targetWeight: Array.isArray(re.target_weight) ? re.target_weight : [],
+        targetRIR: Array.isArray(re.target_rir) ? re.target_rir : [],
+        restSeconds: re.rest_seconds || 90,
+        orderIndex: re.order_index
+      }));
 
-      setExercises(sortedExercises);
+    setExercises(sortedExercises);
 
-      // Inicializar estructura de datos para cada ejercicio
-      const initialData = {};
-      sortedExercises.forEach(exercise => {
-        initialData[exercise.id] = exercise.targetReps.map((reps, idx) => ({
-          serieNumber: idx + 1,
-          targetReps: reps,
-          actualReps: '',
-          actualWeight: '',
-          actualRIR: '',
-          completed: false
-        }));
-      });
-      setExerciseData(initialData);
+    // Inicializar estructura de datos para cada ejercicio
+    const initialData = {};
+    sortedExercises.forEach(exercise => {
+      initialData[exercise.id] = exercise.targetReps.map((reps, idx) => ({
+        serieNumber: idx + 1,
+        targetReps: reps,
+        targetWeight: exercise.targetWeight[idx] || 0,
+        targetRIR: exercise.targetRIR[idx] || 0,
+        actualReps: '',
+        actualWeight: '',
+        actualRIR: '',
+        completed: false
+      }));
+    });
+    setExerciseData(initialData);
 
-    } catch (error) {
-      console.error('Error cargando rutina:', error);
-      alert('Error al cargar la rutina');
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error('Error cargando rutina:', error);
+    alert('Error al cargar la rutina');
+    navigate('/dashboard');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -394,7 +401,7 @@ const ExecuteRoutine = () => {
                           <input
                             type="number"
                             step="0.5"
-                            placeholder="0"
+                            placeholder={serie.targetWeight > 0 ? serie.targetWeight.toString() : "0"}
                             value={serie.actualWeight}
                             onChange={(e) => handleSerieInputChange(exercise.id, serieIndex, 'actualWeight', e.target.value)}
                             disabled={serie.completed}
@@ -406,7 +413,7 @@ const ExecuteRoutine = () => {
                         <div className="relative">
                           <input
                             type="text"
-                            value="—"
+                            value={serie.targetRIR > 0 ? serie.targetRIR : "—"}
                             disabled
                             className="w-full bg-background/50 border border-text-low/50 rounded-lg px-2 py-1.5 text-text-low/50 text-[14px] font-heading font-semibold text-center cursor-not-allowed"
                           />
