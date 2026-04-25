@@ -445,7 +445,7 @@ const ExecuteRoutine = () => {
           variant="outlined"
           text="✓ Finalizar entrenamiento"
           bgColor="bg-accent3"
-          textColor="text-background"
+          textColor="text-green"
           borderColor="border-accent3"
           w="w-full"
           onClick={handleFinishSession}
