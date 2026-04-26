@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Header from "../components/Header";
@@ -16,6 +16,16 @@ const Checkout = () => {
     price: '9,99',
     billingText: 'mensual'
   };
+
+  // Estados para los datos de la tarjeta
+  const [cardData, setCardData] = useState({
+    number: '1234 5678 9101 1234',
+    holder: 'Santiago Segura',
+    expiry: '12 / 28',
+    cvv: '123'
+  });
+
+  const [isEditingCard, setIsEditingCard] = useState(false);
 
   // Calcular fecha de cobro (7 días desde hoy)
   const getChargeDate = () => {
@@ -54,6 +64,36 @@ const Checkout = () => {
     elite: 'bg-surface'
   };
 
+  const handleCardInputChange = (field, value) => {
+    setCardData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const formatCardNumber = (value) => {
+    const cleaned = value.replace(/\s/g, '');
+    const match = cleaned.match(/.{1,4}/g);
+    return match ? match.join(' ') : cleaned;
+  };
+
+  const handleCardNumberChange = (e) => {
+    const formatted = formatCardNumber(e.target.value.replace(/\D/g, '').slice(0, 16));
+    handleCardInputChange('number', formatted);
+  };
+
+  const handleExpiryChange = (e) => {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+      value = value.slice(0, 2) + ' / ' + value.slice(2, 4);
+    }
+    handleCardInputChange('expiry', value);
+  };
+
+  const getLastFourDigits = () => {
+    return cardData.number.slice(-4);
+  };
+
   const handleConfirmPayment = () => {
     // Aquí iría la lógica de pago real
     alert(`Pago confirmado para plan ${planData.planName}`);
@@ -73,7 +113,7 @@ const Checkout = () => {
         <p className="font-subheading font-bold text-[16px] text-text-low">TU PLAN</p>
         
         <Card>
-          <button className="w-full text-left">
+          <div className="w-full text-left">
             <div className="flex flex-col gap-3.5">
 
               <div className="flex items-start justify-between">
@@ -144,66 +184,156 @@ const Checkout = () => {
               </div>
 
             </div>
-          </button>
+          </div>
         </Card>
       </section>
 
-      {/* CREDIT CARD */}
-      <section className="mx-5 pt-5 flex flex-col gap-3">
-        <p className="font-subheading font-bold text-[16px] text-text-low">MÉTODO DE PAGO</p>
+      {/* CREDIT CARD PREVIEW */}
+      {!isEditingCard && (
+        <section className="mx-5 pt-5 flex flex-col gap-3">
+          <p className="font-subheading font-bold text-[16px] text-text-low">MÉTODO DE PAGO</p>
 
-        <div className="w-full max-w-sm bg-gradient-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
-          <div className="flex items-start justify-between mb-5">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="1" y="4" width="22" height="16" rx="2"/>
-                <line x1="1" y1="10" x2="23" y2="10"/>
-              </svg>
-            </div>
-            
-            <span className="text-white text-2xl font-heading font-extrabold tracking-wider">VISA</span>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between gap-3 text-white text-xl font-mono tracking-widest">
-              <span>····</span>
-              <span>····</span>
-              <span>····</span>
-              <span className="text-white/60">4242</span>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-end">
-            <div>
-              <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
-                Titular
-              </p>
-              <p className="text-white text-sm font-subheading font-bold tracking-wide">
-                SANTIAGO SEGURA
-              </p>
+          <div className="w-full max-w-sm bg-gradient-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
+            <div className="flex items-start justify-between mb-5">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              
+              <span className="text-white text-2xl font-heading font-extrabold tracking-wider">VISA</span>
             </div>
 
-            <div className="text-right">
-              <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
-                Expira
-              </p>
-              <p className="text-white text-sm font-subheading font-bold tracking-wide">
-                12 / 28
-              </p>
+            <div className="mb-4">
+              <div className="flex justify-between gap-3 text-white text-xl font-mono tracking-widest">
+                <span>····</span>
+                <span>····</span>
+                <span>····</span>
+                <span className="text-white/60">{getLastFourDigits()}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
+                  Titular
+                </p>
+                <p className="text-white text-sm font-subheading font-bold tracking-wide uppercase">
+                  {cardData.holder}
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
+                  Expira
+                </p>
+                <p className="text-white text-sm font-subheading font-bold tracking-wide">
+                  {cardData.expiry}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <button 
+                onClick={() => setIsEditingCard(true)}
+                className="flex items-center gap-2 text-accent1 text-sm font-medium hover:text-accent1/80 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Cambiar tarjeta
+              </button>
             </div>
           </div>
+        </section>
+      )}
 
-          <div className="mt-4 pt-4 border-t border-white/10">
-            <button className="flex items-center gap-2 text-accent1 text-sm font-medium">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              Cambiar tarjeta
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* DATOS DE PAGO - EDITABLE */}
+      {isEditingCard && (
+        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <p className="font-subheading font-bold text-[16px] text-text-low">DATOS DE PAGO</p>
+
+          <Card>
+            <div className="flex flex-col gap-[15px]">
+                <div className="flex flex-col gap-[5px]">
+                    <label className="font-subheading font-bold text-[14px] text-text-low uppercase">NÚMERO DE LA TARJETA</label>
+
+                    <div className="flex items-center gap-[20px]">
+                        <div className="text-text-low text-[20px] flex items-center justify-center">💳</div>
+                        <input 
+                          type="text" 
+                          placeholder="1234 5678 9101 1234" 
+                          className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" 
+                          value={cardData.number}
+                          onChange={handleCardNumberChange}
+                          maxLength={19}
+                        />
+                    </div>           
+                </div>
+
+                <div className="w-full h-[1px] bg-text-low"></div>
+
+                <div className="flex flex-col gap-[5px]">
+                    <label className="font-subheading font-bold text-[14px] text-text-low uppercase">NOMBRE DEL TITULAR</label>
+
+                    <div className="flex items-center gap-[20px]">
+                        <div className="text-text-low text-[20px] flex items-center justify-center">👤</div>
+                        <input 
+                          type="text" 
+                          placeholder="Como aparece en la tarjeta" 
+                          className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" 
+                          value={cardData.holder}
+                          onChange={(e) => handleCardInputChange('holder', e.target.value)}
+                        />
+                    </div>  
+                </div>
+
+                <div className="w-full h-[1px] bg-text-low"></div>
+
+                <div className="flex items-center justify-between gap-[25px]">
+
+                    <div className="flex flex-col gap-[5px]">
+                        <label className="font-subheading font-bold text-[14px] text-text-low uppercase">CADUCIDAD</label>
+                        
+                        <div className="flex items-center gap-[20px]">
+                            <input 
+                              type="text" 
+                              className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" 
+                              placeholder="MM / AA"
+                              value={cardData.expiry}
+                              onChange={handleExpiryChange}
+                              maxLength={7}
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="w-[1px] h-[50px] bg-text-low"></div>
+
+                    <div className="flex flex-col gap-[5px]">
+                        <label className="font-subheading font-bold text-[14px] text-text-low uppercase">CVV 🔒</label>
+                        <input 
+                          type="text" 
+                          placeholder="123" 
+                          className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" 
+                          value={cardData.cvv}
+                          onChange={(e) => handleCardInputChange('cvv', e.target.value.replace(/\D/g, '').slice(0, 3))}
+                          maxLength={3}
+                        />
+                    </div>
+                </div>
+
+                <button
+                  onClick={() => setIsEditingCard(false)}
+                  className="mt-2 w-full py-2 bg-primary rounded-lg text-text-high font-subheading font-bold text-[14px] hover:bg-primary/80 transition-colors"
+                >
+                  Guardar tarjeta
+                </button>
+            </div>
+          </Card>            
+        </section>
+      )}
 
       {/* RESUMEN DE LA SUSCRIPCIÓN */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
@@ -252,7 +382,7 @@ const Checkout = () => {
 
       {/* INFORMACIÓN */}
       <section className="mt-[22px] pb-5">
-        <p className="font-body text-[16px] text-text-low text-center">
+        <p className="font-body text-[14px] text-text-low text-center px-4">
           Al confirmar aceptas los
           <span className="text-primary"> Términos de uso </span>
           y la 
