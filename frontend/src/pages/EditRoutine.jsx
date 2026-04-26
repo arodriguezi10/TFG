@@ -55,83 +55,101 @@ const EditRoutine = () => {
   }, [user, id]);
 
   const fetchRoutineData = async () => {
-    try {
-      setLoadingRoutine(true);
+  try {
+    setLoadingRoutine(true);
 
-      const { data: routineData, error: routineError } = await supabase
-        .from('routines')
-        .select(`
-          *,
-          routine_exercises (
+    const { data: routineData, error: routineError } = await supabase
+      .from('routines')
+      .select(`
+        *,
+        routine_exercises (
+          id,
+          exercise_id,
+          order_index,
+          target_sets,
+          target_reps,
+          target_weight,
+          target_rir,
+          rest_seconds,
+          intensity_technique,
+          exercises (
             id,
-            exercise_id,
-            order_index,
-            target_sets,
-            target_reps,
-            rest_seconds,
-            exercises (
-              id,
-              name,
-              muscle_group,
-              equipment,
-              difficulty_level,
-              is_custom
-            )
+            name,
+            muscle_group,
+            equipment,
+            difficulty_level,
+            is_custom
           )
-        `)
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
+        )
+      `)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single();
 
-      if (routineError) {
-        console.error('Error al cargar rutina:', routineError);
-        alert('Error al cargar la rutina');
-        navigate('/routines1');
-        return;
-      }
+    if (routineError) {
+      console.error('Error al cargar rutina:', routineError);
+      alert('Error al cargar la rutina');
+      navigate('/routines1');
+      return;
+    }
 
-      setRoutineName(routineData.name || "");
-      setDescription(routineData.description || "");
-      setSelectedType(routineData.training_type || "");
-      setSelectedDays(JSON.parse(routineData.assigned_days || "[]"));
-      setDuration(routineData.estimated_duration_min || 45);
-      setSelectedMuscles(JSON.parse(routineData.target_muscle_groups || "[]"));
+    // Cargar información básica
+    setRoutineName(routineData.name || "");
+    setDescription(routineData.description || "");
+    setSelectedType(routineData.training_type || "");
+    setSelectedDays(JSON.parse(routineData.assigned_days || "[]"));
+    setDuration(routineData.estimated_duration_min || 45);
+    setSelectedMuscles(JSON.parse(routineData.target_muscle_groups || "[]"));
 
-      const exercises = routineData.routine_exercises
-        .sort((a, b) => a.order_index - b.order_index)
-        .map(re => re.exercises);
+    // Cargar ejercicios
+    const exercises = routineData.routine_exercises
+      .sort((a, b) => a.order_index - b.order_index)
+      .map(re => re.exercises);
 
-      setSelectedExercises(exercises);
+    setSelectedExercises(exercises);
 
+    // ✅ CAMBIO AQUÍ: Solo cargar configuración si NO existe ya en el contexto
+    if (!routineConfiguration || !routineConfiguration.series) {
       const seriesConfig = {};
       const restConfig = {};
+      const techniquesConfig = {};
 
       routineData.routine_exercises.forEach(re => {
-      const exerciseId = re.exercise_id;
-      const repsArray = Array.isArray(re.target_reps) ? re.target_reps : []; 
-      
-      seriesConfig[exerciseId] = repsArray.map((reps, idx) => ({
-        id: idx + 1,
-        reps: reps,
-        weight: ""
-      }));
-      
-      restConfig[exerciseId] = re.rest_seconds || "90"; 
-    });
+        const exerciseId = re.exercise_id;
+        
+        const repsArray = Array.isArray(re.target_reps) ? re.target_reps : [];
+        const weightArray = Array.isArray(re.target_weight) ? re.target_weight : [];
+        const rirArray = Array.isArray(re.target_rir) ? re.target_rir : [];
+        
+        seriesConfig[exerciseId] = repsArray.map((reps, idx) => ({
+          id: idx + 1,
+          reps: String(reps || ""),
+          weight: String(weightArray[idx] || ""),
+          rir: String(rirArray[idx] || "")
+        }));
+        
+        restConfig[exerciseId] = String(re.rest_seconds || "90");
+        
+        if (re.intensity_technique) {
+          techniquesConfig[exerciseId] = re.intensity_technique;
+        }
+      });
 
       setRoutineConfiguration({
         series: seriesConfig,
-        rest: restConfig
+        rest: restConfig,
+        techniques: techniquesConfig
       });
-
-    } catch (err) {
-      console.error('Error inesperado:', err);
-      alert('Error inesperado al cargar');
-      navigate('/routines1');
-    } finally {
-      setLoadingRoutine(false);
     }
-  };
+
+  } catch (err) {
+    console.error('Error inesperado:', err);
+    alert('Error inesperado al cargar');
+    navigate('/routines1');
+  } finally {
+    setLoadingRoutine(false);
+  }
+};
 
   const handleTypeClick = (type) => {
     setSelectedType(type);
@@ -161,100 +179,111 @@ const EditRoutine = () => {
   };
 
   const handleUpdateRoutine = async () => {
-    if (!routineName.trim()) {
-      setError("El nombre de la rutina es obligatorio");
+  if (!routineName.trim()) {
+    setError("El nombre de la rutina es obligatorio");
+    return;
+  }
+
+  if (selectedExercises.length === 0) {
+    setError("Debes añadir al menos un ejercicio");
+    return;
+  }
+
+  if (!selectedType) {
+    setError("Selecciona un tipo de entrenamiento");
+    return;
+  }
+
+  if (selectedDays.length === 0) {
+    setError("Selecciona al menos un día");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    setError("");
+
+    // Actualizar información básica de la rutina
+    const { error: routineError } = await supabase
+      .from('routines')
+      .update({
+        name: routineName.trim(),
+        description: description.trim() || null,
+        training_type: selectedType,
+        assigned_days: JSON.stringify(selectedDays),
+        estimated_duration_min: duration,
+        target_muscle_groups: JSON.stringify(selectedMuscles)
+      })
+      .eq('id', id)
+      .eq('user_id', user.id);
+
+    if (routineError) {
+      console.error('Error al actualizar rutina:', routineError);
+      setError('Error al actualizar la rutina');
       return;
     }
 
-    if (selectedExercises.length === 0) {
-      setError("Debes añadir al menos un ejercicio");
+    // Eliminar ejercicios antiguos
+    const { error: deleteError } = await supabase
+      .from('routine_exercises')
+      .delete()
+      .eq('routine_id', id);
+
+    if (deleteError) {
+      console.error('Error al eliminar ejercicios antiguos:', deleteError);
+      setError('Error al actualizar ejercicios');
       return;
     }
 
-    if (!selectedType) {
-      setError("Selecciona un tipo de entrenamiento");
-      return;
-    }
+    // Insertar ejercicios actualizados
+    if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
+      const exercisesToInsert = selectedExercises.map((exercise, index) => {
+        const series = routineConfiguration.series[exercise.id] || [];
+        const restSeconds = routineConfiguration.rest[exercise.id] || "90";
 
-    if (selectedDays.length === 0) {
-      setError("Selecciona al menos un día");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError("");
-
-      const { error: routineError } = await supabase
-        .from('routines')
-        .update({
-          name: routineName.trim(),
-          description: description.trim() || null,
-          training_type: selectedType,
-          assigned_days: JSON.stringify(selectedDays),
-          estimated_duration_min: duration,
-          target_muscle_groups: JSON.stringify(selectedMuscles)
-        })
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (routineError) {
-        console.error('Error al actualizar rutina:', routineError);
-        setError('Error al actualizar la rutina');
-        return;
-      }
-
-      const { error: deleteError } = await supabase
-        .from('routine_exercises')
-        .delete()
-        .eq('routine_id', id);
-
-      if (deleteError) {
-        console.error('Error al eliminar ejercicios antiguos:', deleteError);
-        setError('Error al actualizar ejercicios');
-        return;
-      }
-
-      if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
-        const exercisesToInsert = selectedExercises.map((exercise, index) => {
-          const series = routineConfiguration.series[exercise.id] || [];
-          const restSeconds = parseInt(routineConfiguration.rest[exercise.id]) || 90;
-
-          return {
-            routine_id: id,
-            exercise_id: exercise.id,
-            order_index: index + 1,
-            target_sets: series.length,
-            target_reps: JSON.stringify(series.map(s => s.reps)),
-            rest_seconds: restSeconds,
-            target_rir: null,
-            intensity_technique: null
-          };
+        const targetReps = series.map(s => parseInt(s.reps) || 0);
+        const targetWeight = series.map(s => {
+          const weight = s.weight?.replace(',', '.') || '0';
+          return parseFloat(weight) || 0;
         });
+        const targetRIR = series.map(s => parseInt(s.rir) || 0);
 
-        const { error: exercisesError } = await supabase
-          .from('routine_exercises')
-          .insert(exercisesToInsert);
+        return {
+          routine_id: id,
+          exercise_id: exercise.id,
+          order_index: index + 1,
+          target_sets: series.length,
+          target_reps: targetReps,
+          target_weight: targetWeight,
+          target_rir: targetRIR,
+          rest_seconds: restSeconds,
+          intensity_technique: routineConfiguration.techniques?.[exercise.id] || null
+        };
+      });
 
-        if (exercisesError) {
-          console.error('Error al insertar ejercicios:', exercisesError);
-          setError('Error al guardar los ejercicios');
-          return;
-        }
+      const { error: exercisesError } = await supabase
+        .from('routine_exercises')
+        .insert(exercisesToInsert);
+
+      if (exercisesError) {
+        console.error('Error al insertar ejercicios:', exercisesError);
+        setError('Error al guardar los ejercicios');
+        return;
       }
-
-      clearRoutineConfiguration();
-      clearExercises();
-      alert('✅ Rutina actualizada exitosamente');
-      navigate("/routines1");
-
-    } catch (err) {
-      console.error('Error inesperado:', err);
-      setError('Error inesperado al guardar');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    clearRoutineConfiguration();
+    clearExercises();
+    alert('✅ Rutina actualizada exitosamente');
+    navigate("/routines1");
+
+  } catch (err) {
+    console.error('Error inesperado:', err);
+    setError('Error inesperado al guardar');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loadingRoutine) {
     return (

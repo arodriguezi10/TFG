@@ -10,7 +10,13 @@ import Header from "../components/Header";
 const CreateRoutines1 = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { selectedExercises, removeExercise, routineConfiguration, clearExercises, clearRoutineConfiguration } = useRoutine();
+  const {
+    selectedExercises,
+    removeExercise,
+    routineConfiguration,
+    clearExercises,
+    clearRoutineConfiguration,
+  } = useRoutine();
 
   const isInitialMount = useRef(true);
 
@@ -23,7 +29,15 @@ const CreateRoutines1 = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const trainingTypes = ["Push", "Pull", "Legs", "Upper", "Lower", "Cardio", "Otro"];
+  const trainingTypes = [
+    "Push",
+    "Pull",
+    "Legs",
+    "Upper",
+    "Lower",
+    "Cardio",
+    "Otro",
+  ];
   const days = [
     { short: "L", full: "Lunes" },
     { short: "M", full: "Martes" },
@@ -31,16 +45,25 @@ const CreateRoutines1 = () => {
     { short: "J", full: "Jueves" },
     { short: "V", full: "Viernes" },
     { short: "S", full: "Sábado" },
-    { short: "D", full: "Domingo" }
+    { short: "D", full: "Domingo" },
   ];
   const muscleGroups = [
-    "Pecho", "Hombro", "Tríceps", "Espalda", "Bíceps", 
-    "Cuádriceps", "Femoral", "Glúteo", "Gemelo", 
-    "Core", "Trapecios", "Antebrazo"
+    "Pecho",
+    "Hombro",
+    "Tríceps",
+    "Espalda",
+    "Bíceps",
+    "Cuádriceps",
+    "Femoral",
+    "Glúteo",
+    "Gemelo",
+    "Core",
+    "Trapecios",
+    "Antebrazo",
   ];
 
   useEffect(() => {
-    const savedData = localStorage.getItem('createRoutineFormData');
+    const savedData = localStorage.getItem("createRoutineFormData");
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
@@ -51,7 +74,7 @@ const CreateRoutines1 = () => {
         setDuration(parsedData.duration || 45);
         setSelectedMuscles(parsedData.selectedMuscles || []);
       } catch (error) {
-        console.error('Error al cargar datos guardados:', error);
+        console.error("Error al cargar datos guardados:", error);
       }
     }
   }, []);
@@ -68,10 +91,17 @@ const CreateRoutines1 = () => {
       selectedType,
       selectedDays,
       duration,
-      selectedMuscles
+      selectedMuscles,
     };
-    localStorage.setItem('createRoutineFormData', JSON.stringify(formData));
-  }, [routineName, description, selectedType, selectedDays, duration, selectedMuscles]);
+    localStorage.setItem("createRoutineFormData", JSON.stringify(formData));
+  }, [
+    routineName,
+    description,
+    selectedType,
+    selectedDays,
+    duration,
+    selectedMuscles,
+  ]);
 
   const handleTypeClick = (type) => {
     setSelectedType(type);
@@ -79,7 +109,7 @@ const CreateRoutines1 = () => {
 
   const handleDayClick = (day) => {
     if (selectedDays.includes(day.full)) {
-      setSelectedDays(selectedDays.filter(d => d !== day.full));
+      setSelectedDays(selectedDays.filter((d) => d !== day.full));
     } else {
       setSelectedDays([...selectedDays, day.full]);
     }
@@ -87,7 +117,7 @@ const CreateRoutines1 = () => {
 
   const handleMuscleClick = (muscle) => {
     if (selectedMuscles.includes(muscle)) {
-      setSelectedMuscles(selectedMuscles.filter(m => m !== muscle));
+      setSelectedMuscles(selectedMuscles.filter((m) => m !== muscle));
     } else {
       setSelectedMuscles([...selectedMuscles, muscle]);
     }
@@ -98,6 +128,19 @@ const CreateRoutines1 = () => {
     if (newDuration >= 15 && newDuration <= 180) {
       setDuration(newDuration);
     }
+  };
+
+  const handleNavigateToExercises = () => {
+    const formData = {
+      routineName,
+      description,
+      selectedType,
+      selectedDays,
+      duration,
+      selectedMuscles,
+    };
+    localStorage.setItem("createRoutineFormData", JSON.stringify(formData));
+    navigate("/exerciseSearchFree");
   };
 
   const handleSaveRoutine = async () => {
@@ -126,75 +169,82 @@ const CreateRoutines1 = () => {
       setError("");
 
       const { data: routineData, error: routineError } = await supabase
-        .from('routines')
-        .insert([{
-          user_id: user.id,
-          name: routineName.trim(),
-          description: description.trim() || null,
-          training_type: selectedType,
-          assigned_days: JSON.stringify(selectedDays),
-          estimated_duration_min: duration,
-          target_muscle_groups: JSON.stringify(selectedMuscles)
-        }])
+        .from("routines")
+        .insert([
+          {
+            user_id: user.id,
+            name: routineName.trim(),
+            description: description.trim() || null,
+            training_type: selectedType,
+            assigned_days: JSON.stringify(selectedDays),
+            estimated_duration_min: duration,
+            target_muscle_groups: JSON.stringify(selectedMuscles),
+          },
+        ])
         .select()
         .single();
 
       if (routineError) {
-        console.error('Error al crear rutina:', routineError);
-        setError('Error al guardar la rutina');
+        console.error("Error al crear rutina:", routineError);
+        setError("Error al guardar la rutina");
         return;
       }
 
-      console.log('Rutina creada:', routineData);
+      console.log("Rutina creada:", routineData);
 
-      if (routineConfiguration && routineConfiguration.series && routineConfiguration.rest) {
+      if (
+        routineConfiguration &&
+        routineConfiguration.series &&
+        routineConfiguration.rest
+      ) {
         const exercisesToInsert = selectedExercises.map((exercise, index) => {
           const series = routineConfiguration.series[exercise.id] || [];
           const restSeconds = routineConfiguration.rest[exercise.id] || "90";
 
           // Extraer target_reps y target_weight de las series
-          const targetReps = series.map(s => parseInt(s.reps) || 0);
-          const targetWeight = series.map(s => {
-            const weight = s.weight?.replace(',', '.') || '0';
+          const targetReps = series.map((s) => parseInt(s.reps) || 0);
+          const targetWeight = series.map((s) => {
+            const weight = s.weight?.replace(",", ".") || "0";
             return parseFloat(weight) || 0;
           });
-          const targetRIR = series.map(() => 0); // RIR en 0 para plan free
+          const targetRIR = series.map((s) => parseInt(s.rir) || 0);
+          const intensity_technique =
+            routineConfiguration.techniques?.[exercise.id] || null;
 
           return {
             routine_id: routineData.id,
             exercise_id: exercise.id,
             order_index: index + 1,
             target_sets: series.length,
-            target_reps: targetReps,    
+            target_reps: targetReps,
             target_weight: targetWeight,
-            target_rir: targetRIR,      
+            target_rir: targetRIR,
             rest_seconds: restSeconds,
-            intensity_technique: null
+            intensity_technique: intensity_technique,
           };
         });
 
         const { error: exercisesError } = await supabase
-          .from('routine_exercises')
+          .from("routine_exercises")
           .insert(exercisesToInsert);
 
         if (exercisesError) {
-          console.error('Error al insertar ejercicios:', exercisesError);
-          setError('Error al guardar los ejercicios de la rutina');
+          console.error("Error al insertar ejercicios:", exercisesError);
+          setError("Error al guardar los ejercicios de la rutina");
           return;
         }
 
-        console.log('Ejercicios insertados correctamente');
+        console.log("Ejercicios insertados correctamente");
       }
 
       clearRoutineConfiguration();
       clearExercises();
-      localStorage.removeItem('createRoutineFormData');
-      alert('¡Rutina guardada exitosamente!');
+      localStorage.removeItem("createRoutineFormData");
+      alert("¡Rutina guardada exitosamente!");
       navigate("/routines1");
-
     } catch (err) {
-      console.error('Error inesperado:', err);
-      setError('Error inesperado al guardar');
+      console.error("Error inesperado:", err);
+      setError("Error inesperado al guardar");
     } finally {
       setLoading(false);
     }
@@ -242,7 +292,10 @@ const CreateRoutines1 = () => {
           <div className="mt-[15px] flex flex-col justify-between">
             <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
               DESCRIPCIÓN
-              <span className="font-subheading font-semibold text-[12px]"> (opcional)</span>
+              <span className="font-subheading font-semibold text-[12px]">
+                {" "}
+                (opcional)
+              </span>
             </label>
 
             <div className="flex gap-[15px]">
@@ -380,13 +433,15 @@ const CreateRoutines1 = () => {
               EJERCICIOS
             </p>
             <p className="font-body text-text-low text-[14px]">
-              {selectedExercises.length} añadido{selectedExercises.length !== 1 ? 's' : ''}
+              {selectedExercises.length} añadido
+              {selectedExercises.length !== 1 ? "s" : ""}
             </p>
           </div>
 
+          {/* ✅ AQUÍ VA EL CÓDIGO */}
           {selectedExercises.length > 0 && (
             <button
-              onClick={() => navigate('/exerciseSearchFree')}
+              onClick={handleNavigateToExercises}
               className="bg-primary h-[32px] px-[12px] rounded-[8px] font-body text-[12px] text-text-high hover:bg-primary/80 transition-colors"
             >
               + Añadir más
@@ -407,12 +462,12 @@ const CreateRoutines1 = () => {
 
               <div className="flex items-center justify-center">
                 <p className="font-body text-[16px] text-text-low text-center">
-                  Añade los ejercicios que componen esta sesión. Podrás ordenarlos
-                  y configurar series y repeticiones
+                  Añade los ejercicios que componen esta sesión. Podrás
+                  ordenarlos y configurar series y repeticiones
                 </p>
               </div>
               <Button
-                onClick={() => navigate("/exerciseSearchFree")}
+                onClick={handleNavigateToExercises}
                 variant="outlined"
                 text="Añadir ejercicios"
                 bgColor={"bg-primary-bg"}
@@ -432,7 +487,7 @@ const CreateRoutines1 = () => {
                       {index + 1}
                     </div>
                     <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
-                      {exercise.is_custom ? '⚡' : '💪'}
+                      {exercise.is_custom ? "⚡" : "💪"}
                     </span>
                   </div>
 
@@ -442,7 +497,8 @@ const CreateRoutines1 = () => {
                     </p>
 
                     <p className="font-body text-[12px] text-text-low">
-                      {exercise.muscle_group} · {exercise.equipment || 'Sin equipo'}
+                      {exercise.muscle_group} ·{" "}
+                      {exercise.equipment || "Sin equipo"}
                     </p>
 
                     <div className="mt-[3px] flex gap-[6px]">

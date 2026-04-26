@@ -9,38 +9,129 @@ import Input from "../components/Input";
 
 const ExerciseSearchFree = () => {
   const { user } = useContext(AuthContext);
-  const { addExercise, removeExercise, isExerciseSelected, selectedExercises } = useRoutine();
+  const { addExercise, removeExercise, isExerciseSelected, selectedExercises } =
+    useRoutine();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [customExercises, setCustomExercises] = useState([]);
-  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]);
+  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
 
-  const isSearchActive = location.pathname === "/exerciseSearchFree" || !location.pathname.includes("config");
+  const isSearchActive =
+    location.pathname === "/exerciseSearchFree" ||
+    !location.pathname.includes("config");
   const isConfigActive = location.pathname.includes("config");
 
   const predefinedExercises = [
-    { name: "Flexiones", muscle_group: "Pecho", equipment: "Peso corporal", difficulty_level: "Principiante" },
-    { name: "Press plano con mancuernas", muscle_group: "Pecho", equipment: "Peso libre", difficulty_level: "Principiante" },
-    { name: "Press militar con mancuernas (sentado)", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante" },
-    { name: "Elevaciones laterales con mancuernas", muscle_group: "Hombro", equipment: "Peso libre", difficulty_level: "Principiante" },
-    { name: "Extensión de tríceps", muscle_group: "Tríceps", equipment: "Polea", difficulty_level: "Principiante" },
-    { name: "Jalón al pecho", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Remo unilateral con mancuernas", muscle_group: "Espalda", equipment: "Peso libre", difficulty_level: "Principiante" },
-    { name: "Remo Gironda", muscle_group: "Espalda", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Curl de bíceps", muscle_group: "Bíceps", equipment: "Polea", difficulty_level: "Principiante" },
-    { name: "Prensa", muscle_group: "Cuádriceps", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Sentadilla Goblet con pesa rusa", muscle_group: "Cuádriceps", equipment: "Peso libre", difficulty_level: "Principiante" },
-    { name: "Curl femoral sentado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Curl femoral tumbado", muscle_group: "Femoral", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Elevaciones de talones en multipower", muscle_group: "Gemelo", equipment: "Máquina", difficulty_level: "Principiante" },
-    { name: "Planchas abdominales (Plank)", muscle_group: "Core", equipment: "Peso corporal", difficulty_level: "Principiante" },
+    {
+      name: "Flexiones",
+      muscle_group: "Pecho",
+      equipment: "Peso corporal",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Press plano con mancuernas",
+      muscle_group: "Pecho",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Press militar con mancuernas (sentado)",
+      muscle_group: "Hombro",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Elevaciones laterales con mancuernas",
+      muscle_group: "Hombro",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Extensión de tríceps",
+      muscle_group: "Tríceps",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Jalón al pecho",
+      muscle_group: "Espalda",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Remo unilateral con mancuernas",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Remo Gironda",
+      muscle_group: "Espalda",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Curl de bíceps",
+      muscle_group: "Bíceps",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Prensa",
+      muscle_group: "Cuádriceps",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Sentadilla Goblet con pesa rusa",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Curl femoral sentado",
+      muscle_group: "Femoral",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Curl femoral tumbado",
+      muscle_group: "Femoral",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Elevaciones de talones en multipower",
+      muscle_group: "Gemelo",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Planchas abdominales (Plank)",
+      muscle_group: "Core",
+      equipment: "Peso corporal",
+      difficulty_level: "Principiante",
+    },
   ];
 
-  const muscleGroups = ["Todos", "Pecho", "Hombro", "Tríceps", "Espalda", "Bíceps", "Cuádriceps", "Femoral", "Gemelo", "Core"];
+  const muscleGroups = [
+    "Todos",
+    "Pecho",
+    "Hombro",
+    "Tríceps",
+    "Espalda",
+    "Bíceps",
+    "Cuádriceps",
+    "Femoral",
+    "Gemelo",
+    "Core",
+  ];
 
   useEffect(() => {
     if (user) {
@@ -56,7 +147,7 @@ const ExerciseSearchFree = () => {
 
   const fetchCustomExercises = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
 
@@ -104,57 +195,62 @@ const ExerciseSearchFree = () => {
     }
   };
 
- const insertPredefinedExercisesIfNeeded = async () => {
-  try {
-    // Verificar si ya existen ejercicios predefinidos
-    const { data: existing, error: checkError } = await supabase
-      .from('exercises')
-      .select('name')
-      .eq('is_custom', false)
-      .eq('difficulty_level', 'Principiante');
+  const insertPredefinedExercisesIfNeeded = async () => {
+    try {
+      // Verificar si ya existen ejercicios predefinidos
+      const { data: existing, error: checkError } = await supabase
+        .from("exercises")
+        .select("name")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Principiante");
 
-    if (checkError) {
-      console.error('Error al verificar ejercicios:', checkError);
-      return;
+      if (checkError) {
+        console.error("Error al verificar ejercicios:", checkError);
+        return;
+      }
+
+      // Si ya existen 15 ejercicios predefinidos, no insertar más
+      if (existing && existing.length >= 15) {
+        console.log("Ejercicios predefinidos ya existen");
+        return;
+      }
+
+      // Solo insertar los que no existen
+      const existingNames = existing.map((e) => e.name);
+      const exercisesToInsert = predefinedExercises
+        .filter((exercise) => !existingNames.includes(exercise.name))
+        .map((exercise) => ({
+          name: exercise.name,
+          muscle_group: exercise.muscle_group,
+          equipment: exercise.equipment,
+          difficulty_level: exercise.difficulty_level,
+          is_custom: false,
+          user_id: null,
+        }));
+
+      if (exercisesToInsert.length === 0) {
+        console.log("No hay ejercicios nuevos para insertar");
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from("exercises")
+        .insert(exercisesToInsert);
+
+      if (insertError) {
+        console.error(
+          "Error al insertar ejercicios predefinidos:",
+          insertError,
+        );
+      } else {
+        console.log(
+          `${exercisesToInsert.length} ejercicios insertados correctamente`,
+        );
+      }
+    } catch (err) {
+      console.error("Error inesperado al insertar predefinidos:", err);
     }
-
-    // Si ya existen 15 ejercicios predefinidos, no insertar más
-    if (existing && existing.length >= 15) {
-      console.log('Ejercicios predefinidos ya existen');
-      return;
-    }
-
-    // Solo insertar los que no existen
-    const existingNames = existing.map(e => e.name);
-    const exercisesToInsert = predefinedExercises
-      .filter(exercise => !existingNames.includes(exercise.name))
-      .map(exercise => ({
-        name: exercise.name,
-        muscle_group: exercise.muscle_group,
-        equipment: exercise.equipment,
-        difficulty_level: exercise.difficulty_level,
-        is_custom: false,
-        user_id: null
-      }));
-
-    if (exercisesToInsert.length === 0) {
-      console.log('No hay ejercicios nuevos para insertar');
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from('exercises')
-      .insert(exercisesToInsert);
-
-    if (insertError) {
-      console.error('Error al insertar ejercicios predefinidos:', insertError);
-    } else {
-      console.log(`${exercisesToInsert.length} ejercicios insertados correctamente`);
-    }
-  } catch (err) {
-    console.error('Error inesperado al insertar predefinidos:', err);
-  }
-};
+  };
 
   const handleToggleExercise = (exercise) => {
     if (isExerciseSelected(exercise.id)) {
@@ -174,7 +270,9 @@ const ExerciseSearchFree = () => {
 
   const handleCreateExercise = () => {
     if (customExercises.length >= 5) {
-      alert("Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro para crear ilimitados.");
+      alert(
+        "Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro para crear ilimitados.",
+      );
       return;
     }
     navigate("/createPersonalExercise");
@@ -186,14 +284,14 @@ const ExerciseSearchFree = () => {
     if (window.confirm(`¿Eliminar "${exercise.name}" permanentemente?`)) {
       try {
         const { error } = await supabase
-          .from('exercises')
+          .from("exercises")
           .delete()
-          .eq('id', exercise.id)
-          .eq('user_id', user.id);
+          .eq("id", exercise.id)
+          .eq("user_id", user.id);
 
         if (error) {
-          console.error('Error al eliminar:', error);
-          alert('Error al eliminar el ejercicio');
+          console.error("Error al eliminar:", error);
+          alert("Error al eliminar el ejercicio");
           return;
         }
 
@@ -203,23 +301,33 @@ const ExerciseSearchFree = () => {
 
         await fetchCustomExercises();
       } catch (err) {
-        console.error('Error inesperado:', err);
-        alert('Error inesperado al eliminar');
+        console.error("Error inesperado:", err);
+        alert("Error inesperado al eliminar");
       }
     }
   };
 
-  const filteredCustomExercises = customExercises.filter(exercise => {
-    const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
+  const filteredCustomExercises = customExercises.filter((exercise) => {
+    const matchesSearch = exercise.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesMuscle =
+      selectedMuscleFilter === "Todos" ||
+      exercise.muscle_group === selectedMuscleFilter;
     return matchesSearch && matchesMuscle;
   });
 
-  const filteredPredefinedExercises = predefinedExercisesFromDB.filter(exercise => {
-    const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesMuscle = selectedMuscleFilter === "Todos" || exercise.muscle_group === selectedMuscleFilter;
-    return matchesSearch && matchesMuscle;
-  });
+  const filteredPredefinedExercises = predefinedExercisesFromDB.filter(
+    (exercise) => {
+      const matchesSearch = exercise.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesMuscle =
+        selectedMuscleFilter === "Todos" ||
+        exercise.muscle_group === selectedMuscleFilter;
+      return matchesSearch && matchesMuscle;
+    },
+  );
 
   if (!user) {
     return (
@@ -316,7 +424,8 @@ const ExerciseSearchFree = () => {
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
             <span className="text-primary text-[20px]">👑</span>
             <p className="font-body text-[16px] text-text-low text-left">
-              Amplía tus posibilidades con el <span className="text-primary"> Plan Pro. </span>
+              Amplía tus posibilidades con el{" "}
+              <span className="text-primary"> Plan Pro. </span>
               +80 ejercicios de nivel intermedio y avanzado.
             </p>
           </div>
@@ -332,7 +441,12 @@ const ExerciseSearchFree = () => {
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
             <span className="text-text-high text-[20px]">⚡</span>
             <p className="font-body text-[16px] text-text-high">
-              Crea tus propios ejercicios {customExercises.length >= 5 && <span className="text-text-low">({customExercises.length}/5 - Límite alcanzado)</span>}
+              Crea tus propios ejercicios{" "}
+              {customExercises.length >= 5 && (
+                <span className="text-text-low">
+                  ({customExercises.length}/5 - Límite alcanzado)
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center justify-center gap-[15px] text-text-high">
@@ -399,7 +513,11 @@ const ExerciseSearchFree = () => {
                             ? "bg-primary border-primary text-text-high"
                             : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
                         }`}
-                        title={isSelected ? "Quitar de la selección" : "Añadir a la selección"}
+                        title={
+                          isSelected
+                            ? "Quitar de la selección"
+                            : "Añadir a la selección"
+                        }
                       >
                         {isSelected ? "✓" : "+"}
                       </button>
@@ -475,21 +593,23 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
-      {filteredCustomExercises.length === 0 && filteredPredefinedExercises.length === 0 && !loading && (
-        <section className="mt-[16px] w-full px-[16px]">
-          <Card>
-            <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
-              <span className="text-[48px]">🔍</span>
-              <p className="font-heading font-bold text-[18px] text-text-high text-center">
-                No se encontraron ejercicios
-              </p>
-              <p className="font-body text-[14px] text-text-low text-center">
-                Intenta con otra búsqueda o filtro
-              </p>
-            </div>
-          </Card>
-        </section>
-      )}
+      {filteredCustomExercises.length === 0 &&
+        filteredPredefinedExercises.length === 0 &&
+        !loading && (
+          <section className="mt-[16px] w-full px-[16px]">
+            <Card>
+              <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
+                <span className="text-[48px]">🔍</span>
+                <p className="font-heading font-bold text-[18px] text-text-high text-center">
+                  No se encontraron ejercicios
+                </p>
+                <p className="font-body text-[14px] text-text-low text-center">
+                  Intenta con otra búsqueda o filtro
+                </p>
+              </div>
+            </Card>
+          </section>
+        )}
 
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
         <p className="font-subheading font-bold text-[16px] text-orange">
@@ -502,7 +622,8 @@ const ExerciseSearchFree = () => {
               Nivel bloqueado
             </p>
             <p className="font-body text-[13px] text-text-low text-center px-[20px]">
-              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de nivel intermedio
+              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de
+              nivel intermedio
             </p>
           </div>
         </Card>
@@ -519,7 +640,8 @@ const ExerciseSearchFree = () => {
               Nivel bloqueado
             </p>
             <p className="font-body text-[13px] text-text-low text-center px-[20px]">
-              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de nivel avanzado
+              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de
+              nivel avanzado
             </p>
           </div>
         </Card>
@@ -537,7 +659,7 @@ const ExerciseSearchFree = () => {
           textColor={"text-text-high"}
           borderColor={"border-primary"}
           w="w-[100%]"
-          onClick={() => navigate("/createRoutines1")}
+          onClick={() => navigate(-1)}
         />
       </section>
     </div>

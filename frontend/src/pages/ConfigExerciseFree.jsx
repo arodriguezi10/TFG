@@ -26,7 +26,7 @@ const ConfigExerciseFree = () => {
     Object.keys(routineConfiguration.series).forEach(exerciseId => {
       updatedSeries[exerciseId] = routineConfiguration.series[exerciseId].map(serie => ({
         ...serie,
-        rir: serie.rir || "" // ✅ Agregar rir si no existe
+        rir: serie.rir || ""
       }));
     });
     return updatedSeries;
@@ -54,7 +54,12 @@ const ConfigExerciseFree = () => {
     return initialRest;
   });
 
-  const [exercisesTechnique, setExercisesTechnique] = useState({});
+  const [exercisesTechnique, setExercisesTechnique] = useState(() => {
+    if (routineConfiguration?.techniques) {
+      return routineConfiguration.techniques;
+    }
+    return {};
+  });
 
   // Cargar suscripción del usuario
   useEffect(() => {
@@ -227,39 +232,40 @@ const ConfigExerciseFree = () => {
   };
 
   const handleSaveRoutine = () => {
-    if (!validateConfiguration()) {
-      return;
-    }
+  if (!validateConfiguration()) {
+    return;
+  }
 
-    const transformedExercises = selectedExercises.map(exercise => {
-      const series = exercisesSeries[exercise.id] || [];
-      
-      return {
-        exercise_id: exercise.id,
-        exercise: exercise,
-        target_reps: series.map(s => parseInt(s.reps) || 0),
-        target_weight: series.map(s => {
-          const weight = s.weight.replace(',', '.');
-          return parseFloat(weight) || 0;
-        }),
-        target_rir: series.map(s => parseInt(s.rir) || 0),
-        rest_seconds: exercisesRest[exercise.id] || "90",
-        technique: exercisesTechnique[exercise.id] || null
-      };
-    });
-
-    const routineData = {
-      exercises: transformedExercises,
-      series: exercisesSeries,
-      rest: exercisesRest,
-      techniques: exercisesTechnique,
-      timestamp: new Date().toISOString()
+  const transformedExercises = selectedExercises.map(exercise => {
+    const series = exercisesSeries[exercise.id] || [];
+    
+    return {
+      exercise_id: exercise.id,
+      exercise: exercise,
+      target_reps: series.map(s => parseInt(s.reps) || 0),
+      target_weight: series.map(s => {
+        const weight = s.weight.replace(',', '.');
+        return parseFloat(weight) || 0;
+      }),
+      target_rir: series.map(s => parseInt(s.rir) || 0),
+      rest_seconds: exercisesRest[exercise.id] || "90",
+      technique: exercisesTechnique[exercise.id] || null
     };
+  });
 
-    saveRoutineConfiguration(routineData);
-    console.log("Configuración guardada:", routineData);
-    navigate("/createRoutines1");
+  const routineData = {
+    exercises: transformedExercises,
+    series: exercisesSeries,
+    rest: exercisesRest,
+    techniques: exercisesTechnique,
+    timestamp: new Date().toISOString()
   };
+
+  saveRoutineConfiguration(routineData);
+  console.log("Configuración guardada:", routineData);
+  
+  navigate(-1);
+};
 
   const isInputFilled = (value) => {
   // Convertir a string si es número, luego verificar
