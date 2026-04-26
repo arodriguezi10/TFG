@@ -107,17 +107,17 @@ const EditRoutine = () => {
       const restConfig = {};
 
       routineData.routine_exercises.forEach(re => {
-        const exerciseId = re.exercise_id;
-        const repsArray = JSON.parse(re.target_reps || "[]");
-        
-        seriesConfig[exerciseId] = repsArray.map((reps, idx) => ({
-          id: idx + 1,
-          reps: reps,
-          weight: ""
-        }));
-
-        restConfig[exerciseId] = re.rest_seconds || 90;
-      });
+      const exerciseId = re.exercise_id;
+      const repsArray = Array.isArray(re.target_reps) ? re.target_reps : []; 
+      
+      seriesConfig[exerciseId] = repsArray.map((reps, idx) => ({
+        id: idx + 1,
+        reps: reps,
+        weight: ""
+      }));
+      
+      restConfig[exerciseId] = re.rest_seconds || "90"; 
+    });
 
       setRoutineConfiguration({
         series: seriesConfig,

@@ -1,11 +1,63 @@
 import React, { useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Header from '../components/Header';
 import Button from '../components/Button';
 
 const Suscription = () => {
+  const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState('mes');
+  const [selectedPlan, setSelectedPlan] = useState('free');
 
+  const prices = {
+    pro: {
+      mes: '9,99',
+      annual: '5,99'
+    },
+    elite: {
+      mes: '19,99',
+      annual: '11,99'
+    }
+  };
+
+  const planNames = {
+    free: 'Free',
+    pro: 'Pro',
+    elite: 'Élite'
+  };
+
+  const getButtonText = () => {
+    if (selectedPlan === 'free') {
+      return '✓ Continuar con Free';
+    }
+    return `👑 Activar plan ${planNames[selectedPlan]}`;
+  };
+
+  const getButtonSubtext = () => {
+    if (selectedPlan === 'free') {
+      return 'Sin coste · Siempre gratis';
+    }
+    return 'Prueba 7 días gratis · Sin compromiso';
+  };
+
+  const handleActivatePlan = () => {
+    if (selectedPlan === 'free') {
+      // Si es Free, no navegar a checkout
+      alert('Ya estás en el plan Free');
+      return;
+    }
+
+    // Navegar a checkout con los datos del plan seleccionado
+    navigate('/checkout', {
+      state: {
+        plan: selectedPlan,
+        planName: planNames[selectedPlan],
+        billingPeriod: billingPeriod,
+        price: prices[selectedPlan][billingPeriod],
+        billingText: billingPeriod === 'mes' ? 'mensual' : 'anual'
+      }
+    });
+  };
   
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
@@ -16,7 +68,7 @@ const Suscription = () => {
 
       <section className="mt-[25px] flex flex-col items-center justify-center gap-[15px]">
           <span className="bg-yellow-bg3 h-[110px] w-[110px] px-[10px] rounded-[35px] border border-yellow font-heading font-bold text-[50px] text-yellow flex items-center justify-center">
-              & {/*! PONER EL ICONO */}
+              👑
           </span>
 
           <span className="items-center bg-text-low/8 border border-text-low rounded-full px-3.5 py-0.5 text-[16px] text-text-low font-subheading font-semibold">
@@ -71,7 +123,10 @@ const Suscription = () => {
         
         {/* FREE PLAN */}
         <Card>
-          <button className="w-full text-left">
+          <button 
+            onClick={() => setSelectedPlan('free')}
+            className="w-full text-left"
+          >
             <div className="flex flex-col gap-3.5">
 
               <div className="flex items-start justify-between">
@@ -83,9 +138,11 @@ const Suscription = () => {
                     Free
                   </p>
                 </div>
-                <span className="items-center border border-text-low rounded-full px-3.5 py-0.5 text-[16px] text-text-low font-subheading font-semibold">
-                  Activo
-                </span>
+                {selectedPlan === 'free' && (
+                  <span className="items-center border border-text-low rounded-full px-3.5 py-0.5 text-[16px] text-text-low font-subheading font-semibold">
+                    Activo
+                  </span>
+                )}
               </div>
 
               <div className="flex items-end gap-1">
@@ -153,10 +210,20 @@ const Suscription = () => {
               <div className="w-full h-px bg-text-low mb-1.5"></div>
 
               <div className='flex gap-2'>
-                <div className="w-5 h-5 rounded-full border-[1.5px] border-text-low flex items-center justify-center" ></div>
+                <div className={`w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center ${
+                  selectedPlan === 'free' 
+                    ? 'border-primary bg-primary' 
+                    : 'border-text-low'
+                }`}>
+                  {selectedPlan === 'free' && (
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  )}
+                </div>
 
-                <span className="font-subheading font-bold text-[16px] text-text-low">
-                  Seleccionar Free
+                <span className={`font-subheading font-bold text-[16px] ${
+                  selectedPlan === 'free' ? 'text-primary' : 'text-text-low'
+                }`}>
+                  {selectedPlan === 'free' ? 'Seleccionado' : 'Seleccionar Free'}
                 </span>
               </div>
 
@@ -166,7 +233,10 @@ const Suscription = () => {
 
         {/* PRO PLAN */}
         <Card>
-          <button className="w-full text-left">
+          <button 
+            onClick={() => setSelectedPlan('pro')}
+            className="w-full text-left"
+          >
             <div className="flex flex-col gap-3.5">
 
               <div className="flex items-start justify-between">
@@ -177,18 +247,24 @@ const Suscription = () => {
                 </div>
 
                 <span className="items-center bg-yellow-bg2 border border-orange rounded-full px-3.5 py-0.5 text-[16px] text-orange font-subheading font-semibold">
-                  & Más popular
+                  🔥 Más popular
                 </span>
               </div>
 
               <div className="flex items-end gap-1">
-                <span className="font-heading font-extrabold text-[30px] text-text-high tracking-tighter leading-none">9</span>
+                <span className="font-heading font-extrabold text-[30px] text-text-high tracking-tighter leading-none">
+                  {prices.pro[billingPeriod].split(',')[0]}
+                </span>
 
-                <span className="font-subheading font-semibold text-base text-text-low mb-0.5">,99€</span>
+                <span className="font-subheading font-semibold text-base text-text-low mb-0.5">
+                  ,{prices.pro[billingPeriod].split(',')[1]}
+                </span>
               </div>
 
               <p className="text-[16px] text-text-low font-body mb-1.5">
-                  Por mes · cancela cuando quieras
+                {billingPeriod === 'mes' 
+                  ? 'Por mes · cancela cuando quieras' 
+                  : 'Por mes · Facturado anualmente'}
               </p>
 
               <div className="w-full h-px bg-text-low mb-1.5"></div>
@@ -245,10 +321,20 @@ const Suscription = () => {
               <div className="w-full h-px bg-text-low mb-1.5"></div>
 
               <div className='flex gap-2'>
-                <div className="w-5 h-5 rounded-full border-[1.5px] border-text-low flex items-center justify-center" ></div>
+                <div className={`w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center ${
+                  selectedPlan === 'pro' 
+                    ? 'border-orange bg-orange' 
+                    : 'border-text-low'
+                }`}>
+                  {selectedPlan === 'pro' && (
+                    <div className="w-2 h-2 rounded-full bg-white"></div>
+                  )}
+                </div>
 
-                <span className="font-subheading font-bold text-[16px] text-text-low">
-                  Seleccionar Pro
+                <span className={`font-subheading font-bold text-[16px] ${
+                  selectedPlan === 'pro' ? 'text-orange' : 'text-text-low'
+                }`}>
+                  {selectedPlan === 'pro' ? 'Seleccionado' : 'Seleccionar Pro'}
                 </span>
               </div>
 
@@ -258,7 +344,10 @@ const Suscription = () => {
 
         {/* ELITE PLAN */}
         <Card>
-          <button className="w-full text-left">
+          <button 
+            onClick={() => setSelectedPlan('elite')}
+            className="w-full text-left"
+          >
             <div className="flex flex-col gap-3.5">
 
               <div className="flex items-start justify-between">
@@ -267,20 +356,22 @@ const Suscription = () => {
 
                   <p className="font-heading font-extrabold text-[17px] text-text-high">Élite</p>
                 </div>
-
-                {/*<span className="items-center bg-yellow-bg2 border border-orange rounded-full px-3.5 py-0.5 text-[16px] text-orange font-subheading font-semibold">
-                  & Más popular
-                </span>*/}
               </div>
 
               <div className="flex items-end gap-1">
-                <span className="font-heading font-extrabold text-[30px] text-text-high tracking-tighter leading-none">19</span>
+                <span className="font-heading font-extrabold text-[30px] text-text-high tracking-tighter leading-none">
+                  {prices.elite[billingPeriod].split(',')[0]}
+                </span>
 
-                <span className="font-subheading font-semibold text-base text-text-low mb-0.5">,99€</span>
+                <span className="font-subheading font-semibold text-base text-text-low mb-0.5">
+                  ,{prices.elite[billingPeriod].split(',')[1]}
+                </span>
               </div>
 
               <p className="text-[16px] text-text-low font-body mb-1.5">
-                  Por mes · cancela cuando quieras
+                {billingPeriod === 'mes' 
+                  ? 'Por mes · cancela cuando quieras' 
+                  : 'Por mes · Facturado anualmente'}
               </p>
 
               <div className="w-full h-px bg-text-low mb-1.5"></div>
@@ -334,10 +425,20 @@ const Suscription = () => {
                 <div className="w-full h-px bg-text-low mb-1.5"></div>
 
                 <div className='flex gap-2'>
-                  <div className="w-5 h-5 rounded-full border-[1.5px] border-text-low flex items-center justify-center" ></div>
+                  <div className={`w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center ${
+                    selectedPlan === 'elite' 
+                      ? 'border-primary bg-primary' 
+                      : 'border-text-low'
+                  }`}>
+                    {selectedPlan === 'elite' && (
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
+                    )}
+                  </div>
 
-                  <span className="font-subheading font-bold text-[16px] text-text-low">
-                    Seleccionar Élite
+                  <span className={`font-subheading font-bold text-[16px] ${
+                    selectedPlan === 'elite' ? 'text-primary' : 'text-text-low'
+                  }`}>
+                    {selectedPlan === 'elite' ? 'Seleccionado' : 'Seleccionar Élite'}
                   </span>
                 </div>
               </div>
@@ -351,28 +452,36 @@ const Suscription = () => {
       <section className='mt-[10px] flex flex-col items-center justify-center gap-2'>
           <div className='flex gap-1'>
               <span className="items-center bg-text-low/8 border border-text-low rounded-full px-3.5 py-0.5 text-[14px] text-text-low font-body">
-                & Tarjeta
+                💳 Tarjeta
               </span>
 
               <span className="items-center bg-text-low/8 border border-text-low rounded-full px-3.5 py-0.5 text-[14px] text-text-low font-body">
-                & Tarjeta
+                🍎 Apple Pay
               </span>
 
               <span className="items-center bg-text-low/8 border border-text-low rounded-full px-3.5 py-0.5 text-[14px] text-text-low font-body">
-                & Tarjeta
+                🌐 Google Pay
               </span>
           </div>
 
-          <p className='font-body text-[12px] text-text-low'> & Pago 100% seguro. Cancela cuando quieras</p>        
+          <p className='font-body text-[12px] text-text-low'>🔒 Pago 100% seguro. Cancela cuando quieras</p>        
       </section>
 
       {/* STICKY CTA */}
       <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
-          <Button variant="outlined" text="& Activa plan Élite" bgColor={"bg-orange"} textColor={"text-text-high"} borderColor={"border-orange"} w="w-[100%]"/>
+          <Button 
+            variant="outlined" 
+            text={getButtonText()}
+            bgColor={"bg-orange"} 
+            textColor={"text-text-high"} 
+            borderColor={"border-orange"} 
+            w="w-[100%]"
+            onClick={handleActivatePlan}
+          />
 
           <p className="text-center mt-2 text-[11px] text-text-low font-light">
-            Prueba 7 días gratis · Sin compromiso
-        </p>
+            {getButtonSubtext()}
+          </p>
       </div>
     </div>
   );

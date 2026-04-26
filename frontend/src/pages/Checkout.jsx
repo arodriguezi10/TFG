@@ -1,9 +1,64 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Header from "../components/Header";
 import Button from "../components/Button";
 
 const Checkout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Obtener datos del plan desde location.state
+  const planData = location.state || {
+    plan: 'pro',
+    planName: 'Pro',
+    billingPeriod: 'mes',
+    price: '9,99',
+    billingText: 'mensual'
+  };
+
+  // Calcular fecha de cobro (7 días desde hoy)
+  const getChargeDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    const day = date.getDate();
+    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
+  // Features según el plan
+  const planFeatures = {
+    pro: [
+      'Hasta 4 rutinas',
+      'Registro del peso corporal',
+      'Rutinas predefinidas por nivel'
+    ],
+    elite: [
+      'Hasta 4 rutinas',
+      'Registro del peso corporal',
+      'Rutinas predefinidas por nivel',
+      'Planificación de mesociclos',
+      'Chat directo con el entrenador'
+    ]
+  };
+
+  const planIcons = {
+    pro: '⚡',
+    elite: '👑'
+  };
+
+  const planColors = {
+    pro: 'bg-orange-bg2',
+    elite: 'bg-surface'
+  };
+
+  const handleConfirmPayment = () => {
+    // Aquí iría la lógica de pago real
+    alert(`Pago confirmado para plan ${planData.planName}`);
+    navigate('/dashboard');
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
@@ -16,7 +71,7 @@ const Checkout = () => {
       {/* PLAN CARDS */}
       <section className="mx-5 pt-5 flex flex-col gap-3">
         <p className="font-subheading font-bold text-[16px] text-text-low">TU PLAN</p>
-        {/* PRO PLAN */}
+        
         <Card>
           <button className="w-full text-left">
             <div className="flex flex-col gap-3.5">
@@ -24,24 +79,26 @@ const Checkout = () => {
               <div className="flex items-start justify-between">
                 <div className="w-full flex items-center justify-between">
                   <div className="flex gap-3">
-                    <div className="w-[40px] h-[50px] rounded-[10px] bg-orange-bg2 flex items-center justify-center text-[17px]">
-                      ⚡
+                    <div className={`w-[40px] h-[50px] rounded-[10px] ${planColors[planData.plan]} flex items-center justify-center text-[17px]`}>
+                      {planIcons[planData.plan]}
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                      <span className="items-center bg-accent2-bg2 border border-accent2 rounded-full px-3.5 py-0.5 text-[16px] text-accent2 font-subheading font-semibold">
-                        & Más popular
-                      </span>
+                      {planData.plan === 'pro' && (
+                        <span className="items-center bg-yellow-bg2 border border-orange rounded-full px-3.5 py-0.5 text-[16px] text-orange font-subheading font-semibold">
+                          🔥 Más popular
+                        </span>
+                      )}
 
                       <p className="font-heading font-extrabold text-[17px] text-text-high">
-                        Pro
+                        {planData.planName}
                       </p>
                     </div> 
                   </div>
 
                   <div className="flex gap-3">
                     <p className="font-heading font-extrabold text-[17px] text-text-high flex flex-col items-end">
-                        9,99 <br /> 
+                        {planData.price.split(',')[0]},{planData.price.split(',')[1]} <br /> 
                         <span>€</span>
                         <span className="font-body font-normal text-[16px] text-text-low">al mes</span>
                     </p>
@@ -51,121 +108,39 @@ const Checkout = () => {
 
               <div className="flex items-end gap-3">
                 <span className="items-center bg-primary-bg-bg2 border border-primary rounded-full px-3.5 py-0.5 text-[16px] text-primary font-subheading font-semibold">
-                  & Mesual
+                  📅 {planData.billingText === 'mensual' ? 'Mensual' : 'Anual'}
                 </span>
 
                 <span className="items-center bg-accent2-bg2 border border-accent2 rounded-full px-3.5 py-0.5 text-[16px] text-accent2 font-subheading font-semibold">
-                  & 7 días gratis
+                  🎁 7 días gratis
                 </span>
               </div>
 
-              <div className="w-full h-px bg-text-low mb-1.5"></div> {/* línea divisoria horizontal */}
+              <div className="w-full h-px bg-text-low mb-1.5"></div>
 
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
+                {planFeatures[planData.plan].map((feature, index) => (
+                  <div key={index} className="flex items-center gap-2.5">
+                    <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-accent3"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <span className="font-subheading font-bold text-[16px] text-text-high">
+                      {feature}
+                    </span>
                   </div>
-                  <span className="font-subheading font-bold text-[16px] text-text-high ">
-                    Hasta 4 rutinas
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <span className="font-subheading font-bold text-[16px] text-text-high ">
-                    Registro del peso corporal
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <span className="font-subheading font-bold text-[16px] text-text-high ">
-                    Rutinas predefinidas por nivel
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <span className="font-subheading font-bold text-[16px] text-text-high ">
-                    Planificación de mesociclos
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent3"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </div>
-                  <span className="font-subheading font-bold text-[16px] text-text-high ">
-                    Chat directo con el entrenador
-                  </span>
-                </div>
+                ))}
               </div>
 
             </div>
@@ -175,12 +150,10 @@ const Checkout = () => {
 
       {/* CREDIT CARD */}
       <section className="mx-5 pt-5 flex flex-col gap-3">
-        <p className="font-subheading font-bold text-[16px] text-text-low">TU PLAN</p>
+        <p className="font-subheading font-bold text-[16px] text-text-low">MÉTODO DE PAGO</p>
 
         <div className="w-full max-w-sm bg-gradient-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
-          {/* Top Row - Icon & Brand */}
           <div className="flex items-start justify-between mb-5">
-            {/* Card Icon */}
             <div className="w-12 h-12 bg-gradient-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="1" y="4" width="22" height="16" rx="2"/>
@@ -188,44 +161,38 @@ const Checkout = () => {
               </svg>
             </div>
             
-            {/* VISA Logo */}
             <span className="text-white text-2xl font-heading font-extrabold tracking-wider">VISA</span>
           </div>
 
-          {/* Card Number */}
           <div className="mb-4">
             <div className="flex justify-between gap-3 text-white text-xl font-mono tracking-widest">
               <span>····</span>
               <span>····</span>
               <span>····</span>
-              <span className="text-white/60">???</span>
+              <span className="text-white/60">4242</span>
             </div>
           </div>
 
-          {/* Bottom Row - Cardholder & Expiry */}
           <div className="flex justify-between items-end">
-            {/* Titular */}
             <div>
               <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
                 Titular
               </p>
-              <p className="text-white text-sm font-subheading font-bold  tracking-wide">
-                NOMBRE APELLIDO
+              <p className="text-white text-sm font-subheading font-bold tracking-wide">
+                SANTIAGO SEGURA
               </p>
             </div>
 
-            {/* Expira */}
             <div className="text-right">
               <p className="font-subheading font-bold text-white/50 text-[12px] uppercase tracking-wider mb-1">
                 Expira
               </p>
               <p className="text-white text-sm font-subheading font-bold tracking-wide">
-                MM / AA
+                12 / 28
               </p>
             </div>
           </div>
 
-          {/* Change Card Link */}
           <div className="mt-4 pt-4 border-t border-white/10">
             <button className="flex items-center gap-2 text-accent1 text-sm font-medium">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -238,55 +205,6 @@ const Checkout = () => {
         </div>
       </section>
 
-      {/* DATOS DE PAGO */}
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-        <p className="font-subheading font-bold text-[16px] text-text-low">DATOS DE PAGO</p>
-
-        <Card>
-          <div className="flex flex-col gap-[15px]">
-              <div className="flex flex-col gap-[5px]">
-                  <label className="font-subheading font-bold text-[16px] text-text-low">NÚMERO DE LA TARJETA</label>
-
-                  <div className="flex items-center gap-[20px]">
-                      <div className="text-text-low text-[20px] flex items-center justify-center">&</div>
-                      <input type="password" placeholder="1234 5678 9101" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="1234 5678 9101"/>
-                  </div>           
-              </div>
-
-              <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
-
-              <div className="flex flex-col gap-[5px]">
-                  <label className="font-subheading font-bold text-[16px] text-text-low">NOMBRE DEL TITULAR</label>
-
-                  <div className="flex items-center gap-[20px]">
-                      <div className="text-text-low text-[20px] flex items-center justify-center">&</div>
-                      <input type="text" placeholder="Como aparece en la tarjeta" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="Santiago Segura"/>
-                  </div>  
-              </div>
-
-              <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
-
-              <div className="flex items-center justify-between gap-[25px]">
-
-                  <div className="flex flex-col gap-[5px]">
-                      <label className="font-subheading font-bold text-[16px] text-text-low">CADUCIDAD</label>
-                      
-                      <div className="flex items-center gap-[20px]">
-                          <input type="text" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="MM / AA"/>
-                      </div>
-                  </div>
-                  
-                  <div className="w-[1px] h-[50px] bg-text-low"></div> {/**Esto es una linea de división */}
-
-                  <div className="flex flex-col gap-[5px]">
-                      <label className="font-subheading font-bold text-[16px] text-text-low">CVV &</label>
-                      <input type="number" placeholder="123" className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" defaultValue="123"/>
-                  </div>
-              </div>
-          </div>
-        </Card>            
-      </section>
-
       {/* RESUMEN DE LA SUSCRIPCIÓN */}
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <p className="font-subheading font-bold text-[16px] text-text-low">RESUMEN DE LA SUSCRIPCIÓN</p>
@@ -295,20 +213,26 @@ const Checkout = () => {
           <div className="flex flex-col gap-[10px]">
 
             <div className="flex items-center justify-between">            
-              <p className="font-subheading font-bold text-[16px] text-text-low">Plan Pro mensual</p>
+              <p className="font-subheading font-bold text-[16px] text-text-low">
+                Plan {planData.planName} {planData.billingText}
+              </p>
 
-              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-text-high">9,99 €</p>
+              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-text-high">
+                {planData.price} €
+              </p>
             </div>
 
-            <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+            <div className="w-full h-[1px] bg-text-low"></div>
 
             <div className="flex items-center justify-between">            
               <p className="font-subheading font-bold text-[16px] text-text-low">Prueba gratuita (7 días)</p>
 
-              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-accent2">-9,99 €</p>
+              <p className="font-subheading font-bold text-[16px] flex items-center justify-center text-accent2">
+                -{planData.price} €
+              </p>
             </div>
 
-            <div className="w-full h-[1px] bg-text-low"></div> {/**Esto es una linea de división */}
+            <div className="w-full h-[1px] bg-text-low"></div>
 
             <div className="flex items-center justify-between">            
               <p className="font-subheading font-bold text-[16px] text-text-low">IVA (21%)</p>
@@ -317,9 +241,9 @@ const Checkout = () => {
             </div>
 
             <div className="-mx-[16px] -mb-[23px] mt-[12px] bg-yellow-bg3 rounded-b-[16px] px-[14px] py-[10px] flex items-center justify-between border border-yellow/27">
-              <p className="font-heading font-semibold text-[20px] text-text-high">Precio total</p>
+              <p className="font-heading font-semibold text-[20px] text-text-high">Hoy pagas</p>
 
-              <p className="font-heading font-extrabold text-[18px] text-orange">9,99 €</p> {/*! PONER EL ICONO */}
+              <p className="font-heading font-extrabold text-[18px] text-accent3">0,00 €</p>
             </div>
             
           </div>
@@ -329,14 +253,14 @@ const Checkout = () => {
       {/* INFORMACIÓN */}
       <section className="mt-[22px] pb-5">
         <p className="font-body text-[16px] text-text-low text-center">
-          Al confirmar acetpas los
+          Al confirmar aceptas los
           <span className="text-primary"> Términos de uso </span>
           y la 
-          <span className="text-primary"> Pólitica de privacidad. </span>
+          <span className="text-primary"> Política de privacidad. </span>
           Se te cobrará 
-          <span className="text-text-high"> 9,99€ </span>
+          <span className="text-text-high"> {planData.price}€ </span>
           el <br />
-          <span className="text-text-high"> 24 abr 2026 </span> 
+          <span className="text-text-high"> {getChargeDate()} </span> 
           salvo que canceles antes del <br />fin de periodo.
         </p>
       </section>
@@ -345,15 +269,16 @@ const Checkout = () => {
       <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
         <Button
           variant="outlined"
-          text="& Confirmar pago"
+          text="✓ Confirmar pago"
           bgColor={"bg-orange"}
           textColor={"text-text-high"}
           borderColor={"border-orange"}
           w="w-[100%]"
+          onClick={handleConfirmPayment}
         />
 
         <p className="text-center mt-2 text-[11px] text-text-low font-light">
-          & Pago cifrado SSL · Sin compromiso
+          🔒 Pago cifrado SSL · Sin compromiso
         </p>
       </div>
     </div>

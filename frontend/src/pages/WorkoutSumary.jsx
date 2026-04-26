@@ -135,7 +135,7 @@ const WorkoutSummary = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-[120px]">
+    <div className="min-h-screen bg-background flex flex-col pb-30">
       {/* HEADER */}
       <section className="w-full px-4 pt-4 pb-4 border-b border-text-low/20">
         <div className="flex items-center justify-between mb-2">
