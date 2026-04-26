@@ -38,6 +38,16 @@ const Checkout = () => {
     return `${day} ${month} ${year}`;
   };
 
+  // Calcular fecha actual para el pago
+  const getCurrentDate = () => {
+    const date = new Date();
+    const day = date.getDate();
+    const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
   // Features según el plan
   const planFeatures = {
     pro: [
@@ -95,9 +105,23 @@ const Checkout = () => {
   };
 
   const handleConfirmPayment = () => {
-    // Aquí iría la lógica de pago real
-    alert(`Pago confirmado para plan ${planData.planName}`);
-    navigate('/dashboard');
+    // Generar ID de transacción único
+    const transactionId = 'AUR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    // Navegar a confirmación con todos los datos
+    navigate('/paymentConfirmation', {
+      state: {
+        plan: planData.plan,
+        planName: planData.planName,
+        billingPeriod: planData.billingPeriod,
+        billingText: planData.billingText,
+        price: planData.price,
+        cardLastFour: getLastFourDigits(),
+        paymentDate: getCurrentDate(),
+        nextBillingDate: getChargeDate(),
+        transactionId: transactionId
+      }
+    });
   };
 
   return (
