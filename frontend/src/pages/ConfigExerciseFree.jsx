@@ -1,31 +1,47 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import { useRoutine } from "../context/RoutinesContext";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
 
 const ConfigExerciseFree = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const { selectedExercises, removeExercise, saveRoutineConfiguration, routineConfiguration } = useRoutine();
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const isInitialMount = useRef(true);
 
+  // Estados para suscripción
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
+
   const [exercisesSeries, setExercisesSeries] = useState(() => {
-    if (routineConfiguration?.series) {
-      return routineConfiguration.series;
-    }
-    const initialSeries = {};
-    selectedExercises.forEach(exercise => {
-      initialSeries[exercise.id] = [
-        { id: 1, reps: "", weight: "" },
-        { id: 2, reps: "", weight: "" },
-        { id: 3, reps: "", weight: "" }
-      ];
+  if (routineConfiguration?.series) {
+    // Asegurar que todas las series tengan el campo rir
+    const updatedSeries = {};
+    Object.keys(routineConfiguration.series).forEach(exerciseId => {
+      updatedSeries[exerciseId] = routineConfiguration.series[exerciseId].map(serie => ({
+        ...serie,
+        rir: serie.rir || "" // ✅ Agregar rir si no existe
+      }));
     });
-    return initialSeries;
+    return updatedSeries;
+  }
+  
+  const initialSeries = {};
+  selectedExercises.forEach(exercise => {
+    initialSeries[exercise.id] = [
+      { id: 1, reps: "", weight: "", rir: "" },
+      { id: 2, reps: "", weight: "", rir: "" },
+      { id: 3, reps: "", weight: "", rir: "" }
+    ];
   });
+  return initialSeries;
+});
 
   const [exercisesRest, setExercisesRest] = useState(() => {
     if (routineConfiguration?.rest) {
@@ -38,7 +54,37 @@ const ConfigExerciseFree = () => {
     return initialRest;
   });
 
+  const [exercisesTechnique, setExercisesTechnique] = useState({});
 
+  // Cargar suscripción del usuario
+  useEffect(() => {
+    loadUserSubscription();
+  }, []);
+
+  const loadUserSubscription = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error cargando suscripción:', error);
+        setSubscriptionTier('free');
+      } else {
+        setSubscriptionTier(data?.subscription_tier || 'free');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSubscriptionTier('free');
+    } finally {
+      setIsLoadingSubscription(false);
+    }
+  };
+
+  // Verificar si tiene acceso a funciones premium
+  const hasProAccess = subscriptionTier === 'pro' || subscriptionTier === 'elite';
 
   useEffect(() => {
     if (!isInitialMount.current) {
@@ -46,11 +92,12 @@ const ConfigExerciseFree = () => {
         exercises: selectedExercises,
         series: exercisesSeries,
         rest: exercisesRest,
+        techniques: exercisesTechnique,
         timestamp: new Date().toISOString()
       };
       saveRoutineConfiguration(tempConfig);
     }
-  }, [exercisesSeries, exercisesRest]);
+  }, [exercisesSeries, exercisesRest, exercisesTechnique]);
 
   const showAlertMessage = (message) => {
     setAlertMessage(message);
@@ -64,7 +111,7 @@ const ConfigExerciseFree = () => {
       const newSerieId = currentSeries.length + 1;
       return {
         ...prev,
-        [exerciseId]: [...currentSeries, { id: newSerieId, reps: "", weight: "" }]
+        [exerciseId]: [...currentSeries, { id: newSerieId, reps: "", weight: "", rir: "" }]
       };
     });
   };
@@ -91,7 +138,7 @@ const ConfigExerciseFree = () => {
   };
 
   const updateSerie = (exerciseId, serieId, field, value) => {
-    if (field === 'reps') {
+    if (field === 'reps' || field === 'rir') {
       if (!validateNumberInput(value, false)) return;
     }
     if (field === 'weight') {
@@ -106,15 +153,26 @@ const ConfigExerciseFree = () => {
     }));
   };
 
-const updateRest = (exerciseId, value) => {
-  // Permitir números, decimales, comas, puntos y dos puntos para formato mm:ss
-  if (!/^[\d:,.\s]*$/.test(value)) return;
-  
-  setExercisesRest(prev => ({
-    ...prev,
-    [exerciseId]: value
-  }));
-};
+  const updateRest = (exerciseId, value) => {
+    if (!/^[\d:,.\s]*$/.test(value)) return;
+    
+    setExercisesRest(prev => ({
+      ...prev,
+      [exerciseId]: value
+    }));
+  };
+
+  const toggleTechnique = (exerciseId, technique) => {
+    if (!hasProAccess) {
+      showAlertMessage('Necesitas el Plan Pro o Elite para usar técnicas avanzadas');
+      return;
+    }
+
+    setExercisesTechnique(prev => ({
+      ...prev,
+      [exerciseId]: prev[exerciseId] === technique ? null : technique
+    }));
+  };
 
   const handleRemoveExercise = (exerciseId) => {
     const exercise = selectedExercises.find(ex => ex.id === exerciseId);
@@ -126,6 +184,11 @@ const updateRest = (exerciseId, value) => {
         return newState;
       });
       setExercisesRest(prev => {
+        const newState = { ...prev };
+        delete newState[exerciseId];
+        return newState;
+      });
+      setExercisesTechnique(prev => {
         const newState = { ...prev };
         delete newState[exerciseId];
         return newState;
@@ -163,42 +226,53 @@ const updateRest = (exerciseId, value) => {
     return true;
   };
 
-const handleSaveRoutine = () => {
-  if (!validateConfiguration()) {
-    return;
-  }
+  const handleSaveRoutine = () => {
+    if (!validateConfiguration()) {
+      return;
+    }
 
-  const transformedExercises = selectedExercises.map(exercise => {
-    const series = exercisesSeries[exercise.id] || [];
-    
-    return {
-      exercise_id: exercise.id,
-      exercise: exercise,
-      target_reps: series.map(s => parseInt(s.reps) || 0),
-      target_weight: series.map(s => {
-        const weight = s.weight.replace(',', '.');
-        return parseFloat(weight) || 0;
-      }),
-      target_rir: series.map(() => 0),
-      rest_seconds: exercisesRest[exercise.id] || "90" // ✅ Guardar string directo, SIN parseRestToSeconds
+    const transformedExercises = selectedExercises.map(exercise => {
+      const series = exercisesSeries[exercise.id] || [];
+      
+      return {
+        exercise_id: exercise.id,
+        exercise: exercise,
+        target_reps: series.map(s => parseInt(s.reps) || 0),
+        target_weight: series.map(s => {
+          const weight = s.weight.replace(',', '.');
+          return parseFloat(weight) || 0;
+        }),
+        target_rir: series.map(s => parseInt(s.rir) || 0),
+        rest_seconds: exercisesRest[exercise.id] || "90",
+        technique: exercisesTechnique[exercise.id] || null
+      };
+    });
+
+    const routineData = {
+      exercises: transformedExercises,
+      series: exercisesSeries,
+      rest: exercisesRest,
+      techniques: exercisesTechnique,
+      timestamp: new Date().toISOString()
     };
-  });
 
-  const routineData = {
-    exercises: transformedExercises,
-    series: exercisesSeries,
-    rest: exercisesRest,
-    timestamp: new Date().toISOString()
+    saveRoutineConfiguration(routineData);
+    console.log("Configuración guardada:", routineData);
+    navigate("/createRoutines1");
   };
-
-  saveRoutineConfiguration(routineData);
-  console.log("Configuración guardada:", routineData);
-  navigate("/createRoutines1");
-};
 
   const isInputFilled = (value) => {
-    return value && value.trim() !== "";
+  // Convertir a string si es número, luego verificar
+    return value !== null && value !== undefined && String(value).trim() !== "";
   };
+
+  if (isLoadingSubscription) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent1"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-[10px]">
@@ -279,7 +353,9 @@ const handleSaveRoutine = () => {
                   <p className="font-body text-[12px] text-text-low text-center">PESO (KG)</p>
                   <div className="flex items-center justify-center gap-[2px]">
                     <p className="font-body text-[12px] text-text-low text-center">RIR</p>
-                    <p className="bg-orange-bg2 h-[14px] w-[14px] rounded-[4px] border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center">🔒</p>
+                    {!hasProAccess && (
+                      <p className="bg-orange-bg2 h-[14px] w-[14px] rounded-[4px] border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center">🔒</p>
+                    )}
                   </div>   
                   <div></div>
                 </div>
@@ -321,9 +397,25 @@ const handleSaveRoutine = () => {
                         placeholder="60"
                       />
 
-                      <span className="bg-orange-bg2 w-[65px] h-[25px] rounded-[8px] border border-orange font-body text-[12px] text-orange flex items-center justify-center opacity-55 cursor-not-allowed">
-                        🔒 RIR
-                      </span>
+                      {hasProAccess ? (
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          name={`rir-${exercise.id}-${serie.id}`}
+                          value={serie.rir || ""}
+                          onChange={(e) => updateSerie(exercise.id, serie.id, 'rir', e.target.value)}
+                          className={`w-[65px] h-[25px] rounded-[8px] border font-body text-[12px] text-center ${
+                            isInputFilled(serie.rir)
+                              ? "bg-accent3 border-accent3 text-background"
+                              : "border-text-low text-text-high"
+                          }`}
+                          placeholder="2"
+                        />
+                      ) : (
+                        <span className="bg-orange-bg2 w-[65px] h-[25px] rounded-[8px] border border-orange font-body text-[12px] text-orange flex items-center justify-center opacity-55 cursor-not-allowed">
+                          🔒 RIR
+                        </span>
+                      )}
 
                       <button
                         onClick={() => deleteSerie(exercise.id, serie.id)}
@@ -345,30 +437,23 @@ const handleSaveRoutine = () => {
               <div className="flex gap-[8px] mt-[8px] items-center">
                 <p className="font-body text-[12px] text-text-low flex-shrink-0">Técnica</p>
                 
-                <div className="flex gap-[8px] overflow-x-auto scrollbar-hide">
-                  <button className="bg-orange-bg2 px-[10px] py-[1px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 Dropset
-                  </button>
-
-                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 Rest-pause
-                  </button>
-
-                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 Topset
-                  </button>
-
-                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 TS/BO
-                  </button>
-
-                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 Parciales
-                  </button>
-
-                  <button className="bg-orange-bg2 px-[12px] py-[4px] rounded-[16px] border border-orange font-body text-[12px] text-orange opacity-55 cursor-not-allowed whitespace-nowrap">
-                    🔒 Myo-reps
-                  </button>
+                <div className="flex gap-[6px] overflow-x-auto scrollbar-hide">
+                  {['Dropset', 'Rest-pause', 'Topset', 'TS/BO', 'Parciales', 'Myo-reps'].map((technique) => (
+                    <button
+                      key={technique}
+                      onClick={() => toggleTechnique(exercise.id, technique)}
+                      disabled={!hasProAccess}
+                      className={`px-[14px] py-[6px] rounded-[20px] border font-body text-[13px] font-medium whitespace-nowrap transition-all ${
+                        hasProAccess
+                          ? exercisesTechnique[exercise.id] === technique
+                            ? 'bg-primary border-primary text-background shadow-sm'
+                            : 'bg-transparent border-primary/40 text-primary hover:bg-primary/10 hover:border-primary'
+                          : 'bg-transparent border-text-low/30 text-text-low/50 cursor-not-allowed'
+                      }`}
+                    >
+                      {technique}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -394,7 +479,8 @@ const handleSaveRoutine = () => {
         ))
       )}
 
-      {selectedExercises.length > 0 && (
+      {/* CARD DE UPGRADE - SOLO MOSTRAR SI NO TIENE PRO/ELITE */}
+      {selectedExercises.length > 0 && !hasProAccess && (
         <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
           <button
             onClick={handleNavigateToSubscription}
@@ -413,7 +499,7 @@ const handleSaveRoutine = () => {
                     </p>
 
                     <p className="font-body text-[12px] text-text-low text-left">
-                      Con <span className="text-orange">Plan Élite</span> activa control de intensidad por RIR, Dropsets, Rest-pause y más funciones.
+                      Con <span className="text-orange">Plan Pro o Élite</span> activa control de intensidad por RIR, Dropsets, Rest-pause y más funciones.
                     </p>
                   </div>
                 </div>
