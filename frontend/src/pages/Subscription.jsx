@@ -4,7 +4,7 @@ import Card from '../components/Card';
 import Header from '../components/Header';
 import Button from '../components/Button';
 
-const Suscription = () => {
+const Subscription = () => {
   const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState('mes');
   const [selectedPlan, setSelectedPlan] = useState('free');
@@ -487,4 +487,4 @@ const Suscription = () => {
   );
 };
 
-export default Suscription;
+export default Subscription;

@@ -33,7 +33,7 @@ import CreatePersonalExercise from "./pages/CreatePersonalExercise";
 import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
-import Suscription from "./pages/Suscription";
+import Subscription from "./pages/Subscription";
 
 const App = () => {
   return (
@@ -53,7 +53,7 @@ const App = () => {
 
             <Route path="/personalSettings" element={<PersonalSettings />} />
 
-            <Route path="/suscription" element={<Suscription />} />
+            <Route path="/subscription" element={<Subscription />} />
 
             <Route path="/checkout" element={<Checkout />} />
 

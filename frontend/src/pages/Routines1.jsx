@@ -75,7 +75,7 @@ const Routines1 = () => {
   };
 
   const handleNavigateToSubscription = () => {
-    navigate("/suscription");
+    navigate("/subscription");
   };
 
   const handleEditRoutine = (routineId) => {
