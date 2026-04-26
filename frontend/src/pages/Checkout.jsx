@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Header from "../components/Header";
 import Button from "../components/Button";
@@ -7,6 +9,7 @@ import Button from "../components/Button";
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   
   // Obtener datos del plan desde location.state
   const planData = location.state || {
@@ -26,6 +29,7 @@ const Checkout = () => {
   });
 
   const [isEditingCard, setIsEditingCard] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Calcular fecha de cobro (7 días desde hoy)
   const getChargeDate = () => {
@@ -36,6 +40,20 @@ const Checkout = () => {
     const month = months[date.getMonth()];
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
+  };
+
+  // Calcular subscription_ends_at según el billing period
+  const getSubscriptionEndDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 7); // 7 días de prueba gratuita
+    
+    if (planData.billingPeriod === 'mes') {
+      date.setMonth(date.getMonth() + 1); // +1 mes desde el inicio del pago
+    } else {
+      date.setFullYear(date.getFullYear() + 1); // +1 año desde el inicio del pago
+    }
+    
+    return date.toISOString();
   };
 
   // Calcular fecha actual para el pago
@@ -104,24 +122,49 @@ const Checkout = () => {
     return cardData.number.slice(-4);
   };
 
-  const handleConfirmPayment = () => {
-    // Generar ID de transacción único
-    const transactionId = 'AUR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  const handleConfirmPayment = async () => {
+    setIsProcessing(true);
 
-    // Navegar a confirmación con todos los datos
-    navigate('/paymentConfirmation', {
-      state: {
-        plan: planData.plan,
-        planName: planData.planName,
-        billingPeriod: planData.billingPeriod,
-        billingText: planData.billingText,
-        price: planData.price,
-        cardLastFour: getLastFourDigits(),
-        paymentDate: getCurrentDate(),
-        nextBillingDate: getChargeDate(),
-        transactionId: transactionId
+    try {
+      // Actualizar suscripción en la base de datos
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          subscription_tier: planData.plan,
+          subscription_ends_at: getSubscriptionEndDate()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Error al actualizar suscripción:', updateError);
+        alert('Error al procesar el pago. Por favor, intenta de nuevo.');
+        setIsProcessing(false);
+        return;
       }
-    });
+
+      // Generar ID de transacción único
+      const transactionId = 'AUR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+      // Navegar a confirmación con todos los datos
+      navigate('/paymentConfirmation', {
+        state: {
+          plan: planData.plan,
+          planName: planData.planName,
+          billingPeriod: planData.billingPeriod,
+          billingText: planData.billingText,
+          price: planData.price,
+          cardLastFour: getLastFourDigits(),
+          paymentDate: getCurrentDate(),
+          nextBillingDate: getChargeDate(),
+          transactionId: transactionId
+        }
+      });
+
+    } catch (error) {
+      console.error('Error inesperado:', error);
+      alert('Error inesperado. Por favor, intenta de nuevo.');
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -423,12 +466,13 @@ const Checkout = () => {
       <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
         <Button
           variant="outlined"
-          text="✓ Confirmar pago"
+          text={isProcessing ? "Procesando..." : "✓ Confirmar pago"}
           bgColor={"bg-orange"}
           textColor={"text-text-high"}
           borderColor={"border-orange"}
           w="w-[100%]"
           onClick={handleConfirmPayment}
+          disabled={isProcessing}
         />
 
         <p className="text-center mt-2 text-[11px] text-text-low font-light">
