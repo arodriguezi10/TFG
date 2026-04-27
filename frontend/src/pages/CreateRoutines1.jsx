@@ -63,20 +63,25 @@ const CreateRoutines1 = () => {
   ];
 
   useEffect(() => {
-    const savedData = localStorage.getItem("createRoutineFormData");
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setRoutineName(parsedData.routineName || "");
-        setDescription(parsedData.description || "");
-        setSelectedType(parsedData.selectedType || "");
-        setSelectedDays(parsedData.selectedDays || []);
-        setDuration(parsedData.duration || 45);
-        setSelectedMuscles(parsedData.selectedMuscles || []);
-      } catch (error) {
-        console.error("Error al cargar datos guardados:", error);
-      }
+  if (selectedExercises.length === 0) {
+    localStorage.removeItem('createRoutineFormData');
+    return;
+  }
+
+  const savedData = localStorage.getItem('createRoutineFormData');
+  if (savedData) {
+    try {
+      const parsedData = JSON.parse(savedData);
+      setRoutineName(parsedData.routineName || "");
+      setDescription(parsedData.description || "");
+      setSelectedType(parsedData.selectedType || "");
+      setSelectedDays(parsedData.selectedDays || []);
+      setDuration(parsedData.duration || 45);
+      setSelectedMuscles(parsedData.selectedMuscles || []);
+    } catch (error) {
+      console.error('Error al cargar datos guardados:', error);
     }
+  }
   }, []);
 
   useEffect(() => {
