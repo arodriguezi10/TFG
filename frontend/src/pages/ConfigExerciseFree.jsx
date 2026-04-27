@@ -412,7 +412,7 @@ const ConfigExerciseFree = () => {
                           onChange={(e) => updateSerie(exercise.id, serie.id, 'rir', e.target.value)}
                           className={`w-[65px] h-[25px] rounded-[8px] border font-body text-[12px] text-center ${
                             isInputFilled(serie.rir)
-                              ? "bg-accent3 border-accent3 text-background"
+                              ? "bg-primary border-primary text-background"
                               : "border-text-low text-text-high"
                           }`}
                           placeholder="2"
