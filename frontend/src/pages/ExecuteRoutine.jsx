@@ -18,10 +18,33 @@ const ExecuteRoutine = () => {
   const [isTimerRunning, setIsTimerRunning] = useState(true);
 
   const [exerciseData, setExerciseData] = useState({});
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [intensityTechniques, setIntensityTechniques] = useState({});
 
   useEffect(() => {
     loadRoutineData();
+    loadUserSubscription();
   }, [id]);
+
+  const loadUserSubscription = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error cargando suscripción:', error);
+        setSubscriptionTier('free');
+      } else {
+        setSubscriptionTier(data?.subscription_tier || 'free');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSubscriptionTier('free');
+    }
+  };
 
   useEffect(() => {
     let interval;
@@ -50,6 +73,7 @@ const ExecuteRoutine = () => {
             target_weight,
             target_rir,
             rest_seconds,
+            intensity_technique,
             exercises (
               id,
               name,
@@ -80,6 +104,14 @@ const ExecuteRoutine = () => {
         }));
 
       setExercises(sortedExercises);
+
+      const techniques = {};
+      routineData.routine_exercises.forEach(re => {
+        if (re.intensity_technique) {
+          techniques[re.exercises.id] = re.intensity_technique;
+        }
+      });
+      setIntensityTechniques(techniques);
 
       const initialData = {};
       sortedExercises.forEach(exercise => {
@@ -352,12 +384,22 @@ const ExecuteRoutine = () => {
 
               {isExpanded && (
                 <div className="mt-4 pt-4 border-t border-text-low">
-                  <div className="flex items-center justify-center gap-2 mb-4 text-[13px] text-text-low">
-                    <span>⏳</span>
-                    <span>Descanso entre series:</span>
-                    <span className="font-heading font-bold text-primary">
-                      {formatRestTime(exercise.restSeconds)}
-                    </span>
+                  <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex items-center justify-center gap-2 text-[13px] text-text-low">
+                      <span>⏳</span>
+                      <span>Descanso entre series:</span>
+                      <span className="font-heading font-bold text-primary">
+                        {formatRestTime(exercise.restSeconds)}
+                      </span>
+                    </div>
+                    
+                    {intensityTechniques[exercise.id] && (
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="bg-primary/10 border border-primary px-3 py-1 rounded-full font-body text-[12px] text-primary font-medium">
+                          ⚡ {intensityTechniques[exercise.id]}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -392,7 +434,7 @@ const ExecuteRoutine = () => {
                             className="w-full bg-background border border-text-low rounded-lg px-2 py-1.5 text-text-high text-[14px] font-heading font-semibold text-center outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-text-low/40"
                           />
                         </div>
-
+                        
                         <div>
                           <input
                             type="number"
@@ -405,16 +447,29 @@ const ExecuteRoutine = () => {
                           />
                         </div>
 
-                        <div className="relative">
-                          <input
-                            type="text"
-                            value={serie.targetRIR > 0 ? serie.targetRIR : "—"}
-                            disabled
-                            className="w-full bg-background/50 border border-text-low/50 rounded-lg px-2 py-1.5 text-text-low/50 text-[14px] font-heading font-semibold text-center cursor-not-allowed"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span className="text-[10px] text-text-low/30">🔒</span>
-                          </div>
+                        <div>
+                          {subscriptionTier === 'elite' || subscriptionTier === 'pro' ? (
+                            <input
+                              type="number"
+                              placeholder={serie.targetRIR > 0 ? serie.targetRIR.toString() : "0"}
+                              value={serie.actualRIR}
+                              onChange={(e) => handleSerieInputChange(exercise.id, serieIndex, 'actualRIR', e.target.value)}
+                              disabled={serie.completed}
+                              className="w-full bg-background border border-text-low rounded-lg px-2 py-1.5 text-text-high text-[14px] font-heading font-semibold text-center outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-text-low/40"
+                            />
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="text"
+                                value="—"
+                                disabled
+                                className="w-full bg-background/50 border border-text-low/50 rounded-lg px-2 py-1.5 text-text-low/50 text-[14px] font-heading font-semibold text-center cursor-not-allowed"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span className="text-[10px] text-text-low/30">🔒</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <button
