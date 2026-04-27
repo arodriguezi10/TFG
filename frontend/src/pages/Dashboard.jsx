@@ -52,7 +52,7 @@ const Dashboard = () => {
         resetDailyChecks();
         loadWeightData();
         loadWeekData();
-        loadData(); // Recargar rutina del día
+        loadData();
       }
     }, 60000);
 
@@ -255,10 +255,15 @@ const Dashboard = () => {
         const dateStr = date.toISOString().split('T')[0];
         
         const weightLog = last7DaysData?.find(w => w.log_date === dateStr);
+        
+        // Obtener nombre del día correctamente (L, M, X, J, V, S, D)
+        const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+        const firstLetter = dayName === 'mié' ? 'X' : dayName.charAt(0).toUpperCase();
+        
         last7DaysArray.push({
           date: dateStr,
           weight: weightLog?.weight || null,
-          dayName: date.toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase()
+          dayName: firstLetter
         });
       }
 
@@ -364,7 +369,6 @@ const Dashboard = () => {
 
   const handleStartRoutine = () => {
     if (todayRoutine) {
-      // Navegar a la pantalla de ejecución de rutina (próximamente)
       navigate(`/executeRoutine/${todayRoutine.id}`);
     } else {
       navigate("/routines1");
