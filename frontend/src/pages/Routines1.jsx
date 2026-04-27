@@ -14,12 +14,35 @@ const Routines1 = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
 
   useEffect(() => {
     if (user) {
       fetchRoutines();
+      loadUserSubscription();
     }
   }, [user]);
+
+  const loadUserSubscription = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('subscription_tier')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error cargando suscripción:', error);
+      setSubscriptionTier('free');
+    } else {
+      setSubscriptionTier(data?.subscription_tier || 'free');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    setSubscriptionTier('free');
+  }
+};
+
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -364,6 +387,7 @@ const Routines1 = () => {
         </>
       )}
 
+      {subscriptionTier !== 'elite' && (
       <section className="mt-[16px] pb-[16px]">
         <button 
           onClick={handleNavigateToSubscription}
@@ -401,6 +425,7 @@ const Routines1 = () => {
           </Card>
         </button>
       </section>
+      )}
     </div>
   );
 };
