@@ -281,7 +281,7 @@ const ConfigExerciseFree = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+    <div className="min-h-screen bg-background flex flex-col pb-20">
       {showAlert && (
         <div className="fixed top-[20px] left-[50%] transform -translate-x-1/2 z-50 w-[90%] max-w-[400px]">
           <div className="bg-red/90 border border-red rounded-[16px] p-[16px] shadow-lg">
