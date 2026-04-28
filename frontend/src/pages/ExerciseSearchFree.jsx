@@ -15,12 +15,11 @@ const ExerciseSearchFree = () => {
   const location = useLocation();
 
   const [customExercises, setCustomExercises] = useState([]);
-  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState(
-    [],
-  );
+  const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
+  const [subscriptionTier, setSubscriptionTier] = useState('free');
 
   const isSearchActive =
     location.pathname === "/exerciseSearchFree" ||
@@ -133,11 +132,42 @@ const ExerciseSearchFree = () => {
     "Core",
   ];
 
+  // Obtener límite de ejercicios personalizados según plan
+  const getCustomExerciseLimit = () => {
+    if (subscriptionTier === 'elite' || subscriptionTier === 'pro') {
+      return 50;
+    }
+    return 5;
+  };
+
+  const customExerciseLimit = getCustomExerciseLimit();
+
   useEffect(() => {
     if (user) {
+      loadUserSubscription();
       loadData();
     }
   }, [user]);
+
+  const loadUserSubscription = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error cargando suscripción:', error);
+        setSubscriptionTier('free');
+      } else {
+        setSubscriptionTier(data?.subscription_tier || 'free');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setSubscriptionTier('free');
+    }
+  };
 
   const loadData = async () => {
     await insertPredefinedExercisesIfNeeded();
@@ -197,7 +227,6 @@ const ExerciseSearchFree = () => {
 
   const insertPredefinedExercisesIfNeeded = async () => {
     try {
-      // Verificar si ya existen ejercicios predefinidos
       const { data: existing, error: checkError } = await supabase
         .from("exercises")
         .select("name")
@@ -209,13 +238,11 @@ const ExerciseSearchFree = () => {
         return;
       }
 
-      // Si ya existen 15 ejercicios predefinidos, no insertar más
       if (existing && existing.length >= 15) {
         console.log("Ejercicios predefinidos ya existen");
         return;
       }
 
-      // Solo insertar los que no existen
       const existingNames = existing.map((e) => e.name);
       const exercisesToInsert = predefinedExercises
         .filter((exercise) => !existingNames.includes(exercise.name))
@@ -269,10 +296,16 @@ const ExerciseSearchFree = () => {
   };
 
   const handleCreateExercise = () => {
-    if (customExercises.length >= 5) {
-      alert(
-        "Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro para crear ilimitados.",
-      );
+    if (customExercises.length >= customExerciseLimit) {
+      if (subscriptionTier === 'free') {
+        alert(
+          "Has alcanzado el límite de 5 ejercicios personalizados en el plan Free. Actualiza a Pro o Elite para crear hasta 50 ejercicios.",
+        );
+      } else {
+        alert(
+          `Has alcanzado el límite de ${customExerciseLimit} ejercicios personalizados.`,
+        );
+      }
       return;
     }
     navigate("/createPersonalExercise");
@@ -442,9 +475,9 @@ const ExerciseSearchFree = () => {
             <span className="text-text-high text-[20px]">⚡</span>
             <p className="font-body text-[16px] text-text-high">
               Crea tus propios ejercicios{" "}
-              {customExercises.length >= 5 && (
+              {customExercises.length >= customExerciseLimit && (
                 <span className="text-text-low">
-                  ({customExercises.length}/5 - Límite alcanzado)
+                  ({customExercises.length}/{customExerciseLimit} - Límite alcanzado)
                 </span>
               )}
             </p>
@@ -458,7 +491,7 @@ const ExerciseSearchFree = () => {
       {filteredCustomExercises.length > 0 && (
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
           <p className="font-subheading font-bold text-[16px] text-primary">
-            ⚡ MIS EJERCICIOS ({customExercises.length}/5)
+            ⚡ MIS EJERCICIOS ({customExercises.length}/{customExerciseLimit})
           </p>
 
           {loading ? (
