@@ -740,17 +740,17 @@ const ExerciseSearchFree = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5">
       <section className="w-full flex flex-col items-center justify-between">
-        <div className="w-[220px] h-[45px] bg-surf rounded-[16px] border border-text-low p-[10px] gap-[10px] flex items-center">
+        <div className="w-55 h-11.25 bg-surf rounded-2xl border border-text-low p-2.5 gap-2.5 flex items-center">
           <button
             onClick={handleNavigateToSearch}
-            className={`rounded-[16px] transition-colors duration-200 ${
+            className={`rounded-2xl transition-colors duration-200 ${
               isSearchActive ? "bg-primary" : "bg-transparent"
             }`}
           >
             <p
-              className={`font-subheading font-bold text-[16px] px-[15px] py-[5px] ${
+              className={`font-subheading font-bold text-[16px] px-3.75 py-1.25 ${
                 isSearchActive ? "text-text-high" : "text-text-low"
               }`}
             >
@@ -760,12 +760,12 @@ const ExerciseSearchFree = () => {
 
           <button
             onClick={handleNavigateToConfig}
-            className={`rounded-[16px] transition-colors duration-200 ${
+            className={`rounded-2xl transition-colors duration-200 ${
               isConfigActive ? "bg-primary" : "bg-transparent"
             }`}
           >
             <p
-              className={`font-subheading font-bold text-[16px] px-[15px] py-[5px] ${
+              className={`font-subheading font-bold text-[16px] px-3.75 py-1.25 ${
                 isConfigActive ? "text-text-high" : "text-text-low"
               }`}
             >
@@ -775,7 +775,7 @@ const ExerciseSearchFree = () => {
         </div>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <p className="font-heading font-extrabold text-[18px] text-text-high">
             Añadir ejercicio
@@ -783,7 +783,7 @@ const ExerciseSearchFree = () => {
 
           <button
             onClick={() => navigate(-1)}
-            className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-surface transition-colors"
+            className="bg-surf h-10 w-10 rounded-lg border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-surface transition-colors"
           >
             X
           </button>
@@ -801,12 +801,12 @@ const ExerciseSearchFree = () => {
           />
         </div>
 
-        <div className="flex gap-[5px] overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1.25 overflow-x-auto scrollbar-hide">
           {muscleGroups.map((muscle) => (
             <button
               key={muscle}
               onClick={() => setSelectedMuscleFilter(muscle)}
-              className={`px-[10px] py-[1px] rounded-[16px] border font-body text-[16px] whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-px rounded-2xl border font-body text-[16px] whitespace-nowrap transition-colors ${
                 selectedMuscleFilter === muscle
                   ? "bg-primary-bg border-primary text-primary"
                   : "bg-surf border-text-low text-text-low"
@@ -819,12 +819,12 @@ const ExerciseSearchFree = () => {
       </section>
 
       {!hasEliteAccess && (
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
           <button
             onClick={() => navigate("/subscription")}
-            className="h-[80px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+            className="h-20 rounded-2xl bg-primary-bg border border-primary p-4 flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
           >
-            <div className="w-[90%] flex items-center justify-center gap-[15px]">
+            <div className="w-[90%] flex items-center justify-center gap-3.75">
               <span className="text-primary text-[20px]">👑</span>
               <p className="font-body text-[16px] text-text-low text-left">
                 Amplía tus posibilidades con el{" "}
@@ -832,19 +832,19 @@ const ExerciseSearchFree = () => {
                 +28 ejercicios de nivel intermedio y avanzado.
               </p>
             </div>
-            <div className="flex items-center justify-center gap-[15px] text-primary">
+            <div className="flex items-center justify-center gap-3.75 text-primary">
               →
             </div>
           </button>
         </section>
       )}
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <button
           onClick={handleCreateExercise}
-          className="h-[70px] rounded-[16px] bg-primary border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+          className="h-17.5 rounded-2xl bg-primary border border-primary p-4 flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
-          <div className="w-[90%] flex items-center justify-center gap-[15px]">
+          <div className="w-[90%] flex items-center justify-center gap-3.75">
             <span className="text-text-high text-[20px]">⚡</span>
             <p className="font-body text-[16px] text-text-high">
               Crea tus propios ejercicios{" "}
@@ -855,14 +855,14 @@ const ExerciseSearchFree = () => {
               )}
             </p>
           </div>
-          <div className="flex items-center justify-center gap-[15px] text-text-high">
+          <div className="flex items-center justify-center gap-3.75 text-text-high">
             →
           </div>
         </button>
       </section>
 
       {filteredCustomExercises.length > 0 && (
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
           <p className="font-subheading font-bold text-[16px] text-primary">
             ⚡ MIS EJERCICIOS ({customExercises.length}/{customExerciseLimit})
           </p>
@@ -876,9 +876,9 @@ const ExerciseSearchFree = () => {
               const isSelected = isExerciseSelected(exercise.id);
               return (
                 <Card key={exercise.id}>
-                  <div className="flex items-center justify-between gap-[12px]">
-                    <div className="flex items-center gap-[10px]">
-                      <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <span className="bg-primary-bg h-12.5 w-12.5 rounded-xl border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
                         ⚡
                       </span>
 
@@ -891,9 +891,9 @@ const ExerciseSearchFree = () => {
                           {exercise.muscle_group} · {exercise.equipment}
                         </p>
 
-                        <div className="mt-[3px] flex gap-[6px]">
+                        <div className="mt-0.75 flex gap-1.5">
                           <span
-                            className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
+                            className={`h-auto px-2.5 rounded-2xl border font-body text-[12px] ${
                               exercise.difficulty_level === "Principiante"
                                 ? "bg-green-bg2 border-accent2 text-accent2"
                                 : exercise.difficulty_level === "Intermedio"
@@ -904,17 +904,17 @@ const ExerciseSearchFree = () => {
                             {exercise.difficulty_level}
                           </span>
 
-                          <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                          <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                             Personalizado
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-center gap-[8px]">
+                    <div className="flex flex-col items-center gap-2">
                       <button
                         onClick={() => handleToggleExercise(exercise)}
-                        className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                        className={`h-8 w-8 rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                           isSelected
                             ? "bg-primary border-primary text-text-high"
                             : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
@@ -929,7 +929,7 @@ const ExerciseSearchFree = () => {
                       </button>
                       <button
                         onClick={() => handleDeleteExercise(exercise)}
-                        className="h-[32px] w-[32px] rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
+                        className="h-8 w-8 rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
                         title="Eliminar ejercicio permanentemente"
                       >
                         🗑️
@@ -944,7 +944,7 @@ const ExerciseSearchFree = () => {
       )}
 
       {filteredPredefinedExercises.length > 0 && (
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
           <p className="font-subheading font-bold text-[16px] text-accent2">
             💪 PRINCIPIANTE
           </p>
@@ -953,9 +953,9 @@ const ExerciseSearchFree = () => {
             const isSelected = isExerciseSelected(exercise.id);
             return (
               <Card key={exercise.id}>
-                <div className="flex items-center justify-between gap-[12px]">
-                  <div className="flex items-center gap-[10px]">
-                    <span className="bg-green-bg2 h-[50px] w-[50px] rounded-[12px] border border-accent2 font-heading font-extrabold text-[18px] text-accent2 flex items-center justify-center">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="bg-green-bg2 h-12.5 w-12.5 rounded-xl border border-accent2 font-heading font-extrabold text-[18px] text-accent2 flex items-center justify-center">
                       💪
                     </span>
 
@@ -968,12 +968,12 @@ const ExerciseSearchFree = () => {
                         {exercise.muscle_group} · {exercise.equipment}
                       </p>
 
-                      <div className="mt-[3px] flex gap-[6px]">
-                        <span className="bg-green-bg2 h-auto px-[10px] rounded-[16px] border border-accent2 font-body text-[12px] text-accent2">
+                      <div className="mt-0.75 flex gap-1.5">
+                        <span className="bg-green-bg2 h-auto px-2.5 rounded-2xl border border-accent2 font-body text-[12px] text-accent2">
                           Principiante
                         </span>
 
-                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                           {exercise.equipment}
                         </span>
                       </div>
@@ -983,7 +983,7 @@ const ExerciseSearchFree = () => {
                   <div>
                     <button
                       onClick={() => handleToggleExercise(exercise)}
-                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                      className={`h-8 w-8 rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                         isSelected
                           ? "bg-primary border-primary text-text-high"
                           : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
@@ -1000,7 +1000,7 @@ const ExerciseSearchFree = () => {
       )}
 
       {hasEliteAccess && filteredIntermediateExercises.length > 0 && (
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
           <p className="font-subheading font-bold text-[16px] text-orange">
             🔥 INTERMEDIO
           </p>
@@ -1009,9 +1009,9 @@ const ExerciseSearchFree = () => {
             const isSelected = isExerciseSelected(exercise.id);
             return (
               <Card key={exercise.id}>
-                <div className="flex items-center justify-between gap-[12px]">
-                  <div className="flex items-center gap-[10px]">
-                    <span className="bg-orange-bg2 h-[50px] w-[50px] rounded-[12px] border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="bg-orange-bg2 h-12.5 w-12.5 rounded-xl border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
                       🔥
                     </span>
 
@@ -1024,12 +1024,12 @@ const ExerciseSearchFree = () => {
                         {exercise.muscle_group} · {exercise.equipment}
                       </p>
 
-                      <div className="mt-[3px] flex gap-[6px]">
-                        <span className="bg-orange-bg2 h-auto px-[10px] rounded-[16px] border border-orange font-body text-[12px] text-orange">
+                      <div className="mt-0.75 flex gap-1.5">
+                        <span className="bg-orange-bg2 h-auto px-2.5 rounded-2xl border border-orange font-body text-[12px] text-orange">
                           Intermedio
                         </span>
 
-                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                           {exercise.equipment}
                         </span>
                       </div>
@@ -1039,7 +1039,7 @@ const ExerciseSearchFree = () => {
                   <div>
                     <button
                       onClick={() => handleToggleExercise(exercise)}
-                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                      className={`h-8 w-8 rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                         isSelected
                           ? "bg-primary border-primary text-text-high"
                           : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
@@ -1056,7 +1056,7 @@ const ExerciseSearchFree = () => {
       )}
 
       {hasEliteAccess && filteredAdvancedExercises.length > 0 && (
-        <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5">
           <p className="font-subheading font-bold text-[16px] text-accent1">
             ⚡ AVANZADO
           </p>
@@ -1065,9 +1065,9 @@ const ExerciseSearchFree = () => {
             const isSelected = isExerciseSelected(exercise.id);
             return (
               <Card key={exercise.id}>
-                <div className="flex items-center justify-between gap-[12px]">
-                  <div className="flex items-center gap-[10px]">
-                    <span className="bg-accent1-bg1 h-[50px] w-[50px] rounded-[12px] border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="bg-accent1-bg1 h-12.5 w-12.5 rounded-xl border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center">
                       ⚡
                     </span>
 
@@ -1080,12 +1080,12 @@ const ExerciseSearchFree = () => {
                         {exercise.muscle_group} · {exercise.equipment}
                       </p>
 
-                      <div className="mt-[3px] flex gap-[6px]">
-                        <span className="bg-accent1-bg1 h-auto px-[10px] rounded-[16px] border border-accent1 font-body text-[12px] text-accent1">
+                      <div className="mt-0.75 flex gap-1.5">
+                        <span className="bg-accent1-bg1 h-auto px-2.5 rounded-2xl border border-accent1 font-body text-[12px] text-accent1">
                           Avanzado
                         </span>
 
-                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                           {exercise.equipment}
                         </span>
                       </div>
@@ -1095,7 +1095,7 @@ const ExerciseSearchFree = () => {
                   <div>
                     <button
                       onClick={() => handleToggleExercise(exercise)}
-                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                      className={`h-8 w-8 rounded-full border flex items-center justify-center text-[20px] transition-colors ${
                         isSelected
                           ? "bg-primary border-primary text-text-high"
                           : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
@@ -1113,34 +1113,34 @@ const ExerciseSearchFree = () => {
 
       {!hasEliteAccess && (
         <>
-          <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+          <section className="mt-4 w-full px-4 flex flex-col gap-2.5 opacity-50 pointer-events-none">
             <p className="font-subheading font-bold text-[16px] text-orange">
               🔒 INTERMEDIO
             </p>
             <Card>
-              <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+              <div className="flex flex-col items-center justify-center py-7.5 gap-3">
                 <span className="text-[40px]">🔒</span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>
-                <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+                <p className="font-body text-[13px] text-text-low text-center px-5">
                   Actualiza a Plan Elite para acceder a ejercicios de nivel intermedio
                 </p>
               </div>
             </Card>
           </section>
 
-          <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+          <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5 opacity-50 pointer-events-none">
             <p className="font-subheading font-bold text-[16px] text-accent1">
               🔒 AVANZADO
             </p>
             <Card>
-              <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+              <div className="flex flex-col items-center justify-center py-7.5 gap-3">
                 <span className="text-[40px]">🔒</span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>
-                <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+                <p className="font-body text-[13px] text-text-low text-center px-5">
                   Actualiza a Plan Elite para acceder a ejercicios de nivel avanzado
                 </p>
               </div>
@@ -1154,9 +1154,9 @@ const ExerciseSearchFree = () => {
         filteredIntermediateExercises.length === 0 &&
         filteredAdvancedExercises.length === 0 &&
         !loading && (
-          <section className="mt-[16px] pb-[70px] w-full px-[16px]">
+          <section className="mt-4 pb-17.5 w-full px-4">
             <Card>
-              <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
+              <div className="flex flex-col items-center justify-center py-10 gap-4">
                 <span className="text-[48px]">🔍</span>
                 <p className="font-heading font-bold text-[18px] text-text-high text-center">
                   No se encontraron ejercicios
@@ -1169,7 +1169,7 @@ const ExerciseSearchFree = () => {
           </section>
         )}
 
-      <section className="mt-[16px] w-full px-[16px] fixed bottom-1">
+      <section className="mt-4 w-full px-4 fixed bottom-1">
         <Button
           variant="outlined"
           text={

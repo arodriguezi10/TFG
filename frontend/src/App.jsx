@@ -34,6 +34,7 @@ import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
 import Subscription from "./pages/Subscription";
+import Onboarding from "./pages/Onboarding";
 
 const App = () => {
   return (
@@ -49,47 +50,203 @@ const App = () => {
 
             <Route path="/resetPassword" element={<ResetPassword />} />
 
-            <Route path="/profile" element={<Profile />} />
+            <Route 
+              path="/onboarding" 
+              element={
+                <PrivateRoute>
+                  <Onboarding />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/personalSettings" element={<PersonalSettings />} />
+            <Route 
+              path="/profile" 
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/subscription" element={<Subscription />} />
+            <Route 
+              path="/personalSettings" 
+              element={
+                <PrivateRoute>
+                  <PersonalSettings />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/checkout" element={<Checkout />} />
+            <Route 
+              path="/subscription" 
+              element={
+                <PrivateRoute>
+                  <Subscription />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/paymentConfirmation" element={<PaymentConfirmation />} />
+            <Route 
+              path="/checkout" 
+              element={
+                <PrivateRoute>
+                  <Checkout />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/editRoutine/:id" element={<EditRoutine />} />
+            <Route 
+              path="/paymentConfirmation" 
+              element={
+                <PrivateRoute>
+                  <PaymentConfirmation />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/routines2" element={<Routines2 />} />
+            <Route 
+              path="/editRoutine/:id" 
+              element={
+                <PrivateRoute>
+                  <EditRoutine />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/executeRoutine/:id" element={<ExecuteRoutine />} />
+            <Route 
+              path="/routines2" 
+              element={
+                <PrivateRoute>
+                  <Routines2 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/WorkoutSumary" element={<WorkoutSumary />} />
+            <Route 
+              path="/executeRoutine/:id" 
+              element={
+                <PrivateRoute>
+                  <ExecuteRoutine />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/routines3" element={<Routines3 />} />
+            <Route 
+              path="/WorkoutSumary" 
+              element={
+                <PrivateRoute>
+                  <WorkoutSumary />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/routines4" element={<Routines4 />} />
+            <Route 
+              path="/routines3" 
+              element={
+                <PrivateRoute>
+                  <Routines3 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/createRoutines1" element={<CreateRoutines1 />} />
+            <Route 
+              path="/routines4" 
+              element={
+                <PrivateRoute>
+                  <Routines4 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/createRoutines2" element={<CreateRoutines2 />} />
+            <Route 
+              path="/createRoutines1" 
+              element={
+                <PrivateRoute>
+                  <CreateRoutines1 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/createRoutines3" element={<CreateRoutines3 />} />
+            <Route 
+              path="/createRoutines2" 
+              element={
+                <PrivateRoute>
+                  <CreateRoutines2 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/exerciseSearchElite" element={<ExerciseSearchElite />} />
+            <Route 
+              path="/createRoutines3" 
+              element={
+                <PrivateRoute>
+                  <CreateRoutines3 />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/exerciseSearchPro" element={<ExerciseSearchPro />} />
+            <Route 
+              path="/exerciseSearchElite" 
+              element={
+                <PrivateRoute>
+                  <ExerciseSearchElite />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/exerciseSearchFree" element={<ExerciseSearchFree />} />
+            <Route 
+              path="/exerciseSearchPro" 
+              element={
+                <PrivateRoute>
+                  <ExerciseSearchPro />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/createPersonalExercise" element={<CreatePersonalExercise />} />
+            <Route 
+              path="/exerciseSearchFree" 
+              element={
+                <PrivateRoute>
+                  <ExerciseSearchFree />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/configExerciseFree" element={<ConfigExerciseFree />} />
+            <Route 
+              path="/createPersonalExercise" 
+              element={
+                <PrivateRoute>
+                  <CreatePersonalExercise />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/configExercisePro" element={<ConfigExercisePro />} />
+            <Route 
+              path="/configExerciseFree" 
+              element={
+                <PrivateRoute>
+                  <ConfigExerciseFree />
+                </PrivateRoute>
+              } 
+            />
 
-            <Route path="/configExerciseElite" element={<ConfigExerciseElite />} />
+            <Route 
+              path="/configExercisePro" 
+              element={
+                <PrivateRoute>
+                  <ConfigExercisePro />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/configExerciseElite" 
+              element={
+                <PrivateRoute>
+                  <ConfigExerciseElite />
+                </PrivateRoute>
+              } 
+            />
 
             <Route
               element={
