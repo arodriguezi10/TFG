@@ -220,61 +220,91 @@ const ExecuteRoutine = () => {
   };
 
   const handleFinishSession = async () => {
-    const completedExercises = getCompletedExercisesCount();
-    const totalSets = Object.values(exerciseData).reduce((sum, series) => 
-      sum + series.filter(s => s.completed).length, 0
-    );
+  const completedExercises = getCompletedExercisesCount();
+  const totalSets = Object.values(exerciseData).reduce((sum, series) => 
+    sum + series.filter(s => s.completed).length, 0
+  );
 
-    if (completedExercises === 0) {
-      if (!window.confirm('No has completado ningún ejercicio. ¿Seguro que quieres finalizar?')) {
-        return;
+  if (completedExercises === 0) {
+    if (!window.confirm('No has completado ningún ejercicio. ¿Seguro que quieres finalizar?')) {
+      return;
+    }
+  }
+
+  try {
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    const { data: sessionData, error } = await supabase
+      .from('workout_sessions')
+      .insert({
+        user_id: user.id,
+        routine_id: routine.id,
+        routine_name: routine.name,
+        session_date: todayDate,
+        duration_minutes: Math.floor(sessionTime / 60),
+        exercises_completed: completedExercises,
+        total_sets: totalSets,
+        notes: null
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // Guardar logs de ejercicios
+    const exerciseLogs = [];
+    exercises.forEach(exercise => {
+      const series = exerciseData[exercise.id] || [];
+      series.forEach(serie => {
+        exerciseLogs.push({
+          session_id: sessionData.id,
+          exercise_id: exercise.id,
+          serie_number: serie.serieNumber,
+          target_reps: serie.targetReps,
+          actual_reps: parseInt(serie.actualReps) || 0,
+          target_weight: serie.targetWeight,
+          actual_weight: parseFloat(serie.actualWeight) || 0,
+          target_rir: serie.targetRIR,
+          actual_rir: parseInt(serie.actualRIR) || 0,
+          completed: serie.completed
+        });
+      });
+    });
+
+    if (exerciseLogs.length > 0) {
+      const { error: logsError } = await supabase
+        .from('workout_exercise_logs')
+        .insert(exerciseLogs);
+
+      if (logsError) {
+        console.error('Error guardando logs:', logsError);
       }
     }
 
-    try {
-      const todayDate = new Date().toISOString().split('T')[0];
+    const enrichedExerciseData = {};
+    exercises.forEach(exercise => {
+      enrichedExerciseData[exercise.id] = exerciseData[exercise.id].map(serie => ({
+        ...serie,
+        exerciseName: exercise.name
+      }));
+    });
 
-      const { data: sessionData, error } = await supabase
-        .from('workout_sessions')
-        .insert({
-          user_id: user.id,
-          routine_id: routine.id,
-          routine_name: routine.name,
-          session_date: todayDate,
-          duration_minutes: Math.floor(sessionTime / 60),
-          exercises_completed: completedExercises,
-          total_sets: totalSets,
-          notes: null
-        })
-        .select()
-        .single();
+    navigate('/WorkoutSumary', {
+      state: {
+        routineName: routine.name,
+        sessionDuration: Math.floor(sessionTime / 60),
+        totalSets: totalSets,
+        completedExercises: completedExercises,
+        exercisesData: enrichedExerciseData,
+        sessionId: sessionData.id
+      }
+    });
 
-      if (error) throw error;
-
-      const enrichedExerciseData = {};
-      exercises.forEach(exercise => {
-        enrichedExerciseData[exercise.id] = exerciseData[exercise.id].map(serie => ({
-          ...serie,
-          exerciseName: exercise.name
-        }));
-      });
-
-      navigate('/WorkoutSumary', {
-        state: {
-          routineName: routine.name,
-          sessionDuration: Math.floor(sessionTime / 60),
-          totalSets: totalSets,
-          completedExercises: completedExercises,
-          exercisesData: enrichedExerciseData,
-          sessionId: sessionData.id
-        }
-      });
-
-    } catch (error) {
-      console.error('Error guardando sesión:', error);
-      alert('❌ Error al guardar la sesión');
-    }
-  };
+  } catch (error) {
+    console.error('Error guardando sesión:', error);
+    alert('❌ Error al guardar la sesión');
+  }
+};
 
   if (loading) {
     return (

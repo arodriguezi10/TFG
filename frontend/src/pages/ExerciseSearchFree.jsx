@@ -418,7 +418,7 @@ const ExerciseSearchFree = () => {
 
       <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <button
-          onClick={() => navigate("/suscription")}
+          onClick={() => navigate("/subscription")}
           className="h-[80px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-[15px]">
