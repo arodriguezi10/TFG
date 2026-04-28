@@ -16,6 +16,8 @@ const ExerciseSearchFree = () => {
 
   const [customExercises, setCustomExercises] = useState([]);
   const [predefinedExercisesFromDB, setPredefinedExercisesFromDB] = useState([]);
+  const [intermediateExercisesFromDB, setIntermediateExercisesFromDB] = useState([]);
+  const [advancedExercisesFromDB, setAdvancedExercisesFromDB] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState("Todos");
@@ -119,6 +121,174 @@ const ExerciseSearchFree = () => {
     },
   ];
 
+  const intermediateExercises = [
+    {
+      name: "Press Inclinado con Mancuernas",
+      muscle_group: "Pecho",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Cruces de Poleas",
+      muscle_group: "Pecho",
+      equipment: "Polea",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Fondos en Paralelas",
+      muscle_group: "Pecho",
+      equipment: "Peso corporal",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Press Francés con barra EZ",
+      muscle_group: "Tríceps",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Dominadas Libres",
+      muscle_group: "Espalda",
+      equipment: "Peso corporal",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Remo con Barra (Tronco a 45º)",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Face Pull",
+      muscle_group: "Hombro",
+      equipment: "Polea",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Curl Martillo con Mancuernas",
+      muscle_group: "Bíceps",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Peso Muerto Rumano con Mancuernas",
+      muscle_group: "Femoral",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Zancadas Búlgaras",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Sentadilla Hack",
+      muscle_group: "Cuádriceps",
+      equipment: "Máquina",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Hip Thrust con Barra",
+      muscle_group: "Glúteo",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Rueda Abdominal",
+      muscle_group: "Core",
+      equipment: "Peso corporal",
+      difficulty_level: "Intermedio",
+    },
+  ];
+
+  const advancedExercises = [
+    {
+      name: "Press de Banca con Barra",
+      muscle_group: "Pecho",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Press Militar con Barra de Pie",
+      muscle_group: "Hombro",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Press JM",
+      muscle_group: "Tríceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Fondos Lastrados",
+      muscle_group: "Pecho",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Remo Pendlay",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Dominadas Lastradas",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Pullover en Polea Alta",
+      muscle_group: "Espalda",
+      equipment: "Polea",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Curl Bayesiano",
+      muscle_group: "Bíceps",
+      equipment: "Polea",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Sentadilla Libre con Barra",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Sentadilla Frontal con Barra",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Peso Muerto Convencional",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Peso Muerto Rumano con Barra",
+      muscle_group: "Femoral",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Curl Nórdico",
+      muscle_group: "Femoral",
+      equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Dragon Flags",
+      muscle_group: "Core",
+      equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+  ];
+
   const muscleGroups = [
     "Todos",
     "Pecho",
@@ -129,10 +299,10 @@ const ExerciseSearchFree = () => {
     "Cuádriceps",
     "Femoral",
     "Gemelo",
+    "Glúteo",
     "Core",
   ];
 
-  // Obtener límite de ejercicios personalizados según plan
   const getCustomExerciseLimit = () => {
     if (subscriptionTier === 'elite' || subscriptionTier === 'pro') {
       return 50;
@@ -141,6 +311,7 @@ const ExerciseSearchFree = () => {
   };
 
   const customExerciseLimit = getCustomExerciseLimit();
+  const hasEliteAccess = subscriptionTier === 'elite';
 
   useEffect(() => {
     if (user) {
@@ -171,7 +342,11 @@ const ExerciseSearchFree = () => {
 
   const loadData = async () => {
     await insertPredefinedExercisesIfNeeded();
+    await insertIntermediateExercisesIfNeeded();
+    await insertAdvancedExercisesIfNeeded();
     await fetchPredefinedExercises();
+    await fetchIntermediateExercises();
+    await fetchAdvancedExercises();
     await fetchCustomExercises();
   };
 
@@ -225,6 +400,50 @@ const ExerciseSearchFree = () => {
     }
   };
 
+  const fetchIntermediateExercises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Intermedio")
+        .order("muscle_group", { ascending: true });
+
+      if (error) {
+        console.error("Error al cargar ejercicios intermedios:", error);
+        setIntermediateExercisesFromDB([]);
+        return;
+      }
+
+      setIntermediateExercisesFromDB(data || []);
+    } catch (err) {
+      console.error("Error inesperado:", err);
+      setIntermediateExercisesFromDB([]);
+    }
+  };
+
+  const fetchAdvancedExercises = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Avanzado")
+        .order("muscle_group", { ascending: true });
+
+      if (error) {
+        console.error("Error al cargar ejercicios avanzados:", error);
+        setAdvancedExercisesFromDB([]);
+        return;
+      }
+
+      setAdvancedExercisesFromDB(data || []);
+    } catch (err) {
+      console.error("Error inesperado:", err);
+      setAdvancedExercisesFromDB([]);
+    }
+  };
+
   const insertPredefinedExercisesIfNeeded = async () => {
     try {
       const { data: existing, error: checkError } = await supabase
@@ -265,17 +484,110 @@ const ExerciseSearchFree = () => {
         .insert(exercisesToInsert);
 
       if (insertError) {
-        console.error(
-          "Error al insertar ejercicios predefinidos:",
-          insertError,
-        );
+        console.error("Error al insertar ejercicios predefinidos:", insertError);
       } else {
-        console.log(
-          `${exercisesToInsert.length} ejercicios insertados correctamente`,
-        );
+        console.log(`${exercisesToInsert.length} ejercicios insertados correctamente`);
       }
     } catch (err) {
       console.error("Error inesperado al insertar predefinidos:", err);
+    }
+  };
+
+  const insertIntermediateExercisesIfNeeded = async () => {
+    try {
+      const { data: existing, error: checkError } = await supabase
+        .from("exercises")
+        .select("name")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Intermedio");
+
+      if (checkError) {
+        console.error("Error al verificar ejercicios intermedios:", checkError);
+        return;
+      }
+
+      if (existing && existing.length >= 13) {
+        console.log("Ejercicios intermedios ya existen");
+        return;
+      }
+
+      const existingNames = existing.map((e) => e.name);
+      const exercisesToInsert = intermediateExercises
+        .filter((exercise) => !existingNames.includes(exercise.name))
+        .map((exercise) => ({
+          name: exercise.name,
+          muscle_group: exercise.muscle_group,
+          equipment: exercise.equipment,
+          difficulty_level: exercise.difficulty_level,
+          is_custom: false,
+          user_id: null,
+        }));
+
+      if (exercisesToInsert.length === 0) {
+        console.log("No hay ejercicios intermedios nuevos para insertar");
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from("exercises")
+        .insert(exercisesToInsert);
+
+      if (insertError) {
+        console.error("Error al insertar ejercicios intermedios:", insertError);
+      } else {
+        console.log(`${exercisesToInsert.length} ejercicios intermedios insertados correctamente`);
+      }
+    } catch (err) {
+      console.error("Error inesperado al insertar intermedios:", err);
+    }
+  };
+
+  const insertAdvancedExercisesIfNeeded = async () => {
+    try {
+      const { data: existing, error: checkError } = await supabase
+        .from("exercises")
+        .select("name")
+        .eq("is_custom", false)
+        .eq("difficulty_level", "Avanzado");
+
+      if (checkError) {
+        console.error("Error al verificar ejercicios avanzados:", checkError);
+        return;
+      }
+
+      if (existing && existing.length >= 14) {
+        console.log("Ejercicios avanzados ya existen");
+        return;
+      }
+
+      const existingNames = existing.map((e) => e.name);
+      const exercisesToInsert = advancedExercises
+        .filter((exercise) => !existingNames.includes(exercise.name))
+        .map((exercise) => ({
+          name: exercise.name,
+          muscle_group: exercise.muscle_group,
+          equipment: exercise.equipment,
+          difficulty_level: exercise.difficulty_level,
+          is_custom: false,
+          user_id: null,
+        }));
+
+      if (exercisesToInsert.length === 0) {
+        console.log("No hay ejercicios avanzados nuevos para insertar");
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from("exercises")
+        .insert(exercisesToInsert);
+
+      if (insertError) {
+        console.error("Error al insertar ejercicios avanzados:", insertError);
+      } else {
+        console.log(`${exercisesToInsert.length} ejercicios avanzados insertados correctamente`);
+      }
+    } catch (err) {
+      console.error("Error inesperado al insertar avanzados:", err);
     }
   };
 
@@ -351,6 +663,30 @@ const ExerciseSearchFree = () => {
   });
 
   const filteredPredefinedExercises = predefinedExercisesFromDB.filter(
+    (exercise) => {
+      const matchesSearch = exercise.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesMuscle =
+        selectedMuscleFilter === "Todos" ||
+        exercise.muscle_group === selectedMuscleFilter;
+      return matchesSearch && matchesMuscle;
+    },
+  );
+
+  const filteredIntermediateExercises = intermediateExercisesFromDB.filter(
+    (exercise) => {
+      const matchesSearch = exercise.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesMuscle =
+        selectedMuscleFilter === "Todos" ||
+        exercise.muscle_group === selectedMuscleFilter;
+      return matchesSearch && matchesMuscle;
+    },
+  );
+
+  const filteredAdvancedExercises = advancedExercisesFromDB.filter(
     (exercise) => {
       const matchesSearch = exercise.name
         .toLowerCase()
@@ -449,24 +785,28 @@ const ExerciseSearchFree = () => {
         </div>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-        <button
-          onClick={() => navigate("/subscription")}
-          className="h-[80px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
-        >
-          <div className="w-[90%] flex items-center justify-center gap-[15px]">
-            <span className="text-primary text-[20px]">👑</span>
-            <p className="font-body text-[16px] text-text-low text-left">
-              Amplía tus posibilidades con el{" "}
-              <span className="text-primary"> Plan Pro. </span>
-              +80 ejercicios de nivel intermedio y avanzado.
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-[15px] text-primary">
-            →
-          </div>
-        </button>
+      {!hasEliteAccess && (
+        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <button
+            onClick={() => navigate("/subscription")}
+            className="h-[80px] rounded-[16px] bg-primary-bg border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
+          >
+            <div className="w-[90%] flex items-center justify-center gap-[15px]">
+              <span className="text-primary text-[20px]">👑</span>
+              <p className="font-body text-[16px] text-text-low text-left">
+                Amplía tus posibilidades con el{" "}
+                <span className="text-primary"> Plan Elite. </span>
+                +27 ejercicios de nivel intermedio y avanzado.
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-[15px] text-primary">
+              →
+            </div>
+          </button>
+        </section>
+      )}
 
+      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
         <button
           onClick={handleCreateExercise}
           className="h-[70px] rounded-[16px] bg-primary border border-primary p-[16px] flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
@@ -626,10 +966,162 @@ const ExerciseSearchFree = () => {
         </section>
       )}
 
+      {hasEliteAccess && filteredIntermediateExercises.length > 0 && (
+        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <p className="font-subheading font-bold text-[16px] text-orange">
+            🔥 INTERMEDIO
+          </p>
+
+          {filteredIntermediateExercises.map((exercise) => {
+            const isSelected = isExerciseSelected(exercise.id);
+            return (
+              <Card key={exercise.id}>
+                <div className="flex items-center justify-between gap-[12px]">
+                  <div className="flex items-center gap-[10px]">
+                    <span className="bg-orange-bg2 h-[50px] w-[50px] rounded-[12px] border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
+                      🔥
+                    </span>
+
+                    <div className="flex flex-col">
+                      <p className="font-subheading font-bold text-[16px] text-text-high">
+                        {exercise.name}
+                      </p>
+
+                      <p className="font-body text-[12px] text-text-low">
+                        {exercise.muscle_group} · {exercise.equipment}
+                      </p>
+
+                      <div className="mt-[3px] flex gap-[6px]">
+                        <span className="bg-orange-bg2 h-auto px-[10px] rounded-[16px] border border-orange font-body text-[12px] text-orange">
+                          Intermedio
+                        </span>
+
+                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                          {exercise.equipment}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => handleToggleExercise(exercise)}
+                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                        isSelected
+                          ? "bg-primary border-primary text-text-high"
+                          : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                      }`}
+                    >
+                      {isSelected ? "✓" : "+"}
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </section>
+      )}
+
+      {hasEliteAccess && filteredAdvancedExercises.length > 0 && (
+        <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
+          <p className="font-subheading font-bold text-[16px] text-accent1">
+            ⚡ AVANZADO
+          </p>
+
+          {filteredAdvancedExercises.map((exercise) => {
+            const isSelected = isExerciseSelected(exercise.id);
+            return (
+              <Card key={exercise.id}>
+                <div className="flex items-center justify-between gap-[12px]">
+                  <div className="flex items-center gap-[10px]">
+                    <span className="bg-accent1-bg1 h-[50px] w-[50px] rounded-[12px] border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center">
+                      ⚡
+                    </span>
+
+                    <div className="flex flex-col">
+                      <p className="font-subheading font-bold text-[16px] text-text-high">
+                        {exercise.name}
+                      </p>
+
+                      <p className="font-body text-[12px] text-text-low">
+                        {exercise.muscle_group} · {exercise.equipment}
+                      </p>
+
+                      <div className="mt-[3px] flex gap-[6px]">
+                        <span className="bg-accent1-bg1 h-auto px-[10px] rounded-[16px] border border-accent1 font-body text-[12px] text-accent1">
+                          Avanzado
+                        </span>
+
+                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                          {exercise.equipment}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => handleToggleExercise(exercise)}
+                      className={`h-[32px] w-[32px] rounded-full border flex items-center justify-center text-[20px] transition-colors ${
+                        isSelected
+                          ? "bg-primary border-primary text-text-high"
+                          : "bg-surf border-text-low text-text-low hover:bg-primary hover:border-primary hover:text-text-high"
+                      }`}
+                    >
+                      {isSelected ? "✓" : "+"}
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </section>
+      )}
+
+      {!hasEliteAccess && (
+        <>
+          <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+            <p className="font-subheading font-bold text-[16px] text-orange">
+              🔒 INTERMEDIO
+            </p>
+            <Card>
+              <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+                <span className="text-[40px]">🔒</span>
+                <p className="font-heading font-bold text-[16px] text-text-high text-center">
+                  Nivel bloqueado
+                </p>
+                <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+                  Actualiza a Plan Elite para acceder a ejercicios de nivel intermedio
+                </p>
+              </div>
+            </Card>
+          </section>
+
+          <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
+            <p className="font-subheading font-bold text-[16px] text-accent1">
+              🔒 AVANZADO
+            </p>
+            <Card>
+              <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
+                <span className="text-[40px]">🔒</span>
+                <p className="font-heading font-bold text-[16px] text-text-high text-center">
+                  Nivel bloqueado
+                </p>
+                <p className="font-body text-[13px] text-text-low text-center px-[20px]">
+                  Actualiza a Plan Elite para acceder a ejercicios de nivel avanzado
+                </p>
+              </div>
+            </Card>
+          </section>
+        </>
+      )}
+
       {filteredCustomExercises.length === 0 &&
         filteredPredefinedExercises.length === 0 &&
+        filteredIntermediateExercises.length === 0 &&
+        filteredAdvancedExercises.length === 0 &&
         !loading && (
-          <section className="mt-[16px] w-full px-[16px]">
+          <section className="mt-[16px] pb-[70px] w-full px-[16px]">
             <Card>
               <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
                 <span className="text-[48px]">🔍</span>
@@ -643,42 +1135,6 @@ const ExerciseSearchFree = () => {
             </Card>
           </section>
         )}
-
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
-        <p className="font-subheading font-bold text-[16px] text-orange">
-          🔒 INTERMEDIO
-        </p>
-        <Card>
-          <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
-            <span className="text-[40px]">🔒</span>
-            <p className="font-heading font-bold text-[16px] text-text-high text-center">
-              Nivel bloqueado
-            </p>
-            <p className="font-body text-[13px] text-text-low text-center px-[20px]">
-              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de
-              nivel intermedio
-            </p>
-          </div>
-        </Card>
-      </section>
-
-      <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px] opacity-50 pointer-events-none">
-        <p className="font-subheading font-bold text-[16px] text-accent1">
-          🔒 AVANZADO
-        </p>
-        <Card>
-          <div className="flex flex-col items-center justify-center py-[30px] gap-[12px]">
-            <span className="text-[40px]">🔒</span>
-            <p className="font-heading font-bold text-[16px] text-text-high text-center">
-              Nivel bloqueado
-            </p>
-            <p className="font-body text-[13px] text-text-low text-center px-[20px]">
-              Actualiza a Plan Intermedio o Pro para acceder a ejercicios de
-              nivel avanzado
-            </p>
-          </div>
-        </Card>
-      </section>
 
       <section className="mt-[16px] w-full px-[16px] fixed bottom-1">
         <Button
