@@ -30,33 +30,21 @@ const ExerciseSearchFree = () => {
 
   const predefinedExercises = [
     {
+      name: "Peck deck",
+      muscle_group: "Pecho",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Press plano",
+      muscle_group: "Pecho",
+      equipment: "Máquina",
+      difficulty_level: "Principiante",
+    },
+    {
       name: "Flexiones",
       muscle_group: "Pecho",
       equipment: "Peso corporal",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Press plano con mancuernas",
-      muscle_group: "Pecho",
-      equipment: "Peso libre",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Press militar con mancuernas (sentado)",
-      muscle_group: "Hombro",
-      equipment: "Peso libre",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Elevaciones laterales con mancuernas",
-      muscle_group: "Hombro",
-      equipment: "Peso libre",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Extensión de tríceps",
-      muscle_group: "Tríceps",
-      equipment: "Polea",
       difficulty_level: "Principiante",
     },
     {
@@ -66,33 +54,33 @@ const ExerciseSearchFree = () => {
       difficulty_level: "Principiante",
     },
     {
-      name: "Remo unilateral con mancuernas",
+      name: "Pull over",
       muscle_group: "Espalda",
-      equipment: "Peso libre",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Remo Gironda",
-      muscle_group: "Espalda",
-      equipment: "Máquina",
-      difficulty_level: "Principiante",
-    },
-    {
-      name: "Curl de bíceps",
-      muscle_group: "Bíceps",
       equipment: "Polea",
       difficulty_level: "Principiante",
     },
     {
-      name: "Prensa",
-      muscle_group: "Cuádriceps",
+      name: "Hiperextensiones lumbares",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Elevaciones laterales",
+      muscle_group: "Hombro",
       equipment: "Máquina",
       difficulty_level: "Principiante",
     },
     {
-      name: "Sentadilla Goblet con pesa rusa",
+      name: "Face pull",
+      muscle_group: "Hombro",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Extensión de cuádriceps",
       muscle_group: "Cuádriceps",
-      equipment: "Peso libre",
+      equipment: "Máquina",
       difficulty_level: "Principiante",
     },
     {
@@ -108,94 +96,142 @@ const ExerciseSearchFree = () => {
       difficulty_level: "Principiante",
     },
     {
-      name: "Elevaciones de talones en multipower",
-      muscle_group: "Gemelo",
+      name: "Patada de glúteo",
+      muscle_group: "Glúteo",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Abducción de cadera",
+      muscle_group: "Glúteo",
       equipment: "Máquina",
       difficulty_level: "Principiante",
     },
     {
-      name: "Planchas abdominales (Plank)",
+      name: "Curl martillo",
+      muscle_group: "Bíceps",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Extensión de tríceps",
+      muscle_group: "Tríceps",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Patada de tríceps",
+      muscle_group: "Tríceps",
+      equipment: "Polea",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Elevaciones de talones de pie",
+      muscle_group: "Gemelo",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Elevaciones de talones sentado",
+      muscle_group: "Gemelo",
+      equipment: "Peso libre",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Planchas",
       muscle_group: "Core",
       equipment: "Peso corporal",
+      difficulty_level: "Principiante",
+    },
+    {
+      name: "Crunch en polea",
+      muscle_group: "Core",
+      equipment: "Polea",
       difficulty_level: "Principiante",
     },
   ];
 
   const intermediateExercises = [
     {
-      name: "Press Inclinado con Mancuernas",
+      name: "Press de banca plano",
       muscle_group: "Pecho",
       equipment: "Peso libre",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Cruces de Poleas",
+      name: "Cruces en polea",
       muscle_group: "Pecho",
       equipment: "Polea",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Fondos en Paralelas",
-      muscle_group: "Pecho",
-      equipment: "Peso corporal",
-      difficulty_level: "Intermedio",
-    },
-    {
-      name: "Press Francés con barra EZ",
-      muscle_group: "Tríceps",
-      equipment: "Peso libre",
-      difficulty_level: "Intermedio",
-    },
-    {
-      name: "Dominadas Libres",
-      muscle_group: "Espalda",
-      equipment: "Peso corporal",
-      difficulty_level: "Intermedio",
-    },
-    {
-      name: "Remo con Barra (Tronco a 45º)",
+      name: "Remo con barra",
       muscle_group: "Espalda",
       equipment: "Peso libre",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Face Pull",
+      name: "Remo Gironda",
+      muscle_group: "Espalda",
+      equipment: "Máquina",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Press militar con mancuernas",
+      muscle_group: "Hombro",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Elevaciones laterales con polea",
       muscle_group: "Hombro",
       equipment: "Polea",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Curl Martillo con Mancuernas",
-      muscle_group: "Bíceps",
+      name: "Pájaros con mancuernas",
+      muscle_group: "Hombro",
       equipment: "Peso libre",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Peso Muerto Rumano con Mancuernas",
+      name: "Hack",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Peso muerto rumano",
       muscle_group: "Femoral",
       equipment: "Peso libre",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Zancadas Búlgaras",
-      muscle_group: "Cuádriceps",
-      equipment: "Peso libre",
-      difficulty_level: "Intermedio",
-    },
-    {
-      name: "Sentadilla Hack",
-      muscle_group: "Cuádriceps",
-      equipment: "Máquina",
-      difficulty_level: "Intermedio",
-    },
-    {
-      name: "Hip Thrust con Barra",
+      name: "Hip thrust con barra",
       muscle_group: "Glúteo",
       equipment: "Peso libre",
       difficulty_level: "Intermedio",
     },
     {
-      name: "Rueda Abdominal",
+      name: "Curl bayesian",
+      muscle_group: "Bíceps",
+      equipment: "Polea",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Curl predicador",
+      muscle_group: "Bíceps",
+      equipment: "Polea",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Extensión tras nuca",
+      muscle_group: "Tríceps",
+      equipment: "Polea",
+      difficulty_level: "Intermedio",
+    },
+    {
+      name: "Elevaciones de piernas colgado",
       muscle_group: "Core",
       equipment: "Peso corporal",
       difficulty_level: "Intermedio",
@@ -204,87 +240,87 @@ const ExerciseSearchFree = () => {
 
   const advancedExercises = [
     {
-      name: "Press de Banca con Barra",
+      name: "Press inclinado con mancuernas",
       muscle_group: "Pecho",
       equipment: "Peso libre",
       difficulty_level: "Avanzado",
     },
     {
-      name: "Press Militar con Barra de Pie",
+      name: "Fondos en paralelas para pecho",
+      muscle_group: "Pecho",
+      equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Fondos en paralelas para tríceps",
+      muscle_group: "Tríceps",
+      equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Dominadas",
+      muscle_group: "Espalda",
+      equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Peso muerto convencional",
+      muscle_group: "Espalda",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Press militar con barra",
       muscle_group: "Hombro",
       equipment: "Peso libre",
       difficulty_level: "Avanzado",
     },
     {
-      name: "Press JM",
+      name: "Sentadilla con barra",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Sentadilla con barra para glúteo",
+      muscle_group: "Glúteo",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Prensa",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Curl con barra",
+      muscle_group: "Bíceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Curl alterno",
+      muscle_group: "Bíceps",
+      equipment: "Peso libre",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Press francés con barra",
       muscle_group: "Tríceps",
       equipment: "Peso libre",
       difficulty_level: "Avanzado",
     },
     {
-      name: "Fondos Lastrados",
-      muscle_group: "Pecho",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Remo Pendlay",
-      muscle_group: "Espalda",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Dominadas Lastradas",
-      muscle_group: "Espalda",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Pullover en Polea Alta",
-      muscle_group: "Espalda",
-      equipment: "Polea",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Curl Bayesiano",
-      muscle_group: "Bíceps",
-      equipment: "Polea",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Sentadilla Libre con Barra",
-      muscle_group: "Cuádriceps",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Sentadilla Frontal con Barra",
-      muscle_group: "Cuádriceps",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Peso Muerto Convencional",
-      muscle_group: "Espalda",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Peso Muerto Rumano con Barra",
-      muscle_group: "Femoral",
-      equipment: "Peso libre",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Curl Nórdico",
-      muscle_group: "Femoral",
-      equipment: "Peso corporal",
-      difficulty_level: "Avanzado",
-    },
-    {
-      name: "Dragon Flags",
+      name: "Rueda abdominal",
       muscle_group: "Core",
       equipment: "Peso corporal",
+      difficulty_level: "Avanzado",
+    },
+    {
+      name: "Peso muerto convencional para cuádriceps",
+      muscle_group: "Cuádriceps",
+      equipment: "Peso libre",
       difficulty_level: "Avanzado",
     },
   ];
@@ -445,108 +481,106 @@ const ExerciseSearchFree = () => {
   };
 
   const insertPredefinedExercisesIfNeeded = async () => {
-    try {
-      const { data: existing, error: checkError } = await supabase
-        .from("exercises")
-        .select("name")
-        .eq("is_custom", false)
-        .eq("difficulty_level", "Principiante");
+  try {
+    const { data: existing, error: checkError } = await supabase
+      .from("exercises")
+      .select("name, difficulty_level")
+      .eq("is_custom", false)
+      .eq("difficulty_level", "Principiante");
 
-      if (checkError) {
-        console.error("Error al verificar ejercicios:", checkError);
-        return;
-      }
-
-      if (existing && existing.length >= 15) {
-        console.log("Ejercicios predefinidos ya existen");
-        return;
-      }
-
-      const existingNames = existing.map((e) => e.name);
-      const exercisesToInsert = predefinedExercises
-        .filter((exercise) => !existingNames.includes(exercise.name))
-        .map((exercise) => ({
-          name: exercise.name,
-          muscle_group: exercise.muscle_group,
-          equipment: exercise.equipment,
-          difficulty_level: exercise.difficulty_level,
-          is_custom: false,
-          user_id: null,
-        }));
-
-      if (exercisesToInsert.length === 0) {
-        console.log("No hay ejercicios nuevos para insertar");
-        return;
-      }
-
-      const { error: insertError } = await supabase
-        .from("exercises")
-        .insert(exercisesToInsert);
-
-      if (insertError) {
-        console.error("Error al insertar ejercicios predefinidos:", insertError);
-      } else {
-        console.log(`${exercisesToInsert.length} ejercicios insertados correctamente`);
-      }
-    } catch (err) {
-      console.error("Error inesperado al insertar predefinidos:", err);
+    if (checkError) {
+      console.error("Error al verificar ejercicios:", checkError);
+      return;
     }
+
+    if (existing && existing.length >= 20) {
+      return; // Ya existen
+    }
+
+    const existingNames = existing.map((e) => e.name.toLowerCase().trim());
+    const exercisesToInsert = predefinedExercises
+      .filter((exercise) => !existingNames.includes(exercise.name.toLowerCase().trim()))
+      .map((exercise) => ({
+        name: exercise.name,
+        muscle_group: exercise.muscle_group,
+        equipment: exercise.equipment,
+        difficulty_level: exercise.difficulty_level,
+        is_custom: false,
+        user_id: null,
+      }));
+
+    if (exercisesToInsert.length === 0) {
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("exercises")
+      .insert(exercisesToInsert);
+
+    if (insertError) {
+      // ← Silenciosamente ignora errores de duplicados
+      if (!insertError.message.includes('unique_predefined_exercise')) {
+        console.error("Error al insertar ejercicios:", insertError);
+      }
+    }
+  } catch (err) {
+    console.error("Error inesperado:", err);
+  }
   };
 
   const insertIntermediateExercisesIfNeeded = async () => {
-    try {
-      const { data: existing, error: checkError } = await supabase
-        .from("exercises")
-        .select("name")
-        .eq("is_custom", false)
-        .eq("difficulty_level", "Intermedio");
+  try {
+    const { data: existing, error: checkError } = await supabase
+      .from("exercises")
+      .select("name, difficulty_level")
+      .eq("is_custom", false)
+      .eq("difficulty_level", "Intermedio");
 
-      if (checkError) {
-        console.error("Error al verificar ejercicios intermedios:", checkError);
-        return;
-      }
-
-      if (existing && existing.length >= 13) {
-        console.log("Ejercicios intermedios ya existen");
-        return;
-      }
-
-      const existingNames = existing.map((e) => e.name);
-      const exercisesToInsert = intermediateExercises
-        .filter((exercise) => !existingNames.includes(exercise.name))
-        .map((exercise) => ({
-          name: exercise.name,
-          muscle_group: exercise.muscle_group,
-          equipment: exercise.equipment,
-          difficulty_level: exercise.difficulty_level,
-          is_custom: false,
-          user_id: null,
-        }));
-
-      if (exercisesToInsert.length === 0) {
-        console.log("No hay ejercicios intermedios nuevos para insertar");
-        return;
-      }
-
-      const { error: insertError } = await supabase
-        .from("exercises")
-        .insert(exercisesToInsert);
-
-      if (insertError) {
-        console.error("Error al insertar ejercicios intermedios:", insertError);
-      } else {
-        console.log(`${exercisesToInsert.length} ejercicios intermedios insertados correctamente`);
-      }
-    } catch (err) {
-      console.error("Error inesperado al insertar intermedios:", err);
+    if (checkError) {
+      console.error("Error al verificar ejercicios intermedios:", checkError);
+      return;
     }
+
+    if (existing && existing.length >= 14) {
+      return; // Ya existen
+    }
+
+    const existingNames = existing.map((e) => e.name.toLowerCase().trim());
+    const exercisesToInsert = intermediateExercises
+      .filter((exercise) => !existingNames.includes(exercise.name.toLowerCase().trim()))
+      .map((exercise) => ({
+        name: exercise.name,
+        muscle_group: exercise.muscle_group,
+        equipment: exercise.equipment,
+        difficulty_level: exercise.difficulty_level,
+        is_custom: false,
+        user_id: null,
+      }));
+
+    if (exercisesToInsert.length === 0) {
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from("exercises")
+      .insert(exercisesToInsert);
+
+    if (insertError) {
+      // Silenciosamente ignora errores de duplicados
+      if (!insertError.message.includes('unique_predefined_exercise')) {
+        console.error("Error al insertar ejercicios intermedios:", insertError);
+      }
+    }
+  } catch (err) {
+    console.error("Error inesperado al insertar intermedios:", err);
+  }
   };
 
   const insertAdvancedExercisesIfNeeded = async () => {
     try {
       const { data: existing, error: checkError } = await supabase
         .from("exercises")
-        .select("name")
+        .select("name, difficulty_level")
         .eq("is_custom", false)
         .eq("difficulty_level", "Avanzado");
 
@@ -556,13 +590,12 @@ const ExerciseSearchFree = () => {
       }
 
       if (existing && existing.length >= 14) {
-        console.log("Ejercicios avanzados ya existen");
-        return;
+        return; // Ya existen
       }
 
-      const existingNames = existing.map((e) => e.name);
+      const existingNames = existing.map((e) => e.name.toLowerCase().trim());
       const exercisesToInsert = advancedExercises
-        .filter((exercise) => !existingNames.includes(exercise.name))
+        .filter((exercise) => !existingNames.includes(exercise.name.toLowerCase().trim()))
         .map((exercise) => ({
           name: exercise.name,
           muscle_group: exercise.muscle_group,
@@ -573,7 +606,6 @@ const ExerciseSearchFree = () => {
         }));
 
       if (exercisesToInsert.length === 0) {
-        console.log("No hay ejercicios avanzados nuevos para insertar");
         return;
       }
 
@@ -582,9 +614,10 @@ const ExerciseSearchFree = () => {
         .insert(exercisesToInsert);
 
       if (insertError) {
-        console.error("Error al insertar ejercicios avanzados:", insertError);
-      } else {
-        console.log(`${exercisesToInsert.length} ejercicios avanzados insertados correctamente`);
+        // Silenciosamente ignora errores de duplicados
+        if (!insertError.message.includes('unique_predefined_exercise')) {
+          console.error("Error al insertar ejercicios avanzados:", insertError);
+        }
       }
     } catch (err) {
       console.error("Error inesperado al insertar avanzados:", err);
@@ -796,7 +829,7 @@ const ExerciseSearchFree = () => {
               <p className="font-body text-[16px] text-text-low text-left">
                 Amplía tus posibilidades con el{" "}
                 <span className="text-primary"> Plan Elite. </span>
-                +27 ejercicios de nivel intermedio y avanzado.
+                +28 ejercicios de nivel intermedio y avanzado.
               </p>
             </div>
             <div className="flex items-center justify-center gap-[15px] text-primary">
