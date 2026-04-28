@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Card from "../components/Card";
 import Button from "../components/Button";
@@ -13,55 +13,46 @@ const ConfigExerciseFree = () => {
   const { selectedExercises, removeExercise, saveRoutineConfiguration, routineConfiguration } = useRoutine();
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const isInitialMount = useRef(true);
+  const isInitialLoad = useRef(true);
 
-  // Estados para suscripción
   const [subscriptionTier, setSubscriptionTier] = useState('free');
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(true);
 
-  const [exercisesSeries, setExercisesSeries] = useState(() => {
-  if (routineConfiguration?.series) {
-    // Asegurar que todas las series tengan el campo rir
-    const updatedSeries = {};
-    Object.keys(routineConfiguration.series).forEach(exerciseId => {
-      updatedSeries[exerciseId] = routineConfiguration.series[exerciseId].map(serie => ({
-        ...serie,
-        rir: serie.rir || ""
-      }));
-    });
-    return updatedSeries;
-  }
-  
-  const initialSeries = {};
-  selectedExercises.forEach(exercise => {
-    initialSeries[exercise.id] = [
-      { id: 1, reps: "", weight: "", rir: "" },
-      { id: 2, reps: "", weight: "", rir: "" },
-      { id: 3, reps: "", weight: "", rir: "" }
-    ];
-  });
-  return initialSeries;
-});
+  const [exercisesSeries, setExercisesSeries] = useState({});
+  const [exercisesRest, setExercisesRest] = useState({});
+  const [exercisesTechnique, setExercisesTechnique] = useState({});
 
-  const [exercisesRest, setExercisesRest] = useState(() => {
-    if (routineConfiguration?.rest) {
-      return routineConfiguration.rest;
+  useEffect(() => {
+    if (isInitialLoad.current) {
+      const newSeries = {};
+      const newRest = {};
+      const newTechniques = {};
+    
+      selectedExercises.forEach(exercise => {
+        if (routineConfiguration?.series?.[exercise.id]) {
+          newSeries[exercise.id] = routineConfiguration.series[exercise.id];
+        } else {
+          newSeries[exercise.id] = [
+            { id: 1, reps: "", weight: "", rir: "" },
+            { id: 2, reps: "", weight: "", rir: "" },
+            { id: 3, reps: "", weight: "", rir: "" }
+          ];
+        }
+
+        newRest[exercise.id] = routineConfiguration?.rest?.[exercise.id] || "";
+        
+        if (routineConfiguration?.techniques?.[exercise.id]) {
+          newTechniques[exercise.id] = routineConfiguration.techniques[exercise.id];
+        }
+      });
+    
+      setExercisesSeries(newSeries);
+      setExercisesRest(newRest);
+      setExercisesTechnique(newTechniques);
+      isInitialLoad.current = false;
     }
-    const initialRest = {};
-    selectedExercises.forEach(exercise => {
-      initialRest[exercise.id] = "";
-    });
-    return initialRest;
-  });
+  }, []);
 
-  const [exercisesTechnique, setExercisesTechnique] = useState(() => {
-    if (routineConfiguration?.techniques) {
-      return routineConfiguration.techniques;
-    }
-    return {};
-  });
-
-  // Cargar suscripción del usuario
   useEffect(() => {
     loadUserSubscription();
   }, []);
@@ -88,21 +79,7 @@ const ConfigExerciseFree = () => {
     }
   };
 
-  // Verificar si tiene acceso a funciones premium
   const hasProAccess = subscriptionTier === 'pro' || subscriptionTier === 'elite';
-
-  useEffect(() => {
-    if (!isInitialMount.current) {
-      const tempConfig = {
-        exercises: selectedExercises,
-        series: exercisesSeries,
-        rest: exercisesRest,
-        techniques: exercisesTechnique,
-        timestamp: new Date().toISOString()
-      };
-      saveRoutineConfiguration(tempConfig);
-    }
-  }, [exercisesSeries, exercisesRest, exercisesTechnique]);
 
   const showAlertMessage = (message) => {
     setAlertMessage(message);
@@ -232,43 +209,53 @@ const ConfigExerciseFree = () => {
   };
 
   const handleSaveRoutine = () => {
-  if (!validateConfiguration()) {
-    return;
-  }
+    if (!validateConfiguration()) {
+      return;
+    }
 
-  const transformedExercises = selectedExercises.map(exercise => {
-    const series = exercisesSeries[exercise.id] || [];
-    
-    return {
-      exercise_id: exercise.id,
-      exercise: exercise,
-      target_reps: series.map(s => parseInt(s.reps) || 0),
-      target_weight: series.map(s => {
-        const weight = s.weight.replace(',', '.');
-        return parseFloat(weight) || 0;
-      }),
-      target_rir: series.map(s => parseInt(s.rir) || 0),
-      rest_seconds: exercisesRest[exercise.id] || "90",
-      technique: exercisesTechnique[exercise.id] || null
+    const transformedExercises = selectedExercises.map(exercise => {
+      const series = exercisesSeries[exercise.id] || [];
+      
+      return {
+        exercise_id: exercise.id,
+        exercise: exercise,
+        target_reps: series.map(s => parseInt(s.reps) || 0),
+        target_weight: series.map(s => {
+          const weight = s.weight.replace(',', '.');
+          return parseFloat(weight) || 0;
+        }),
+        target_rir: series.map(s => parseInt(s.rir) || 0),
+        rest_seconds: exercisesRest[exercise.id] || "90",
+        technique: exercisesTechnique[exercise.id] || null
+      };
+    });
+
+    const routineData = {
+      exercises: transformedExercises,
+      series: exercisesSeries,
+      rest: exercisesRest,
+      techniques: exercisesTechnique,
+      timestamp: new Date().toISOString()
     };
-  });
 
-  const routineData = {
-    exercises: transformedExercises,
-    series: exercisesSeries,
-    rest: exercisesRest,
-    techniques: exercisesTechnique,
-    timestamp: new Date().toISOString()
+    saveRoutineConfiguration(routineData);
+    navigate(-1);
   };
 
-  saveRoutineConfiguration(routineData);
-  console.log("Configuración guardada:", routineData);
-  
-  navigate(-1);
-};
+  const handleBack = () => {
+    const routineData = {
+      exercises: selectedExercises,
+      series: exercisesSeries,
+      rest: exercisesRest,
+      techniques: exercisesTechnique,
+      timestamp: new Date().toISOString()
+    };
+
+    saveRoutineConfiguration(routineData);
+    navigate(-1);
+  };
 
   const isInputFilled = (value) => {
-  // Convertir a string si es número, luego verificar
     return value !== null && value !== undefined && String(value).trim() !== "";
   };
 
@@ -293,7 +280,7 @@ const ConfigExerciseFree = () => {
       )}
 
       <section className="w-full flex items-center justify-between">
-        <Header showback title={<>Configurar<br/>ejercicio</>}/>
+        <Header showback onBackClick={handleBack} title={<>Configurar<br/>ejercicio</>}/>
       </section>
 
       {selectedExercises.length === 0 ? (
@@ -485,7 +472,6 @@ const ConfigExerciseFree = () => {
         ))
       )}
 
-      {/* CARD DE UPGRADE - SOLO MOSTRAR SI NO TIENE PRO/ELITE */}
       {selectedExercises.length > 0 && !hasProAccess && (
         <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
           <button
