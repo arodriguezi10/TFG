@@ -190,18 +190,18 @@ const PersonalSettings = () => {
         </section>
 
 
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
             <Button variant="outlined" text="Guardar cambios" bgColor={"bg-primary"} textColor={"text-text-high"} borderColor={"border-primary"} w="w-[100%]"/> 
         </section>
 
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
             <p className="font-subheading font-bold text-[16px] text-red">ZONA DE PELIGRO</p>
 
             <Card>
                 <button className="w-full">
                     <div className="flex items-center justify-between">  
-                        <div className="flex gap-[20px] items-center justify-center">
-                            <div className="bg-red-bg1 h-[40px] w-[40px] rounded-[8px] text-red flex items-center justify-center">
+                        <div className="flex gap-5 items-center justify-center">
+                            <div className="bg-red-bg1 h-10 w-10 rounded-[8px] text-red flex items-center justify-center">
                                 &
                             </div>
 
