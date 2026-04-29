@@ -229,7 +229,7 @@ const Profile = () => {
         <Card>
           <div className="flex flex-col gap-3.75">
             <button 
-              onClick={() => navigate("#")}
+              onClick={() => navigate("/personalSettings")}
               className="w-full"
             >
               <div className="flex items-center justify-between">
@@ -239,7 +239,7 @@ const Profile = () => {
                   <div className="flex flex-col text-left">
                     <p className="font-subheading font-bold text-[16px] text-text-high">Ajustes y datos personales</p>
 
-                    <p className="font-subheading font-bold text-[16px] text-text-low">Edita tu foto de y métricas</p>
+                    <p className="font-subheading font-bold text-[16px] text-text-low">Edita tu foto y tus datos</p>
                   </div>
                 </div>
 
