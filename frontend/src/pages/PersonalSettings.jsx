@@ -191,7 +191,7 @@ const PersonalSettings = () => {
 
 
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-            <Button variant="outlined" text="Crear progresión" bgColor={"bg-surf"} textColor={"text-primary"} borderColor={"border-primary"} w="w-[100%]"/> 
+            <Button variant="outlined" text="Guardar cambios" bgColor={"bg-primary"} textColor={"text-text-high"} borderColor={"border-primary"} w="w-[100%]"/> 
         </section>
 
         <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
