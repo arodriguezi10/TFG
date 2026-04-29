@@ -12,7 +12,11 @@ const Profile = () => {
   
   const [userData, setUserData] = useState({
     fullName: "",
-    subscription_tier: "free"
+    subscription_tier: "free",
+    height_cm: null,
+    initial_weight_kg: null,
+    age: null,
+    fitness_goal: ""
   });
   const [loading, setLoading] = useState(true);
 
@@ -22,26 +26,56 @@ const Profile = () => {
     }
   }, [user]);
 
+  const calculateAge = (birthDate) => {
+    if (!birthDate) return null;
+    
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
   const loadUserData = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('first_name, last_name, subscription_tier')
+        .select('first_name, last_name, subscription_tier, height_cm, initial_weight_kg, fitness_goal')
         .eq('id', user.id)
         .single();
 
-      if (error) {
-        console.error('Error cargando datos del usuario:', error);
+      if (userError) {
+        console.error('Error cargando datos del usuario:', userError);
         return;
       }
 
-      const firstName = data?.first_name || "";
-      const lastName = data?.last_name || "";
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('birth_date')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error cargando perfil del usuario:', profileError);
+      }
+
+      const firstName = userData?.first_name || "";
+      const lastName = userData?.last_name || "";
       const fullName = `${firstName} ${lastName}`.trim() || "Usuario";
+      const age = calculateAge(profileData?.birth_date);
 
       setUserData({
         fullName: fullName,
-        subscription_tier: data?.subscription_tier || "free"
+        subscription_tier: userData?.subscription_tier || "free",
+        height_cm: userData?.height_cm || null,
+        initial_weight_kg: userData?.initial_weight_kg || null,
+        age: age,
+        fitness_goal: userData?.fitness_goal || "Volumen"
       });
     } catch (error) {
       console.error('Error:', error);
@@ -50,7 +84,6 @@ const Profile = () => {
     }
   };
 
-  // Función para obtener el badge según el tier
   const getBadgeByTier = (tier) => {
     switch (tier) {
       case 'elite':
@@ -81,7 +114,30 @@ const Profile = () => {
     }
   };
 
+  const getGoalEmoji = (goal) => {
+    switch (goal) {
+      case 'Volumen':
+        return '🔥';
+      case 'Definición':
+        return '⚡';
+      case 'Fuerza':
+        return '💪';
+      case 'Mantenimiento':
+        return '✨';
+      default:
+        return '🔥';
+    }
+  };
+
+  const formatWeight = (weight) => {
+    if (!weight) return { integer: '--', decimal: '--' };
+    const integerPart = Math.floor(weight);
+    const decimalPart = ((weight % 1) * 100).toFixed(0).padStart(2, '0');
+    return { integer: integerPart, decimal: decimalPart };
+  };
+
   const badge = getBadgeByTier(userData.subscription_tier);
+  const weightFormatted = formatWeight(userData.initial_weight_kg);
 
   if (loading) {
     return (
@@ -93,7 +149,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-2.5">
-      {/* HEADER CON BOTÓN ATRÁS */}
       <Header 
         showback 
         onBackClick={() => navigate("/dashboard")}
@@ -113,7 +168,7 @@ const Profile = () => {
             {badge.icon} {badge.text}
           </span>
           <span className="bg-orange-bg4 h-7.5 py-0.5 px-3 rounded-2xl border border-orange text-[16px] text-orange font-subheading font-semibold ">
-            🔥 Volumen
+            {getGoalEmoji(userData.fitness_goal)} {userData.fitness_goal}
           </span>
         </div>
       </section>
@@ -130,9 +185,16 @@ const Profile = () => {
           </Card>
           <Card>
             <div className="flex flex-col h-auto">
-                <div className="bg-brown-bg2 h-10 w-10 rounded-lg text-brown  flex items-center justify-center">⚖️</div>
+                <div className="bg-brown-bg2 h-10 w-10 rounded-lg text-brown flex items-center justify-center">⚖️</div>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-2.5">PESO INICIAL</p>
-                <p className="font-heading font-semibold text-accent1 text-[20px] mt-1.25">77,65</p>
+                <div className="flex items-baseline gap-1 mt-1.25">
+                  <p className="font-heading font-semibold text-accent1 text-[20px] leading-none">
+                    {weightFormatted.integer}
+                  </p>
+                  <p className="font-heading font-semibold text-accent1 text-[14px] leading-none">
+                    ,{weightFormatted.decimal}
+                  </p>
+                </div>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-1.25">kg · hace 6 m.</p>
             </div>
           </Card>
@@ -142,7 +204,9 @@ const Profile = () => {
             <div className="flex flex-col h-auto ">
                 <div className="bg-accent2-bg1 h-10 w-10 rounded-lg text-accent2 flex items-center justify-center">📏</div>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-2.5">ALTURA</p>
-                <p className="font-heading font-semibold text-accent2 text-[20px] mt-1.25">178</p>
+                <p className="font-heading font-semibold text-accent2 text-[20px] mt-1.25">
+                  {userData.height_cm || '--'}
+                </p>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-1.25">cm</p>
             </div>
           </Card>
@@ -150,7 +214,9 @@ const Profile = () => {
             <div className="flex flex-col h-auto">
                 <div className="bg-orange-bg4 h-10 w-10 rounded-lg text-orange flex items-center justify-center">🎂</div>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-2.5">EDAD</p>
-                <p className="font-heading font-semibold text-orange text-[20px] mt-1.25">26</p>
+                <p className="font-heading font-semibold text-orange text-[20px] mt-1.25">
+                  {userData.age || '--'}
+                </p>
                 <p className="font-subheading font-bold text-text-low text-[16px] mt-1.25">años</p>
             </div>
           
@@ -162,7 +228,6 @@ const Profile = () => {
 
         <Card>
           <div className="flex flex-col gap-3.75">
-            {/* AJUSTES Y DATOS PERSONALES */}
             <button 
               onClick={() => navigate("#")}
               className="w-full"
@@ -186,7 +251,6 @@ const Profile = () => {
 
             <div className="w-full h-px bg-text-low"></div>
 
-            {/* SUSCRIPCIÓN Y PAGOS */}
             <button 
               onClick={() => navigate("#")}
               className="w-full"
@@ -212,7 +276,6 @@ const Profile = () => {
 
             <div className="w-full h-px bg-text-low"></div>
 
-            {/* SOPORTE / AYUDA */}
             <button 
               onClick={() => navigate("#")}
               className="w-full"
