@@ -16,7 +16,8 @@ const Profile = () => {
     height_cm: null,
     initial_weight_kg: null,
     age: null,
-    fitness_goal: ""
+    fitness_goal: "",
+    onboarding_date: null
   });
   const [loading, setLoading] = useState(true);
 
@@ -41,11 +42,33 @@ const Profile = () => {
     return age;
   };
 
+  const calculateTimeSince = (date) => {
+    if (!date) return "Sin fecha";
+    
+    const past = new Date(date);
+    const today = new Date();
+    
+    const diffTime = Math.abs(today - past);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffMonths = Math.floor(diffDays / 30);
+    const diffYears = Math.floor(diffDays / 365);
+    
+    if (diffYears > 0) {
+      return `hace ${diffYears} ${diffYears === 1 ? 'año' : 'años'}`;
+    } else if (diffMonths > 0) {
+      return `hace ${diffMonths} ${diffMonths === 1 ? 'mes' : 'meses'}`;
+    } else if (diffDays > 0) {
+      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+    } else {
+      return "hoy";
+    }
+  };
+
   const loadUserData = async () => {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('first_name, last_name, subscription_tier, height_cm, initial_weight_kg, fitness_goal')
+        .select('first_name, last_name, subscription_tier, height_cm, initial_weight_kg, fitness_goal, updated_at')
         .eq('id', user.id)
         .single();
 
@@ -75,7 +98,8 @@ const Profile = () => {
         height_cm: userData?.height_cm || null,
         initial_weight_kg: userData?.initial_weight_kg || null,
         age: age,
-        fitness_goal: userData?.fitness_goal || "Volumen"
+        fitness_goal: userData?.fitness_goal || "Volumen",
+        onboarding_date: userData?.updated_at || null
       });
     } catch (error) {
       console.error('Error:', error);
@@ -138,6 +162,7 @@ const Profile = () => {
 
   const badge = getBadgeByTier(userData.subscription_tier);
   const weightFormatted = formatWeight(userData.initial_weight_kg);
+  const timeSinceOnboarding = calculateTimeSince(userData.onboarding_date);
 
   if (loading) {
     return (
@@ -195,7 +220,9 @@ const Profile = () => {
                     ,{weightFormatted.decimal}
                   </p>
                 </div>
-                <p className="font-subheading font-bold text-text-low text-[16px] mt-1.25">kg · hace 6 m.</p>
+                <p className="font-subheading font-bold text-text-low text-[16px] mt-1.25">
+                  kg · {timeSinceOnboarding}
+                </p>
             </div>
           </Card>
         </div>
