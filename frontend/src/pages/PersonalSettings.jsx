@@ -191,14 +191,14 @@ const PersonalSettings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5">
 
         <section className="w-full flex items-center justify-between">
             <Header showback subtitle={"perfil"} title={"Ajustes personales"}/>
         </section>    
 
-        <section className="mt-[25px] flex flex-col items-center justify-center gap-[15px]">
-            <span className="bg-primary-bg h-[110px] w-[110px] px-[10px] rounded-[35px] border border-primary font-heading font-bold text-[50px] text-accent1 flex items-center justify-center">
+        <section className="mt-6.25 flex flex-col items-center justify-center gap-3.75">
+            <span className="bg-primary-bg h-27.5 w-27.5 px-2.5 rounded-[35px] border border-primary font-heading font-bold text-[50px] text-accent1 flex items-center justify-center">
                 {formData.fullName.charAt(0).toUpperCase() || "U"}
             </span>
 
@@ -207,15 +207,15 @@ const PersonalSettings = () => {
             </p>
         </section>
 
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
             <p className="font-subheading font-bold text-[16px] text-text-low">DATOS PERSONALES</p>
 
             <Card>
-                <div className="flex flex-col gap-[15px]">
-                    <div className="flex flex-col gap-[5px]">
+                <div className="flex flex-col gap-3.75">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">NOMBRE COMPLETO</label>
 
-                        <div className={`flex items-center gap-[20px] ${changedFields.has('fullName') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-center gap-5 ${changedFields.has('fullName') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center">👤</div>
                             <input 
                               type="text"
@@ -228,12 +228,12 @@ const PersonalSettings = () => {
                         </div>           
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">FECHA DE NACIMIENTO</label>
 
-                        <div className={`flex items-center gap-[20px] ${changedFields.has('birthDate') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-center gap-5 ${changedFields.has('birthDate') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center">🎂</div>
                             <input 
                               type="date"
@@ -245,12 +245,12 @@ const PersonalSettings = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">TELÉFONO</label>
 
-                        <div className={`flex items-center gap-[20px] ${changedFields.has('phone') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-center gap-5 ${changedFields.has('phone') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center">📱</div>
                             <input 
                               type="tel"
@@ -263,12 +263,12 @@ const PersonalSettings = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">SEXO</label>
 
-                        <div className={`flex items-center gap-[20px] ${changedFields.has('sex') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-center gap-5 ${changedFields.has('sex') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center">⚧️</div>
                             <select 
                               name="sex"
@@ -283,13 +283,13 @@ const PersonalSettings = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex items-center gap-[5px]">
-                        <div className="flex flex-col gap-[5px] flex-1">
+                    <div className="flex items-center gap-1.25">
+                        <div className="flex flex-col gap-1.25 flex-1">
                             <label className="font-subheading font-bold text-[16px] text-text-low">ALTURA (CM)</label>
                             
-                            <div className={`flex items-center gap-[20px] ${changedFields.has('height_cm') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                            <div className={`flex items-center gap-5 ${changedFields.has('height_cm') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                                 <div className="text-text-low text-[20px] flex items-center justify-center">📏</div>
                                 <input 
                                   type="number"
@@ -302,12 +302,12 @@ const PersonalSettings = () => {
                             </div>
                         </div>
                         
-                        <div className="w-[1px] h-[50px] bg-text-low"></div>
+                        <div className="w-px h-12.5 bg-text-low"></div>
 
-                        <div className="flex flex-col gap-[5px] flex-1">
+                        <div className="flex flex-col gap-1.25 flex-1">
                             <label className="font-subheading font-bold text-[16px] text-text-low">PESO INICIAL (KG)</label>
 
-                            <div className={`flex items-center gap-[10px] ${changedFields.has('initial_weight_kg') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                            <div className={`flex items-center gap-2.5 ${changedFields.has('initial_weight_kg') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                                 <div className="text-text-low text-[20px] flex items-center justify-center">⚖️</div>
                                 <input 
                                   type="number"
@@ -322,12 +322,12 @@ const PersonalSettings = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">BIO</label>
 
-                        <div className={`flex items-start gap-[20px] ${changedFields.has('bio') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-start gap-5 ${changedFields.has('bio') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center mt-1">📝</div>
                             <textarea 
                               name="bio"
@@ -340,12 +340,12 @@ const PersonalSettings = () => {
                         </div>
                     </div>
 
-                    <div className="w-full h-[1px] bg-text-low"></div>
+                    <div className="w-full h-px bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[16px] text-text-low">PAÍS</label>
 
-                        <div className={`flex items-center gap-[20px] ${changedFields.has('country') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
+                        <div className={`flex items-center gap-5 ${changedFields.has('country') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
                             <div className="text-text-low text-[20px] flex items-center justify-center">🌍</div>
 
                             <select 
@@ -381,14 +381,14 @@ const PersonalSettings = () => {
             </Card>            
         </section>
 
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
             <p className="font-subheading font-bold text-[16px] text-text-low">PREFERENCIAS</p>
 
             <Card>
-              <div className="flex flex-col gap-[15px]">
+              <div className="flex flex-col gap-3.75">
                 <div className="flex items-center justify-between">
-                    <div className="flex gap-[15px] items-center flex-1">
-                        <div className="bg-primary-bg h-[40px] w-[40px] rounded-[8px] text-primary flex items-center justify-center flex-shrink-0">🔔</div>
+                    <div className="flex gap-3.75 items-center flex-1">
+                        <div className="bg-primary-bg h-10 w-10 rounded-lg text-primary flex items-center justify-center shrink-0">🔔</div>
 
                         <div className="flex flex-col">
                             <p className="font-subheading font-bold text-[16px] text-text-high">Notificaciones</p>
@@ -398,27 +398,27 @@ const PersonalSettings = () => {
 
                     <button
                       onClick={() => handleToggle('notifications')}
-                      className={`relative inline-flex h-[31px] w-[51px] flex-shrink-0 items-center rounded-full transition-all ${
+                      className={`relative inline-flex h-7.75 w-12.75 shrink-0 items-center rounded-full transition-all ${
                         preferences.notifications 
                           ? 'bg-primary' 
                           : 'bg-background border-2 border-text-low'
                       }`}
                     >
                       <span
-                        className={`inline-block h-[27px] w-[27px] transform rounded-full transition-transform ${
+                        className={`inline-block h-6.75 w-6.75 transform rounded-full transition-transform ${
                           preferences.notifications 
-                            ? 'translate-x-[22px] bg-text-high' 
-                            : 'translate-x-[2px] bg-text-low'
+                            ? 'translate-x-5.5 bg-text-high' 
+                            : 'translate-x-0.5 bg-text-low'
                         }`}
                       />
                     </button>
                 </div>
 
-                <div className="w-full h-[1px] bg-text-low"></div>
+                <div className="w-full h-px bg-text-low"></div>
 
                 <div className="flex items-center justify-between">
-                    <div className="flex gap-[15px] items-center flex-1">
-                        <div className="bg-accent2-bg2 h-[40px] w-[40px] rounded-[8px] text-accent2 flex items-center justify-center flex-shrink-0">👁️</div>
+                    <div className="flex gap-3.75 items-center flex-1">
+                        <div className="bg-accent2-bg2 h-10 w-10 rounded-lg text-accent2 flex items-center justify-center shrink-0">👁️</div>
 
                         <div className="flex flex-col">
                           <p className="font-subheading font-bold text-[16px] text-text-high">Ocultar series hechas</p>
@@ -428,27 +428,27 @@ const PersonalSettings = () => {
 
                     <button
                       onClick={() => handleToggle('hideCompletedSets')}
-                      className={`relative inline-flex h-[31px] w-[51px] flex-shrink-0 items-center rounded-full transition-all ${
+                      className={`relative inline-flex h-7.75 w-12.75 shrink-0 items-center rounded-full transition-all ${
                         preferences.hideCompletedSets 
                           ? 'bg-primary' 
                           : 'bg-background border-2 border-text-low'
                       }`}
                     >
                       <span
-                        className={`inline-block h-[27px] w-[27px] transform rounded-full transition-transform ${
+                        className={`inline-block h-6.75 w-6.75 transform rounded-full transition-transform ${
                           preferences.hideCompletedSets 
-                            ? 'translate-x-[22px] bg-text-high' 
-                            : 'translate-x-[2px] bg-text-low'
+                            ? 'translate-x-5.5 bg-text-high' 
+                            : 'translate-x-0.5 bg-text-low'
                         }`}
                       />
                     </button>
                 </div>
 
-                <div className="w-full h-[1px] bg-text-low"></div>
+                <div className="w-full h-px bg-text-low"></div>
 
                 <div className="flex items-center justify-between">
-                    <div className="flex gap-[15px] items-center flex-1">
-                        <div className="bg-orange-bg4 h-[40px] w-[40px] rounded-[8px] text-orange flex items-center justify-center flex-shrink-0">📱</div>
+                    <div className="flex gap-3.75 items-center flex-1">
+                        <div className="bg-orange-bg4 h-10 w-10 rounded-lg text-orange flex items-center justify-center shrink-0">📱</div>
 
                         <div className="flex flex-col">
                           <p className="font-subheading font-bold text-[16px] text-text-high">Pantalla siempre activa</p>
@@ -458,28 +458,28 @@ const PersonalSettings = () => {
 
                     <button
                       onClick={() => handleToggle('keepScreenOn')}
-                      className={`relative inline-flex h-[31px] w-[51px] flex-shrink-0 items-center rounded-full transition-all ${
+                      className={`relative inline-flex h-7.75 w-12.75 shrink-0 items-center rounded-full transition-all ${
                         preferences.keepScreenOn 
                           ? 'bg-primary' 
                           : 'bg-background border-2 border-text-low'
                       }`}
                     >
                       <span
-                        className={`inline-block h-[27px] w-[27px] transform rounded-full transition-transform ${
+                        className={`inline-block h-6.75 w-6.75 transform rounded-full transition-transform ${
                           preferences.keepScreenOn 
-                            ? 'translate-x-[22px] bg-text-high' 
-                            : 'translate-x-[2px] bg-text-low'
+                            ? 'translate-x-5.5 bg-text-high' 
+                            : 'translate-x-0.5 bg-text-low'
                         }`}
                       />
                     </button>
                 </div>
 
-                <div className="w-full h-[1px] bg-text-low"></div>
+                <div className="w-full h-px bg-text-low"></div>
 
-                <div className="flex flex-col gap-[5px]">
+                <div className="flex flex-col gap-1.25">
                     <label className="font-subheading font-bold text-[16px] text-text-low">IDIOMA DE LA APP</label>
 
-                    <div className="flex items-center gap-[20px]">
+                    <div className="flex items-center gap-5">
                         <div className="text-text-low text-[20px] flex items-center justify-center">🌐</div>
 
                         <select 
@@ -532,7 +532,7 @@ const PersonalSettings = () => {
                 <button className="w-full">
                     <div className="flex items-center justify-between">  
                         <div className="flex gap-5 items-center justify-center">
-                            <div className="bg-red-bg1 h-10 w-10 rounded-[8px] text-red flex items-center justify-center">
+                            <div className="bg-red-bg1 h-10 w-10 rounded-lg text-red flex items-center justify-center">
                                 🗑️
                             </div>
 
@@ -543,7 +543,7 @@ const PersonalSettings = () => {
                             </div>
                         </div>
 
-                        <div className="flex gap-[15px] text-red">
+                        <div className="flex gap-3.75 text-red">
                             →
                         </div>      
                     </div>

@@ -43,8 +43,8 @@ const PaymentConfirmation = () => {
     <div className="min-h-screen bg-background flex flex-col pb-24">
 
         {/* HEADER */}
-        <section className="mt-[10px] flex flex-col items-center justify-center gap-[11px]">
-        <span className="bg-accent2-bg2 h-[105px] w-[105px] px-[10px] rounded-full border border-accent2 font-heading font-bold text-[50px] text-accent2 flex items-center justify-center">
+        <section className="mt-2.5 flex flex-col items-center justify-center gap-2.75">
+        <span className="bg-accent2-bg2 h-26.25 w-26.25 px-2.5 rounded-full border border-accent2 font-heading font-bold text-[50px] text-accent2 flex items-center justify-center">
             ✓
         </span>
 
@@ -63,12 +63,12 @@ const PaymentConfirmation = () => {
         <p className="font-subheading font-bold text-[16px] text-text-low">DETALLES DEL PAGO</p>
         
         <Card>
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
 
             <div className="flex items-start justify-between">
                 <div className="w-full flex items-center justify-between">
                     <div className="flex gap-3">
-                    <div className={`w-[40px] h-[50px] rounded-[10px] ${planColors[paymentData.plan]} flex items-center justify-center text-[17px]`}>
+                    <div className={`w-10 h-12.5 rounded-[10px] ${planColors[paymentData.plan]} flex items-center justify-center text-[17px]`}>
                         {planIcons[paymentData.plan]}
                     </div>
 
@@ -143,7 +143,7 @@ const PaymentConfirmation = () => {
                 </p>
             </div>
 
-            <div className="-mx-[16px] -mb-[23px] mt-[12px] bg-yellow-bg3 px-[14px] py-[10px] flex items-center justify-between border border-yellow/27">
+            <div className="-mx-4 -mb-5.75 mt-3 bg-yellow-bg3 px-3.5 py-2.5 flex items-center justify-between border border-yellow/27">
                 <div className="flex flex-col gap-1">
                     <p className="font-heading font-semibold text-[20px] text-text-high">Total hoy</p>
 
@@ -153,7 +153,7 @@ const PaymentConfirmation = () => {
                 <p className="font-heading font-extrabold text-[18px] text-orange">0,00 €</p>
             </div>
 
-            <div className="-mx-[16px] -mb-[17px] mt-[12px] rounded-b-[16px] px-[14px] py-[10px] flex items-center justify-between border border-yellow/27">
+            <div className="-mx-4 -mb-4.25 mt-3 rounded-b-2xl px-3.5 py-2.5 flex items-center justify-between border border-yellow/27">
                 <p className="font-subheading font-bold text-[16px] text-text-low">ID TRANSACCIÓN</p>
 
                 <p className="font-body text-[12px] text-text-low">
@@ -166,9 +166,9 @@ const PaymentConfirmation = () => {
         </section>
 
         {/* INFORMACIÓN */}
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
                 
-            <div className="h-auto rounded-[16px] bg-accent2-bg3 border border-accent2 p-[10px] flex items-center justify-between gap-[10px]">
+            <div className="h-auto rounded-2xl bg-accent2-bg3 border border-accent2 p-2.5 flex items-center justify-between gap-2.5">
                     
                 <span className="text-accent2 text-[20px]">ℹ️</span>
 
@@ -187,10 +187,10 @@ const PaymentConfirmation = () => {
             <p className="font-subheading font-bold text-[16px] text-text-low">PRÓXIMO PAGO</p>
             
             <Card>
-                <div className="flex gap-[10px]">
+                <div className="flex gap-2.5">
                     <div className="w-full flex">
                         <div className="flex gap-3 items-center justify-between">
-                            <div className="w-[60px] h-[60px] rounded-[16px] bg-orange-bg2 text-orange flex items-center justify-center text-[24px]">
+                            <div className="w-15 h-15 rounded-2xl bg-orange-bg2 text-orange flex items-center justify-center text-[24px]">
                                 📅
                             </div>
 
@@ -214,14 +214,14 @@ const PaymentConfirmation = () => {
 
         {/* ENTRENADOR ASIGNADO - Solo para plan Elite */}
         {paymentData.plan === 'elite' && (
-          <section className="mx-5 pt-5 pb-[70px] flex flex-col gap-3">
+          <section className="mx-5 pt-5 pb-17.5 flex flex-col gap-3">
               <p className="font-subheading font-bold text-[16px] text-text-low">TU ENTRENADOR ASIGNADO</p>
               
               <Card>
                   <div className="flex">
                       <div className="w-full flex items-center justify-between">
                           <div className="flex gap-5 items-center justify-between">
-                              <div className="w-[75px] h-[75px] rounded-[16px] bg-primary-bg border border-primary flex items-center justify-center text-[17px]">
+                              <div className="w-18.75 h-18.75 rounded-2xl bg-primary-bg border border-primary flex items-center justify-center text-[17px]">
                                   <p className="font-heading font-extrabold text-[28px] text-accent1">CS</p>
                               </div>
 
@@ -237,7 +237,7 @@ const PaymentConfirmation = () => {
                               </div> 
                           </div>
 
-                          <div className="flex items-center justify-center gap-[15px] text-text-low text-[20px]">
+                          <div className="flex items-center justify-center gap-3.75 text-text-low text-[20px]">
                               →
                           </div>
                       </div>
@@ -247,7 +247,7 @@ const PaymentConfirmation = () => {
         )}
 
         {/* STICKY CTA */}
-        <div className="w-full px-[16px] fixed bottom-3">
+        <div className="w-full px-4 fixed bottom-3">
             <div className="flex flex-col gap-1">
                 <Button
                     variant="outlined"

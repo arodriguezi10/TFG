@@ -171,10 +171,10 @@ const Routines1 = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px] px-[16px]">
-      <section className="w-[100%] flex items-center justify-between">
-        <div className="flex flex-col gap-[5px]">
-          <div className="flex gap-[15px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5 px-4">
+      <section className="w-full flex items-center justify-between">
+        <div className="flex flex-col gap-1.25">
+          <div className="flex gap-3.75">
             <p className="font-subheading text-[12px] text-text-low">
               Biblioteca
             </p>
@@ -190,21 +190,21 @@ const Routines1 = () => {
           </h1>
         </div>
 
-        <div className="flex gap-[10px]">
+        <div className="flex gap-2.5">
           <button
             onClick={() => setShowSearch(!showSearch)}
-            className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors cursor-pointer"
+            className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors cursor-pointer"
           >
             🔍
           </button>
 
-          <div className="bg-surf h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-low">
+          <div className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low">
             ⚙️
           </div>
 
           <button
             onClick={handleCreateRoutine}
-            className="bg-accent1 h-[40px] w-[40px] rounded-[8px] border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
+            className="bg-accent1 h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
           >
             +
           </button>
@@ -212,25 +212,25 @@ const Routines1 = () => {
       </section>
 
       {showSearch && (
-        <section className="mt-[16px] w-full">
+        <section className="mt-4 w-full">
           <input
             type="text"
             placeholder="Buscar rutina por nombre, tipo o descripción..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-surf border border-text-low rounded-[12px] px-[16px] py-[12px] font-body text-[14px] text-text-high placeholder-text-low outline-none focus:border-accent1 transition-colors"
+            className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high placeholder-text-low outline-none focus:border-accent1 transition-colors"
           />
         </section>
       )}
 
       {routines.length === 0 ? (
         <>
-          <section className="mt-[50px] flex flex-col items-center justify-center gap-[15px]">
-            <span className="bg-surf h-[110px] w-[110px] px-[10px] rounded-[35px] font-body text-[45px] text-accent1 flex items-center justify-center">
+          <section className="mt-12.5 flex flex-col items-center justify-center gap-3.75">
+            <span className="bg-surf h-27.5 w-27.5 px-2.5 rounded-[35px] font-body text-[45px] text-accent1 flex items-center justify-center">
               📋
             </span>
 
-            <p className="mt-[20px] bg-surf px-[14px] py-[2px] rounded-[16px] border border-text-low font-subheading font-semibold text-[16px] text-text-low">
+            <p className="mt-5 bg-surf px-3.5 py-0.5 rounded-2xl border border-text-low font-subheading font-semibold text-[16px] text-text-low">
               Sin rutinas todavía
             </p>
 
@@ -245,7 +245,7 @@ const Routines1 = () => {
             </p>
           </section>
 
-          <section className="mt-[30px] flex flex-col gap-[10px]">
+          <section className="mt-7.5 flex flex-col gap-2.5">
             <Button
               variant="outlined"
               text="Crear rutina"
@@ -259,10 +259,10 @@ const Routines1 = () => {
         </>
       ) : (
         <>
-          <section className="mt-[24px] flex flex-col gap-[12px]">
+          <section className="mt-6 flex flex-col gap-3">
             {filteredRoutines.length === 0 ? (
               <Card>
-                <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
+                <div className="flex flex-col items-center justify-center py-16 gap-4">
                   <span className="text-[48px]">🔍</span>
                   <p className="font-heading font-bold text-[18px] text-text-high text-center">
                     No se encontraron rutinas
@@ -278,27 +278,27 @@ const Routines1 = () => {
                 
                 return (
                   <Card key={routine.id}>
-                    <div className="flex flex-col gap-[12px]">
+                    <div className="flex flex-col gap-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-[8px] mb-[4px]">
+                          <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-heading font-bold text-[20px] text-text-high">
                               {routine.name}
                             </h3>
                             {routine.training_type && (
-                              <span className="bg-accent1-bg1 px-[8px] py-[2px] rounded-[12px] border border-accent1 font-body text-[11px] text-accent1">
+                              <span className="bg-accent1-bg1 px-2 py-0.5 rounded-xl border border-accent1 font-body text-[11px] text-accent1">
                                 {routine.training_type}
                               </span>
                             )}
                           </div>
                           
                           {routine.description && (
-                            <p className="font-body text-[13px] text-text-low mb-[8px]">
+                            <p className="font-body text-[13px] text-text-low mb-2">
                               {routine.description}
                             </p>
                           )}
 
-                          <div className="flex gap-[12px] text-[12px] text-text-low">
+                          <div className="flex gap-3 text-[12px] text-text-low">
                             <span>📅 {parseDays(routine.assigned_days)}</span>
                             <span>⏱️ {stats.duration} min</span>
                           </div>
@@ -306,7 +306,7 @@ const Routines1 = () => {
 
                         <button
                           onClick={() => handleDeleteRoutine(routine.id)}
-                          className="bg-surf h-[32px] w-[32px] rounded-[8px] border border-red flex items-center justify-center text-red text-[16px] hover:bg-red/10 transition-colors flex-shrink-0"
+                          className="bg-surf h-8 w-8 rounded-lg border border-red flex items-center justify-center text-red text-[16px] hover:bg-red/10 transition-colors shrink-0"
                         >
                           🗑️
                         </button>
@@ -315,7 +315,7 @@ const Routines1 = () => {
                       <hr className="border-text-low" />
 
                       <div className="flex items-center justify-between">
-                        <div className="flex gap-[16px]">
+                        <div className="flex gap-4">
                           <div className="text-center">
                             <p className="font-heading font-bold text-[20px] text-accent1">
                               {stats.exerciseCount}
@@ -325,7 +325,7 @@ const Routines1 = () => {
                             </p>
                           </div>
 
-                          <div className="w-[1px] bg-text-low"></div>
+                          <div className="w-px bg-text-low"></div>
 
                           <div className="text-center">
                             <p className="font-heading font-bold text-[20px] text-accent1">
@@ -336,7 +336,7 @@ const Routines1 = () => {
                             </p>
                           </div>
 
-                          <div className="w-[1px] bg-text-low"></div>
+                          <div className="w-px bg-text-low"></div>
 
                           <div className="text-center">
                             <p className="font-heading font-bold text-[20px] text-accent1">
@@ -350,15 +350,15 @@ const Routines1 = () => {
 
                         <button
                           onClick={() => handleEditRoutine(routine.id)}
-                          className="bg-accent1 h-[36px] px-[16px] rounded-[8px] font-body text-[13px] text-text-high hover:bg-accent1/80 transition-colors"
+                          className="bg-accent1 h-9 px-4 rounded-lg font-body text-[13px] text-text-high hover:bg-accent1/80 transition-colors"
                         >
                           Ver
                         </button>
                       </div>
 
                       {routine.target_muscle_groups && (
-                        <div className="bg-surface rounded-[8px] p-[10px]">
-                          <p className="font-body text-[11px] text-text-low mb-[4px]">
+                        <div className="bg-surface rounded-lg p-2.5">
+                          <p className="font-body text-[11px] text-text-low mb-1">
                             Grupos musculares:
                           </p>
                           <p className="font-body text-[12px] text-text-high">
@@ -373,7 +373,7 @@ const Routines1 = () => {
             )}
           </section>
 
-          <section className="mt-[16px] flex flex-col gap-[10px]">
+          <section className="mt-4 flex flex-col gap-2.5">
             <Button
               variant="outlined"
               text="+ Crear nueva rutina"
@@ -388,19 +388,19 @@ const Routines1 = () => {
       )}
 
       {subscriptionTier !== 'elite' && (
-      <section className="mt-[16px] pb-[16px]">
+      <section className="mt-4 pb-4">
         <button 
           onClick={handleNavigateToSubscription}
           className="w-full cursor-pointer"
         >
           <Card>
-            <div className="flex items-center justify-between gap-[15px] hover:bg-surface/50 transition-colors rounded-[16px] -m-[16px] p-[16px]">
-              <span className="bg-orange-bg2 h-[60px] w-[60px] px-[10px] rounded-[16px] border border-orange font-body text-[25px] text-orange flex items-center justify-center">
+            <div className="flex items-center justify-between gap-3.75 hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
+              <span className="bg-orange-bg2 h-15 w-15 px-2.5 rounded-2xl border border-orange font-body text-[25px] text-orange flex items-center justify-center">
                 👑
               </span>
 
-              <div className="w-[70%] flex flex-col gap-[1px]">
-                <div className="flex gap-[2px]">
+              <div className="w-[70%] flex flex-col gap-px">
+                <div className="flex gap-0.5">
                   <div className="flex">
                     <p className="font-heading font-semibold text-[20px] text-text-high leading-tight text-left">
                       Crear <br />
@@ -408,7 +408,7 @@ const Routines1 = () => {
                     </p>
                   </div>
 
-                  <span className="bg-yellow-bg2 h-[20px] px-[10px] rounded-[16px] border border-yellow font-body text-[12px] text-yellow">
+                  <span className="bg-yellow-bg2 h-5 px-2.5 rounded-2xl border border-yellow font-body text-[12px] text-yellow">
                     ◆ ÉLITE
                   </span>
                 </div>
@@ -418,7 +418,7 @@ const Routines1 = () => {
                 </p>
               </div>
 
-              <div className="bg-orange-bg2 h-[37px] w-[37px] px-[8px] rounded-[8px] border border-orange font-body text-[15px] text-orange flex items-center justify-center">
+              <div className="bg-orange-bg2 h-9.25 w-9.25 px-2 rounded-lg border border-orange font-body text-[15px] text-orange flex items-center justify-center">
                 →
               </div>
             </div>

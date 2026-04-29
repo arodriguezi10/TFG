@@ -294,20 +294,20 @@ const EditRoutine = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5">
       <section className="w-full flex items-center justify-between">
         <Header showback subtitle={"rutinas"} title={"Editar rutina"} />
       </section>
 
       {error && (
-        <section className="mt-[16px] w-full px-[16px]">
-          <div className="rounded-[16px] bg-red/10 border border-red p-[14px]">
+        <section className="mt-4 w-full px-4">
+          <div className="rounded-2xl bg-red/10 border border-red p-3.5">
             <p className="font-body text-[13px] text-red">{error}</p>
           </div>
         </section>
       )}
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <p className="font-subheading font-bold text-text-low text-[16px]">
           INFORMACIÓN BÁSICA
         </p>
@@ -318,7 +318,7 @@ const EditRoutine = () => {
               NOMBRE DE LA RUTINA
             </label>
 
-            <div className="flex gap-[15px]">
+            <div className="flex gap-3.75">
               <p className="text-text-low">📋</p>
               <input
                 className="font-body text-[16px] text-text-high bg-transparent border-none outline-none w-full"
@@ -330,15 +330,15 @@ const EditRoutine = () => {
             </div>
           </div>
 
-          <div className="w-full h-[1px] bg-text-low mt-[15px]"></div>
+          <div className="w-full h-px bg-text-low mt-3.75"></div>
 
-          <div className="mt-[15px] flex flex-col justify-between">
+          <div className="mt-3.75 flex flex-col justify-between">
             <label className="font-subheading font-bold text-text-low text-[14px] uppercase tracking-wider">
               DESCRIPCIÓN
               <span className="font-subheading font-semibold text-[12px]"> (opcional)</span>
             </label>
 
-            <div className="flex gap-[15px]">
+            <div className="flex gap-3.75">
               <p className="text-text-low">📝</p>
               <textarea
                 className="w-full font-body text-[16px] text-text-high bg-transparent border-none outline-none resize-none"
@@ -352,18 +352,18 @@ const EditRoutine = () => {
         </Card>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           TIPO DE ENTRENAMIENTO
         </p>
 
         <Card>
-          <div className="flex gap-[10px] items-center justify-center">
+          <div className="flex gap-2.5 items-center justify-center">
             {trainingTypes.slice(0, 3).map((type) => (
               <button
                 key={type}
                 onClick={() => handleTypeClick(type)}
-                className={`px-[10px] py-[3px] rounded-[16px] border font-body text-[16px] transition-colors ${
+                className={`px-2.5 py-0.75 rounded-2xl border font-body text-[16px] transition-colors ${
                   selectedType === type
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "bg-surface border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -374,12 +374,12 @@ const EditRoutine = () => {
             ))}
           </div>
 
-          <div className="mt-[10px] flex gap-[10px] items-center justify-center">
+          <div className="mt-2.5 flex gap-2.5 items-center justify-center">
             {trainingTypes.slice(3).map((type) => (
               <button
                 key={type}
                 onClick={() => handleTypeClick(type)}
-                className={`px-[10px] py-[3px] rounded-[16px] border font-body text-[16px] transition-colors ${
+                className={`px-2.5 py-0.75 rounded-2xl border font-body text-[16px] transition-colors ${
                   selectedType === type
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "bg-surface border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -392,18 +392,18 @@ const EditRoutine = () => {
         </Card>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] w-full flex gap-[10px]">
+      <section className="mt-4 w-full px-4 flex gap-2.5">
         <div className="w-full flex flex-col">
           <p className="font-subheading font-bold text-[16px] text-text-low">
             DÍA
           </p>
           <Card>
-            <div className="flex gap-[10px]">
+            <div className="flex gap-2.5">
               {days.slice(0, 4).map((day) => (
                 <button
                   key={day.short}
                   onClick={() => handleDayClick(day)}
-                  className={`h-[35px] w-[35px] rounded-[8px] border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
+                  className={`h-8.75 w-8.75 rounded-lg border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
                     selectedDays.includes(day.full)
                       ? "bg-accent1-bg1 border-accent1 text-accent1"
                       : "bg-surface border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -414,12 +414,12 @@ const EditRoutine = () => {
               ))}
             </div>
 
-            <div className="mt-[10px] flex gap-[10px] flex items-center justify-center">
+            <div className="mt-2.5 flex gap-2.5 items-center justify-center">
               {days.slice(4).map((day) => (
                 <button
                   key={day.short}
                   onClick={() => handleDayClick(day)}
-                  className={`h-[35px] w-[35px] rounded-[8px] border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
+                  className={`h-8.75 w-8.75 rounded-lg border font-subheading font-bold text-[16px] flex items-center justify-center transition-colors ${
                     selectedDays.includes(day.full)
                       ? "bg-accent1-bg1 border-accent1 text-accent1"
                       : "bg-surface border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -441,22 +441,22 @@ const EditRoutine = () => {
               <div>
                 <p className="font-heading font-bold text-[22px] text-accent1">
                   {duration}
-                  <span className="font-body text-[16px] text-text-low ml-[5px]">
+                  <span className="font-body text-[16px] text-text-low ml-1.25">
                     min
                   </span>
                 </p>
               </div>
-              <div className="mt-[10px] flex justify-end align-end gap-[10px]">
+              <div className="mt-2.5 flex justify-end align-end gap-2.5">
                 <button
                   onClick={() => handleDurationChange(-5)}
-                  className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-accent1 hover:text-text-high transition-colors"
+                  className="bg-surface h-8.75 w-8.75 rounded-lg border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-accent1 hover:text-text-high transition-colors"
                 >
                   -
                 </button>
 
                 <button
                   onClick={() => handleDurationChange(5)}
-                  className="bg-surface h-[35px] w-[35px] rounded-[8px] border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-accent1 hover:text-text-high transition-colors"
+                  className="bg-surface h-8.75 w-8.75 rounded-lg border border-text-low font-subheading font-bold text-[16px] text-text-high flex items-center justify-center hover:bg-accent1 hover:text-text-high transition-colors"
                 >
                   +
                 </button>
@@ -466,9 +466,9 @@ const EditRoutine = () => {
         </div>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
-        <div className="w-[100%] flex gap-[10px] items-center justify-between">
-          <div className="flex gap-[10px] items-center">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
+        <div className="w-full flex gap-2.5 items-center justify-between">
+          <div className="flex gap-2.5 items-center">
             <p className="font-subheading font-bold text-text-low text-[16px]">
               EJERCICIOS
             </p>
@@ -480,7 +480,7 @@ const EditRoutine = () => {
           {selectedExercises.length > 0 && (
             <button
               onClick={() => navigate('/exerciseSearchFree')}
-              className="bg-accent1 h-[32px] px-[12px] rounded-[8px] font-body text-[12px] text-text-high hover:bg-accent1/80 transition-colors"
+              className="bg-accent1 h-8 px-3 rounded-lg font-body text-[12px] text-text-high hover:bg-accent1/80 transition-colors"
             >
               + Añadir más
             </button>
@@ -489,8 +489,8 @@ const EditRoutine = () => {
 
         {selectedExercises.length === 0 ? (
           <Card>
-            <div className="mt-[16px] flex flex-col items-center justify-center gap-[12px]">
-              <span className="bg-accent1-bg1 h-[60px] w-[60px] px-[10px] rounded-[16px] border border-accent1 font-body text-[25px] text-accent1 flex items-center justify-center">
+            <div className="mt-4 flex flex-col items-center justify-center gap-3">
+              <span className="bg-accent1-bg1 h-15 w-15 px-2.5 rounded-2xl border border-accent1 font-body text-[25px] text-accent1 flex items-center justify-center">
                 💪
               </span>
 
@@ -515,15 +515,15 @@ const EditRoutine = () => {
             </div>
           </Card>
         ) : (
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             {selectedExercises.map((exercise, index) => (
               <Card key={exercise.id}>
-                <div className="flex items-center gap-[12px]">
-                  <div className="flex flex-col items-center gap-[4px]">
-                    <div className="bg-accent1-bg1 min-w-[35px] h-[24px] rounded-[8px] border border-accent1 font-heading font-bold text-[14px] text-accent1 flex items-center justify-center flex-shrink-0 px-[8px]">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="bg-accent1-bg1 min-w-8.75 h-6 rounded-lg border border-accent1 font-heading font-bold text-[14px] text-accent1 flex items-center justify-center shrink-0 px-2">
                       {index + 1}
                     </div>
-                    <span className="bg-accent1-bg1 h-[50px] w-[50px] rounded-[12px] border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center flex-shrink-0">
+                    <span className="bg-accent1-bg1 h-12.5 w-12.5 rounded-xl border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center shrink-0">
                       {exercise.is_custom ? '⚡' : '💪'}
                     </span>
                   </div>
@@ -537,9 +537,9 @@ const EditRoutine = () => {
                       {exercise.muscle_group} · {exercise.equipment || 'Sin equipo'}
                     </p>
 
-                    <div className="mt-[3px] flex gap-[6px]">
+                    <div className="mt-0.75 flex gap-1.5">
                       <span
-                        className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
+                        className={`h-auto px-2.5 rounded-2xl border font-body text-[12px] ${
                           exercise.difficulty_level === "Principiante"
                             ? "bg-green-bg2 border-accent2 text-accent2"
                             : exercise.difficulty_level === "Intermedio"
@@ -551,7 +551,7 @@ const EditRoutine = () => {
                       </span>
 
                       {exercise.is_custom && (
-                        <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                        <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                           Personalizado
                         </span>
                       )}
@@ -560,7 +560,7 @@ const EditRoutine = () => {
 
                   <button
                     onClick={() => removeExercise(exercise.id)}
-                    className="bg-surf h-[35px] w-[35px] rounded-[8px] border border-red flex items-center justify-center text-red text-[20px] hover:bg-red/10 transition-colors flex-shrink-0"
+                    className="bg-surf h-8.75 w-8.75 rounded-lg border border-red flex items-center justify-center text-red text-[20px] hover:bg-red/10 transition-colors shrink-0"
                   >
                     ×
                   </button>
@@ -571,7 +571,7 @@ const EditRoutine = () => {
         )}
       </section>
 
-      <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5">
         <p className="font-subheading font-bold text-[16px] text-text-low">
           GRUPOS MUSCULARES
         </p>
@@ -581,12 +581,12 @@ const EditRoutine = () => {
             SELECCIONA LOS QUE TRABAJES
           </p>
 
-          <div className="mt-[10px] flex gap-[10px] items-center justify-center">
+          <div className="mt-2.5 flex gap-2.5 items-center justify-center">
             {muscleGroups.slice(0, 3).map((muscle) => (
               <button
                 key={muscle}
                 onClick={() => handleMuscleClick(muscle)}
-                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                className={`w-24.5 px-2.5 py-1.25 rounded-lg border font-subheading text-[16px] transition-colors ${
                   selectedMuscles.includes(muscle)
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -597,12 +597,12 @@ const EditRoutine = () => {
             ))}
           </div>
 
-          <div className="mt-[10px] flex gap-[10px] items-center justify-center">
+          <div className="mt-2.5 flex gap-2.5 items-center justify-center">
             {muscleGroups.slice(3, 6).map((muscle) => (
               <button
                 key={muscle}
                 onClick={() => handleMuscleClick(muscle)}
-                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                className={`w-24.5 px-2.5 py-1.25 rounded-lg border font-subheading text-[16px] transition-colors ${
                   selectedMuscles.includes(muscle)
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -613,12 +613,12 @@ const EditRoutine = () => {
             ))}
           </div>
 
-          <div className="mt-[10px] flex gap-[10px] items-center justify-center">
+          <div className="mt-2.5 flex gap-2.5 items-center justify-center">
             {muscleGroups.slice(6, 9).map((muscle) => (
               <button
                 key={muscle}
                 onClick={() => handleMuscleClick(muscle)}
-                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                className={`w-24.5 px-2.5 py-1.25 rounded-lg border font-subheading text-[16px] transition-colors ${
                   selectedMuscles.includes(muscle)
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -629,12 +629,12 @@ const EditRoutine = () => {
             ))}
           </div>
 
-          <div className="mt-[10px] flex gap-[10px] items-center justify-center">
+          <div className="mt-2.5 flex gap-2.5 items-center justify-center">
             {muscleGroups.slice(9).map((muscle) => (
               <button
                 key={muscle}
                 onClick={() => handleMuscleClick(muscle)}
-                className={`w-[98px] px-[10px] py-[5px] rounded-[8px] border font-subheading text-[16px] transition-colors ${
+                className={`w-24.5 px-2.5 py-1.25 rounded-lg border font-subheading text-[16px] transition-colors ${
                   selectedMuscles.includes(muscle)
                     ? "bg-accent1-bg1 border-accent1 text-accent1"
                     : "border-text-low text-text-low hover:bg-accent1-bg1 hover:border-accent1 hover:text-accent1"
@@ -647,7 +647,7 @@ const EditRoutine = () => {
         </Card>
       </section>
 
-      <section className="mt-[16px] w-full px-[16px] fixed bottom-1 gap-[10px]">
+      <section className="mt-4 w-full px-4 fixed bottom-1 gap-2.5">
         <Button
           variant="outlined"
           text={loading ? "Guardando cambios..." : "Guardar cambios"}

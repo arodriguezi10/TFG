@@ -66,8 +66,8 @@ const Subscription = () => {
           <Header showback subtitle={"perfil"} title={"Suscripción y pagos"}/>
       </section>
 
-      <section className="mt-[25px] flex flex-col items-center justify-center gap-[15px]">
-          <span className="bg-yellow-bg3 h-[110px] w-[110px] px-[10px] rounded-[35px] border border-yellow font-heading font-bold text-[50px] text-yellow flex items-center justify-center">
+      <section className="mt-6.25 flex flex-col items-center justify-center gap-3.75">
+          <span className="bg-yellow-bg3 h-27.5 w-27.5 px-2.5 rounded-[35px] border border-yellow font-heading font-bold text-[50px] text-yellow flex items-center justify-center">
               👑
           </span>
 
@@ -78,21 +78,21 @@ const Subscription = () => {
           <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center justify-center text-center">
             Desbloquea tu
             
-            <span className="bg-gradient-to-r from-orange to-orange-bg3 bg-clip-text text-transparent">pontencial</span>
-            <span className="bg-gradient-to-l from-accent1 to-accent1-bg1 bg-clip-text text-transparent">completo</span>                   
+            <span className="bg-linear-to-r from-orange to-orange-bg3 bg-clip-text text-transparent">pontencial</span>
+            <span className="bg-linear-to-l from-accent1 to-accent1-bg1 bg-clip-text text-transparent">completo</span>                   
           </p>
 
-          <p className="font-subheading text-[16px] p-[16px] text-text-low text-center">
+          <p className="font-subheading text-[16px] p-4 text-text-low text-center">
               Actualmente estás en el plan gratuito. Elige  <br/>
               un plan y accede a todas las funciones de FYLIOS.                  
           </p>
       </section>
 
-      <section className="mt-[10px] mx-5 mb-5">
-        <div className="bg-surf rounded-[16px] border border-text-low p-1.5 flex">
+      <section className="mt-2.5 mx-5 mb-5">
+        <div className="bg-surf rounded-2xl border border-text-low p-1.5 flex">
           <button
             onClick={() => setBillingPeriod('mes')}
-            className={`flex-1 py-2.5 rounded-[16px] font-subheading font-bold text-[16px] transition-all duration-200 ${
+            className={`flex-1 py-2.5 rounded-2xl font-subheading font-bold text-[16px] transition-all duration-200 ${
               billingPeriod === 'mes'
                 ? 'bg-surface text-text-high shadow-lg'
                 : 'text-text-low'
@@ -131,7 +131,7 @@ const Subscription = () => {
 
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-[34px] h-[34px] rounded-[10px] bg-text-low/8 flex items-center justify-center text-[17px]">
+                  <div className="w-8.5 h-8.5 rounded-[10px] bg-text-low/8 flex items-center justify-center text-[17px]">
                     🌱
                   </div>
                   <p className="font-heading font-extrabold text-[17px] text-text-high">
@@ -159,7 +159,7 @@ const Subscription = () => {
               
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -168,7 +168,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -177,7 +177,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5 opacity-50">
-                  <div className=" w-[18px] h-[18px] rounded-[5px] bg-background flex items-center justify-center flex-shrink-0">
+                  <div className=" w-4.5 h-4.5 rounded-[5px] bg-background flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-low">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -187,7 +187,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5 opacity-50">
-                  <div className=" w-[18px] h-[18px] rounded-[5px] bg-background flex items-center justify-center flex-shrink-0">
+                  <div className=" w-4.5 h-4.5 rounded-[5px] bg-background flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-low">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -197,7 +197,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5 opacity-50">
-                  <div className=" w-[18px] h-[18px] rounded-[5px] bg-background flex items-center justify-center flex-shrink-0">
+                  <div className=" w-4.5 h-4.5 rounded-[5px] bg-background flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-low">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -241,7 +241,7 @@ const Subscription = () => {
 
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-[34px] h-[34px] rounded-[10px] bg-orange-bg2 flex items-center justify-center text-[17px]">⚡</div>
+                  <div className="w-8.5 h-8.5 rounded-[10px] bg-orange-bg2 flex items-center justify-center text-[17px]">⚡</div>
 
                   <p className="font-heading font-extrabold text-[17px] text-text-high">Pro</p>
                 </div>
@@ -271,7 +271,7 @@ const Subscription = () => {
               
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -280,7 +280,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -289,7 +289,7 @@ const Subscription = () => {
                 </div>
 
                  <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -298,7 +298,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5 opacity-50">
-                  <div className=" w-[18px] h-[18px] rounded-[5px] bg-background flex items-center justify-center flex-shrink-0">
+                  <div className=" w-4.5 h-4.5 rounded-[5px] bg-background flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-low">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -308,7 +308,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5 opacity-50">
-                  <div className=" w-[18px] h-[18px] rounded-[5px] bg-background flex items-center justify-center flex-shrink-0">
+                  <div className=" w-4.5 h-4.5 rounded-[5px] bg-background flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-text-low">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -352,7 +352,7 @@ const Subscription = () => {
 
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-[34px] h-[34px] rounded-[10px] bg-surface flex items-center justify-center text-[17px]">👑</div>
+                  <div className="w-8.5 h-8.5 rounded-[10px] bg-surface flex items-center justify-center text-[17px]">👑</div>
 
                   <p className="font-heading font-extrabold text-[17px] text-text-high">Élite</p>
                 </div>
@@ -378,7 +378,7 @@ const Subscription = () => {
               
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -387,7 +387,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -396,7 +396,7 @@ const Subscription = () => {
                 </div>
 
                  <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -405,7 +405,7 @@ const Subscription = () => {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -414,7 +414,7 @@ const Subscription = () => {
                 </div>
 
                  <div className="flex items-center gap-2.5">
-                  <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" className="text-accent3">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
@@ -449,7 +449,7 @@ const Subscription = () => {
       </section>
 
       {/* PAYMENT METHODS */}
-      <section className='mt-[10px] flex flex-col items-center justify-center gap-2'>
+      <section className='mt-2.5 flex flex-col items-center justify-center gap-2'>
           <div className='flex gap-1'>
               <span className="items-center bg-text-low/8 border border-text-low rounded-full px-3.5 py-0.5 text-[14px] text-text-low font-body">
                 💳 Tarjeta
@@ -468,7 +468,7 @@ const Subscription = () => {
       </section>
 
       {/* STICKY CTA */}
-      <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
+      <div className="w-full px-4 fixed bottom-1 gap-2.5">
           <Button 
             variant="outlined" 
             text={getButtonText()}

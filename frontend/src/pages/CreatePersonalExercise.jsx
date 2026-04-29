@@ -86,7 +86,7 @@ const CreatePersonalExercise = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col mb-[10px]">
+    <div className="min-h-screen bg-background flex flex-col mb-2.5">
       
       {/* HEADER */}
       <section className="w-full">
@@ -99,20 +99,20 @@ const CreatePersonalExercise = () => {
 
       {/* MENSAJE DE ERROR */}
       {error && (
-        <section className="mt-[16px] w-full px-[16px]">
-          <div className="rounded-[16px] bg-red/10 border border-red p-[14px]">
+        <section className="mt-4 w-full px-4">
+          <div className="rounded-2xl bg-red/10 border border-red p-3.5">
             <p className="font-body text-[13px] text-red">{error}</p>
           </div>
         </section>
       )}
 
       {/* FORMULARIO */}
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <Card>
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             
             {/* Nombre del ejercicio */}
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-1.25">
             <label className="font-subheading font-bold text-[14px] text-text-low uppercase tracking-wide">
                 Nombre del ejercicio
             </label>
@@ -126,20 +126,20 @@ const CreatePersonalExercise = () => {
             />
             </div>
 
-            <div className="w-full h-[1px] bg-border"></div>
+            <div className="w-full h-px bg-border"></div>
 
             {/* Grupo muscular */}
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-1.25">
               <label className="font-subheading font-bold text-[14px] text-text-low uppercase">
                 Grupo muscular principal
               </label>
               
-              <div className="flex gap-[8px] flex-wrap">
+              <div className="flex gap-2 flex-wrap">
                 {['Pecho', 'Espalda', 'Hombro', 'Bíceps', 'Tríceps', 'Cuádriceps', 'Femoral', 'Glúteo', 'Gemelo', 'Core'].map((muscle) => (
                   <button
                     key={muscle}
                     onClick={() => setFormData({ ...formData, muscleGroup: muscle })}
-                    className={`px-[12px] py-[6px] rounded-[16px] border font-body text-[14px] transition-colors ${
+                    className={`px-3 py-1.5 rounded-2xl border font-body text-[14px] transition-colors ${
                       formData.muscleGroup === muscle
                         ? 'bg-primary-bg border-primary text-primary'
                         : 'bg-surf border-text-low text-text-low'
@@ -151,20 +151,20 @@ const CreatePersonalExercise = () => {
               </div>
             </div>
 
-            <div className="w-full h-[1px] bg-border"></div>
+            <div className="w-full h-px bg-border"></div>
 
             {/* Equipamiento */}
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-1.25">
               <label className="font-subheading font-bold text-[14px] text-text-low uppercase">
                 Tipo de equipamiento
               </label>
               
-              <div className="flex gap-[8px] flex-wrap">
+              <div className="flex gap-2 flex-wrap">
                 {['Peso libre', 'Máquina', 'Polea', 'Peso corporal', 'Bandas'].map((equip) => (
                   <button
                     key={equip}
                     onClick={() => setFormData({ ...formData, equipment: equip })}
-                    className={`px-[12px] py-[6px] rounded-[16px] border font-body text-[14px] transition-colors ${
+                    className={`px-3 py-1.5 rounded-2xl border font-body text-[14px] transition-colors ${
                       formData.equipment === equip
                         ? 'bg-primary-bg border-primary text-primary'
                         : 'bg-surf border-text-low text-text-low'
@@ -176,18 +176,18 @@ const CreatePersonalExercise = () => {
               </div>
             </div>
 
-            <div className="w-full h-[1px] bg-border"></div>
+            <div className="w-full h-px bg-border"></div>
 
             {/* Nivel de dificultad */}
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-1.25">
               <label className="font-subheading font-bold text-[14px] text-text-low uppercase">
                 Nivel de dificultad
               </label>
               
-              <div className="flex gap-[8px]">
+              <div className="flex gap-2">
                 <button
                   onClick={() => setFormData({ ...formData, difficulty: 'Principiante' })}
-                  className={`flex-1 px-[12px] py-[8px] rounded-[16px] border font-body text-[14px] transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-2xl border font-body text-[14px] transition-colors ${
                     formData.difficulty === 'Principiante'
                       ? 'bg-green-bg2 border-accent2 text-accent2'
                       : 'bg-surf border-text-low text-text-low'
@@ -198,7 +198,7 @@ const CreatePersonalExercise = () => {
 
                 <button
                   onClick={() => setFormData({ ...formData, difficulty: 'Intermedio' })}
-                  className={`flex-1 px-[12px] py-[8px] rounded-[16px] border font-body text-[14px] transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-2xl border font-body text-[14px] transition-colors ${
                     formData.difficulty === 'Intermedio'
                       ? 'bg-orange-bg2 border-orange text-orange'
                       : 'bg-surf border-text-low text-text-low'
@@ -209,7 +209,7 @@ const CreatePersonalExercise = () => {
 
                 <button
                   onClick={() => setFormData({ ...formData, difficulty: 'Avanzado' })}
-                  className={`flex-1 px-[12px] py-[8px] rounded-[16px] border font-body text-[14px] transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-2xl border font-body text-[14px] transition-colors ${
                     formData.difficulty === 'Avanzado'
                       ? 'bg-accent1-bg1 border-accent1 text-accent1'
                       : 'bg-surf border-text-low text-text-low'
@@ -225,9 +225,9 @@ const CreatePersonalExercise = () => {
       </section>
 
       {/* INFO CARD */}
-      <section className="mt-[16px] w-full px-[16px]">
-        <div className="rounded-[16px] bg-primary-bg/50 border border-primary/30 p-[14px] flex items-start gap-[12px]">
-          <span className="text-primary text-[20px] flex-shrink-0">ℹ️</span>
+      <section className="mt-4 w-full px-4">
+        <div className="rounded-2xl bg-primary-bg/50 border border-primary/30 p-3.5 flex items-start gap-3">
+          <span className="text-primary text-[20px] shrink-0">ℹ️</span>
           <p className="font-body text-[13px] text-text-low leading-relaxed">
             Los ejercicios personalizados se guardan en tu biblioteca y solo estarán disponibles para ti. Podrás editarlos o eliminarlos en cualquier momento.
           </p>
@@ -236,14 +236,14 @@ const CreatePersonalExercise = () => {
 
       {/* PREVIEW CARD */}
       {formData.name && (
-        <section className="mt-[16px] w-full px-[16px] pb-[80px]">
-          <p className="font-subheading font-bold text-[14px] text-text-low mb-[10px] uppercase">
+        <section className="mt-4 w-full px-4 pb-20">
+          <p className="font-subheading font-bold text-[14px] text-text-low mb-2.5 uppercase">
             Vista previa
           </p>
           <Card>
-            <div className="flex items-center justify-between gap-[12px]">
-              <div className="flex items-center gap-[10px]">
-                <span className="bg-primary-bg h-[50px] w-[50px] rounded-[12px] border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="bg-primary-bg h-12.5 w-12.5 rounded-xl border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center">
                   ⚡
                 </span>
 
@@ -256,9 +256,9 @@ const CreatePersonalExercise = () => {
                     {formData.muscleGroup || 'Grupo muscular'} · {formData.equipment || 'Equipamiento'}
                   </p>
 
-                  <div className="mt-[3px] flex gap-[6px]">
+                  <div className="mt-0.75 flex gap-1.5">
                     {formData.difficulty && (
-                      <span className={`h-auto px-[10px] rounded-[16px] border font-body text-[12px] ${
+                      <span className={`h-auto px-2.5 rounded-2xl border font-body text-[12px] ${
                         formData.difficulty === 'Principiante' 
                           ? 'bg-green-bg2 border-accent2 text-accent2'
                           : formData.difficulty === 'Intermedio'
@@ -268,7 +268,7 @@ const CreatePersonalExercise = () => {
                         {formData.difficulty}
                       </span>
                     )}
-                    <span className="bg-surface h-auto px-[10px] rounded-[16px] border border-text-low font-body text-[12px] text-text-low">
+                    <span className="bg-surface h-auto px-2.5 rounded-2xl border border-text-low font-body text-[12px] text-text-low">
                       Personalizado
                     </span>
                   </div>
@@ -280,7 +280,7 @@ const CreatePersonalExercise = () => {
       )}
 
       {/* STICKY BUTTON */}
-      <section className="mt-[16px] w-full px-[16px] fixed bottom-1">
+      <section className="mt-4 w-full px-4 fixed bottom-1">
         <Button
           variant="outlined"
           text={loading ? "Guardando..." : "Guardar ejercicio"}

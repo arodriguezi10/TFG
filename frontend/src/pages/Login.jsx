@@ -27,7 +27,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background px-4 flex flex-col text-text-high">
       <section className="h-15 items-center text-[28px] font-heading font-extrabold flex gap-4 ">
-        <h1 className="bg-primary h-13.75 w-13.75 rounded-[12px] flex items-center justify-center">
+        <h1 className="bg-primary h-13.75 w-13.75 rounded-xl flex items-center justify-center">
           F
         </h1>
 
@@ -35,7 +35,7 @@ const Login = () => {
       </section>
 
       <section className="items-center mt-5.5">
-        <span className="bg-surf h-7.5 py-0.5 px-3 rounded-[16px] border border-primary text-[16px] text-primary font-subheading ">
+        <span className="bg-surf h-7.5 py-0.5 px-3 rounded-2xl border border-primary text-[16px] text-primary font-subheading ">
           ◆ Acceso seguro
         </span>
 
@@ -100,11 +100,11 @@ const Login = () => {
       </section>
 
       <section className="flex justify-center gap-2.5 mt-5.5">
-        <button className="bg-surface w-42.5 h-15.25 rounded-[16px] font-body font-semibold text-[24px] text-text-high">
+        <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">
           Google
         </button>
         
-        <button className="bg-surface w-42.5 h-15.25 rounded-[16px] font-body font-semibold text-[24px] text-text-high">
+        <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">
           Apple
         </button>
       </section>

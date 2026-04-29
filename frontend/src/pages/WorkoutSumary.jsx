@@ -434,7 +434,7 @@ const WorkoutSummary = () => {
       </section>
 
       {/* BOTÓN GUARDAR Y ENVIAR */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-background via-background to-transparent">
         <Button
           variant="outlined"
           text="✉️ Guardar y enviar al entrenador"

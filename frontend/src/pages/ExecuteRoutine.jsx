@@ -318,7 +318,7 @@ const ExecuteRoutine = () => {
   const completedExercises = getCompletedExercisesCount();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-[100px]">
+    <div className="min-h-screen bg-background flex flex-col pb-25">
       <section className="w-full px-4 pt-4 pb-3 sticky top-0 bg-background z-50 border-b border-text-low/20">
         <div className="flex items-center justify-between mb-3">
           <button
@@ -359,7 +359,7 @@ const ExecuteRoutine = () => {
 
           <button
             onClick={() => setIsTimerRunning(!isTimerRunning)}
-            className="bg-surf h-[56px] w-[56px] rounded-xl border border-text-low flex items-center justify-center text-[20px] hover:bg-surface transition-colors"
+            className="bg-surf h-14 w-14 rounded-xl border border-text-low flex items-center justify-center text-[20px] hover:bg-surface transition-colors"
           >
             {isTimerRunning ? '⏸️' : '▶️'}
           </button>

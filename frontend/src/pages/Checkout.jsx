@@ -186,7 +186,7 @@ const Checkout = () => {
               <div className="flex items-start justify-between">
                 <div className="w-full flex items-center justify-between">
                   <div className="flex gap-3">
-                    <div className={`w-[40px] h-[50px] rounded-[10px] ${planColors[planData.plan]} flex items-center justify-center text-[17px]`}>
+                    <div className={`w-10 h-12.5 rounded-[10px] ${planColors[planData.plan]} flex items-center justify-center text-[17px]`}>
                       {planIcons[planData.plan]}
                     </div>
 
@@ -228,7 +228,7 @@ const Checkout = () => {
               <div className="flex flex-col gap-2">
                 {planFeatures[planData.plan].map((feature, index) => (
                   <div key={index} className="flex items-center gap-2.5">
-                    <div className="bg-green w-[18px] h-[18px] rounded-[5px] bg-accent3/12 flex items-center justify-center flex-shrink-0">
+                    <div className="bg-green w-4.5 h-4.5 rounded-[5px] bg-accent3/12 flex items-center justify-center shrink-0">
                       <svg
                         width="10"
                         height="10"
@@ -319,15 +319,15 @@ const Checkout = () => {
 
       {/* DATOS DE PAGO - EDITABLE */}
       {isEditingCard && (
-        <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
           <p className="font-subheading font-bold text-[16px] text-text-low">DATOS DE PAGO</p>
 
           <Card>
-            <div className="flex flex-col gap-[15px]">
-                <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-3.75">
+                <div className="flex flex-col gap-1.25">
                     <label className="font-subheading font-bold text-[14px] text-text-low uppercase">NÚMERO DE LA TARJETA</label>
 
-                    <div className="flex items-center gap-[20px]">
+                    <div className="flex items-center gap-5">
                         <div className="text-text-low text-[20px] flex items-center justify-center">💳</div>
                         <input 
                           type="text" 
@@ -340,12 +340,12 @@ const Checkout = () => {
                     </div>           
                 </div>
 
-                <div className="w-full h-[1px] bg-text-low"></div>
+                <div className="w-full h-px bg-text-low"></div>
 
-                <div className="flex flex-col gap-[5px]">
+                <div className="flex flex-col gap-1.25">
                     <label className="font-subheading font-bold text-[14px] text-text-low uppercase">NOMBRE DEL TITULAR</label>
 
-                    <div className="flex items-center gap-[20px]">
+                    <div className="flex items-center gap-5">
                         <div className="text-text-low text-[20px] flex items-center justify-center">👤</div>
                         <input 
                           type="text" 
@@ -357,14 +357,14 @@ const Checkout = () => {
                     </div>  
                 </div>
 
-                <div className="w-full h-[1px] bg-text-low"></div>
+                <div className="w-full h-px bg-text-low"></div>
 
-                <div className="flex items-center justify-between gap-[25px]">
+                <div className="flex items-center justify-between gap-6.25">
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[14px] text-text-low uppercase">CADUCIDAD</label>
                         
-                        <div className="flex items-center gap-[20px]">
+                        <div className="flex items-center gap-5">
                             <input 
                               type="text" 
                               className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full" 
@@ -376,9 +376,9 @@ const Checkout = () => {
                         </div>
                     </div>
                     
-                    <div className="w-[1px] h-[50px] bg-text-low"></div>
+                    <div className="w-px h-12.5 bg-text-low"></div>
 
-                    <div className="flex flex-col gap-[5px]">
+                    <div className="flex flex-col gap-1.25">
                         <label className="font-subheading font-bold text-[14px] text-text-low uppercase">CVV 🔒</label>
                         <input 
                           type="text" 
@@ -403,11 +403,11 @@ const Checkout = () => {
       )}
 
       {/* RESUMEN DE LA SUSCRIPCIÓN */}
-      <section className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+      <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
         <p className="font-subheading font-bold text-[16px] text-text-low">RESUMEN DE LA SUSCRIPCIÓN</p>
 
         <Card>
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
 
             <div className="flex items-center justify-between">            
               <p className="font-subheading font-bold text-[16px] text-text-low">
@@ -419,7 +419,7 @@ const Checkout = () => {
               </p>
             </div>
 
-            <div className="w-full h-[1px] bg-text-low"></div>
+            <div className="w-full h-px bg-text-low"></div>
 
             <div className="flex items-center justify-between">            
               <p className="font-subheading font-bold text-[16px] text-text-low">Prueba gratuita (7 días)</p>
@@ -429,7 +429,7 @@ const Checkout = () => {
               </p>
             </div>
 
-            <div className="w-full h-[1px] bg-text-low"></div>
+            <div className="w-full h-px bg-text-low"></div>
 
             <div className="flex items-center justify-between">            
               <p className="font-subheading font-bold text-[16px] text-text-low">IVA (21%)</p>
@@ -437,7 +437,7 @@ const Checkout = () => {
               <p className="font-body text-[16px] flex items-center justify-center text-text-low">Incluido</p>
             </div>
 
-            <div className="-mx-[16px] -mb-[23px] mt-[12px] bg-yellow-bg3 rounded-b-[16px] px-[14px] py-[10px] flex items-center justify-between border border-yellow/27">
+            <div className="-mx-4 -mb-5.75 mt-3 bg-yellow-bg3 rounded-b-2xl px-3.5 py-2.5 flex items-center justify-between border border-yellow/27">
               <p className="font-heading font-semibold text-[20px] text-text-high">Hoy pagas</p>
 
               <p className="font-heading font-extrabold text-[18px] text-accent3">0,00 €</p>
@@ -448,7 +448,7 @@ const Checkout = () => {
       </section>
 
       {/* INFORMACIÓN */}
-      <section className="mt-[22px] pb-5">
+      <section className="mt-5.5 pb-5">
         <p className="font-body text-[14px] text-text-low text-center px-4">
           Al confirmar aceptas los
           <span className="text-primary"> Términos de uso </span>
@@ -463,7 +463,7 @@ const Checkout = () => {
       </section>
 
       {/* STICKY CTA */}
-      <div className="w-full px-[16px] fixed bottom-1 gap-[10px]">
+      <div className="w-full px-4 fixed bottom-1 gap-2.5">
         <Button
           variant="outlined"
           text={isProcessing ? "Procesando..." : "✓ Confirmar pago"}

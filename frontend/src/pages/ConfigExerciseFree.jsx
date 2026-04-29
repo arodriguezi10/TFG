@@ -270,8 +270,8 @@ const ConfigExerciseFree = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20">
       {showAlert && (
-        <div className="fixed top-[20px] left-[50%] transform -translate-x-1/2 z-50 w-[90%] max-w-[400px]">
-          <div className="bg-red/90 border border-red rounded-[16px] p-[16px] shadow-lg">
+        <div className="fixed top-5 left-[50%] transform -translate-x-1/2 z-50 w-[90%] max-w-100">
+          <div className="bg-red/90 border border-red rounded-2xl p-4 shadow-lg">
             <p className="font-body text-[14px] text-text-high text-center">
               {alertMessage}
             </p>
@@ -284,9 +284,9 @@ const ConfigExerciseFree = () => {
       </section>
 
       {selectedExercises.length === 0 ? (
-        <section className="mt-[16px] w-full px-[16px]">
+        <section className="mt-4 w-full px-4">
           <Card>
-            <div className="flex flex-col items-center justify-center py-[40px] gap-[16px]">
+            <div className="flex flex-col items-center justify-center py-10 gap-4">
               <span className="text-[48px]">💪</span>
               <p className="font-heading font-bold text-[18px] text-text-high text-center">
                 Sin ejercicios añadidos
@@ -299,14 +299,14 @@ const ConfigExerciseFree = () => {
         </section>
       ) : (
         selectedExercises.map((exercise, index) => (
-          <section key={exercise.id} className="mt-[16px] w-full px-[16px] flex flex-col gap-[10px]">
+          <section key={exercise.id} className="mt-4 w-full px-4 flex flex-col gap-2.5">
             <Card>
-              <div className="flex items-center gap-[15px]">
-                <p className="bg-primary-bg min-w-[35px] h-[35px] rounded-[8px] border border-primary font-heading font-bold text-[22px] text-primary text-center flex items-center justify-center px-[8px]">
+              <div className="flex items-center gap-3.75">
+                <p className="bg-primary-bg min-w-8.75 h-8.75 rounded-lg border border-primary font-heading font-bold text-[22px] text-primary text-center flex items-center justify-center px-2">
                   {index + 1}
                 </p>
 
-                <div className="flex items-center gap-[10px]">
+                <div className="flex items-center gap-2.5">
                   <div className="flex flex-col">
                     <p className="font-heading font-extrabold text-[18px] text-text-high">
                       {exercise.name}
@@ -318,7 +318,7 @@ const ConfigExerciseFree = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-[5px] ml-auto">
+                <div className="flex flex-col gap-1.25 ml-auto">
                   <p className="font-body text-[12px] text-text-low">Descanso</p>
 
                   <input
@@ -327,7 +327,7 @@ const ConfigExerciseFree = () => {
                     name={`descanso-${exercise.id}`}
                     value={exercisesRest[exercise.id] || ""}
                     onChange={(e) => updateRest(exercise.id, e.target.value)}
-                    className={`w-[70px] h-[29px] rounded-[8px] border font-heading font-bold text-[18px] text-center ${
+                    className={`w-17.5 h-7.25 rounded-lg border font-heading font-bold text-[18px] text-center ${
                       isInputFilled(exercisesRest[exercise.id])
                         ? "bg-accent2 border-accent2 text-background"
                         : "bg-green-bg2 border-accent2 text-accent2"
@@ -337,27 +337,27 @@ const ConfigExerciseFree = () => {
                 </div>
               </div>
 
-              <hr className="text-text-low -mx-[16px] mt-[5px] mb-[5px]" />
+              <hr className="text-text-low -mx-4 mt-1.25 mb-1.25" />
 
-              <div className="flex flex-col gap-[8px]">
-                <div className="grid grid-cols-[40px_1fr_1fr_1fr_40px] gap-[8px] items-center">
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-[40px_1fr_1fr_1fr_40px] gap-2 items-center">
                   <p className="font-body text-[12px] text-text-low text-center">#</p>
                   <p className="font-body text-[12px] text-text-low text-center">REPS</p>
                   <p className="font-body text-[12px] text-text-low text-center">PESO (KG)</p>
-                  <div className="flex items-center justify-center gap-[2px]">
+                  <div className="flex items-center justify-center gap-0.5">
                     <p className="font-body text-[12px] text-text-low text-center">RIR</p>
                     {!hasProAccess && (
-                      <p className="bg-orange-bg2 h-[14px] w-[14px] rounded-[4px] border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center">🔒</p>
+                      <p className="bg-orange-bg2 h-3.5 w-3.5 rounded-sm border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center">🔒</p>
                     )}
                   </div>   
                   <div></div>
                 </div>
 
-                <hr className="text-text-low -mx-[16px]" />
+                <hr className="text-text-low -mx-4" />
 
                 {(exercisesSeries[exercise.id] || []).map((serie, serieIndex) => (
                   <React.Fragment key={serie.id}>
-                    <div className="grid grid-cols-[40px_1fr_1fr_1fr_40px] gap-[8px] items-center">
+                    <div className="grid grid-cols-[40px_1fr_1fr_1fr_40px] gap-2 items-center">
                       <p className="font-heading font-bold text-[22px] text-text-high text-center">
                         S{serie.id}
                       </p>
@@ -368,7 +368,7 @@ const ConfigExerciseFree = () => {
                         name={`reps-${exercise.id}-${serie.id}`}
                         value={serie.reps}
                         onChange={(e) => updateSerie(exercise.id, serie.id, 'reps', e.target.value)}
-                        className={`w-[65px] h-[25px] rounded-[8px] border font-body text-[12px] text-center ${
+                        className={`w-16.25 h-6.25 rounded-lg border font-body text-[12px] text-center ${
                           isInputFilled(serie.reps)
                             ? "bg-primary border-primary text-background"
                             : "border-text-low text-text-high"
@@ -382,7 +382,7 @@ const ConfigExerciseFree = () => {
                         name={`weight-${exercise.id}-${serie.id}`}
                         value={serie.weight}
                         onChange={(e) => updateSerie(exercise.id, serie.id, 'weight', e.target.value)}
-                        className={`w-[65px] h-[25px] rounded-[8px] border font-body text-[12px] text-center ${
+                        className={`w-16.25 h-6.25 rounded-lg border font-body text-[12px] text-center ${
                           isInputFilled(serie.weight)
                             ? "bg-primary border-primary text-background"
                             : "border-text-low text-text-high"
@@ -397,7 +397,7 @@ const ConfigExerciseFree = () => {
                           name={`rir-${exercise.id}-${serie.id}`}
                           value={serie.rir || ""}
                           onChange={(e) => updateSerie(exercise.id, serie.id, 'rir', e.target.value)}
-                          className={`w-[65px] h-[25px] rounded-[8px] border font-body text-[12px] text-center ${
+                          className={`w-16.25 h-6.25 rounded-lg border font-body text-[12px] text-center ${
                             isInputFilled(serie.rir)
                               ? "bg-primary border-primary text-background"
                               : "border-text-low text-text-high"
@@ -405,38 +405,38 @@ const ConfigExerciseFree = () => {
                           placeholder="2"
                         />
                       ) : (
-                        <span className="bg-orange-bg2 w-[65px] h-[25px] rounded-[8px] border border-orange font-body text-[12px] text-orange flex items-center justify-center opacity-55 cursor-not-allowed">
+                        <span className="bg-orange-bg2 w-16.25 h-6.25 rounded-lg border border-orange font-body text-[12px] text-orange flex items-center justify-center opacity-55 cursor-not-allowed">
                           🔒 RIR
                         </span>
                       )}
 
                       <button
                         onClick={() => deleteSerie(exercise.id, serie.id)}
-                        className="bg-surface w-[25px] h-[25px] rounded-[8px] border border-red font-body text-[16px] text-red flex items-center justify-center hover:bg-red/10 transition-colors"
+                        className="bg-surface w-6.25 h-6.25 rounded-lg border border-red font-body text-[16px] text-red flex items-center justify-center hover:bg-red/10 transition-colors"
                       >
                         x
                       </button>
                     </div>
 
                     {serieIndex < (exercisesSeries[exercise.id] || []).length - 1 && (
-                      <hr className="text-text-low h-[1px]"/>
+                      <hr className="text-text-low h-px"/>
                     )}
                   </React.Fragment>
                 ))}
               </div>
 
-              <hr className="text-text-low -mx-[16px] mt-[5px] mb-[5px]" />
+              <hr className="text-text-low -mx-4 mt-1.25 mb-1.25" />
 
-              <div className="flex gap-[8px] mt-[8px] items-center">
-                <p className="font-body text-[12px] text-text-low flex-shrink-0">Técnica</p>
+              <div className="flex gap-2 mt-2 items-center">
+                <p className="font-body text-[12px] text-text-low shrink-0">Técnica</p>
                 
-                <div className="flex gap-[6px] overflow-x-auto scrollbar-hide">
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                   {['Dropset', 'Rest-pause', 'Topset', 'TS/BO', 'Parciales', 'Myo-reps'].map((technique) => (
                     <button
                       key={technique}
                       onClick={() => toggleTechnique(exercise.id, technique)}
                       disabled={!hasProAccess}
-                      className={`px-[14px] py-[6px] rounded-[20px] border font-body text-[13px] font-medium whitespace-nowrap transition-all ${
+                      className={`px-3.5 py-1.5 rounded-[20px] border font-body text-[13px] font-medium whitespace-nowrap transition-all ${
                         hasProAccess
                           ? exercisesTechnique[exercise.id] === technique
                             ? 'bg-primary border-primary text-background shadow-sm'
@@ -450,9 +450,9 @@ const ConfigExerciseFree = () => {
                 </div>
               </div>
 
-              <hr className="text-text-low -mx-[16px] mt-[8px] mb-[5px]" />
+              <hr className="text-text-low -mx-4 mt-2 mb-1.25" />
 
-              <div className="flex items-center justify-between items-center mt-[8px]">
+              <div className="flex items-center justify-between mt-2">
                 <button
                   onClick={() => addSerie(exercise.id)}
                   className="font-body font-bold text-[14px] text-primary hover:text-primary/80 transition-colors"
@@ -473,15 +473,15 @@ const ConfigExerciseFree = () => {
       )}
 
       {selectedExercises.length > 0 && !hasProAccess && (
-        <section className="mt-[16px] pb-[70px] w-full px-[16px] flex flex-col gap-[10px]">
+        <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5">
           <button
             onClick={handleNavigateToSubscription}
             className="w-full"
           >
             <Card variant="outlined">
-              <div className="flex items-center justify-between gap-[12px] cursor-pointer hover:bg-surface/50 transition-colors rounded-[16px] -m-[16px] p-[16px]">
-                <div className="flex items-center justify-center gap-[10px]">
-                  <span className="bg-brown-bg h-[55px] w-[55px] px-[16px] rounded-[12px] border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
+              <div className="flex items-center justify-between gap-3 cursor-pointer hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
+                <div className="flex items-center justify-center gap-2.5">
+                  <span className="bg-brown-bg h-13.75 w-13.75 px-4 rounded-xl border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
                     👑
                   </span>
 
@@ -506,7 +506,7 @@ const ConfigExerciseFree = () => {
       )}
 
       {selectedExercises.length > 0 && (
-        <section className="mt-[16px] w-full px-[16px] fixed bottom-1 gap-[10px]">
+        <section className="mt-4 w-full px-4 fixed bottom-1 gap-2.5">
           <Button
             variant="outlined"
             text="Guardar rutina"

@@ -51,7 +51,7 @@ const ForgotPassword = () => {
     <div className="min-h-screen bg-background px-4 flex flex-col text-text-high">
 
         <section className="h-15 items-center text-[28px] font-heading font-extrabold flex gap-4 ">
-            <h1 className="bg-accent2 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center">
+            <h1 className="bg-accent2 h-13.75 w-13.75 rounded-xl flex items-center justify-center">
                 F
             </h1>
 
@@ -65,7 +65,7 @@ const ForgotPassword = () => {
         </section>
 
         <section className="items-center mt-9.5">
-            <span className="bg-surf h-7.5 py-0.5 px-3 rounded-[16px] border border-accent2 text-[16px] text-accent2 font-subheading "> 
+            <span className="bg-surf h-7.5 py-0.5 px-3 rounded-2xl border border-accent2 text-[16px] text-accent2 font-subheading "> 
                 ◆ Recuperación segura
             </span>
 
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
                 onChange={(e) => setEmail(e.target.value)}
             />
 
-            <div className="h-19.25 rounded-[16px] bg-primary-bg border border-accent2 p-4 flex gap-2.5 items-center justify-center">
+            <div className="h-19.25 rounded-2xl bg-primary-bg border border-accent2 p-4 flex gap-2.5 items-center justify-center">
                 <span className="text-accent2">&</span>
 
                 <p className="font-body text-[16px] text-text-low">Revisa también tu carpeta de 
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
             {/* Mostrar mensaje de éxito */}
             {message && (
             <section className="mt-4">
-                <div className="bg-green-bg2 rounded-[16px] border border-accent2 p-4">
+                <div className="bg-green-bg2 rounded-2xl border border-accent2 p-4">
                 <p className="font-body text-[14px] text-accent2 text-center">
                     {message}
                 </p>
@@ -127,7 +127,7 @@ const ForgotPassword = () => {
             {/* Mostrar mensaje de error */}
             {error && (
             <section className="mt-4">
-                <div className="bg-red-500/10 rounded-[16px] border border-red-500 p-4">
+                <div className="bg-red-500/10 rounded-2xl border border-red-500 p-4">
                     <p className="font-body text-[14px] text-red-500 text-center">
                         {error}
                     </p>

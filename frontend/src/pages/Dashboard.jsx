@@ -470,7 +470,7 @@ const Dashboard = () => {
 
           <button
             onClick={handleNavigateToProfile}
-            className="bg-accent1 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high cursor-pointer hover:opacity-80 transition-opacity"
+            className="bg-accent1 h-13.75 w-13.75 rounded-xl flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high cursor-pointer hover:opacity-80 transition-opacity"
           >
             F
           </button>
@@ -496,10 +496,10 @@ const Dashboard = () => {
               </p>
 
               <div className="flex space-x-2">
-                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
+                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                   {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
                 </span>
-                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-[16px] border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
+                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                   {parseMuscles(todayRoutine.target_muscle_groups)}
                 </span>
               </div>
@@ -582,7 +582,7 @@ const Dashboard = () => {
             className="flex-1 cursor-pointer"
           >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-[8px] border flex justify-center items-center transition-colors ${
+              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
                 preWorkout 
                   ? 'bg-accent1 border-accent1 text-text-high' 
                   : 'bg-surf border-white/27 text-text-low'
@@ -605,7 +605,7 @@ const Dashboard = () => {
             className="flex-1 cursor-pointer"
           >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-[8px] border flex justify-center items-center transition-colors ${
+              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
                 postWorkout 
                   ? 'bg-accent1 border-accent1 text-text-high' 
                   : 'bg-surf border-white/27 text-text-low'
@@ -768,7 +768,7 @@ const Dashboard = () => {
                     {day.dayStr}
                   </p>
                   
-                  <div className={`h-5.5 min-w-[33px] px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${
+                  <div className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${
                     isCompleted 
                       ? 'bg-accent1' 
                       : day.isToday 

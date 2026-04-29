@@ -38,7 +38,7 @@ const Register = () => {
     <div className="min-h-screen bg-background px-4 flex flex-col text-text-high">
 
         <section className="h-15 items-center text-[28px] font-heading font-extrabold flex gap-4 ">
-            <h1 className="bg-accent1 h-13.75 w-13.75 rounded-[12px] flex items-center justify-center">
+            <h1 className="bg-accent1 h-13.75 w-13.75 rounded-xl flex items-center justify-center">
                 F
             </h1>
 
@@ -46,7 +46,7 @@ const Register = () => {
         </section>
 
         <section className="items-center mt-5.5">
-            <span className="bg-surf h-7.5 py-0.5 px-3 rounded-[16px] border border-accent1 text-[16px] text-accent1 font-subheading "> 
+            <span className="bg-surf h-7.5 py-0.5 px-3 rounded-2xl border border-accent1 text-[16px] text-accent1 font-subheading "> 
                 ◆ Nuevo por aquí
             </span>
 
@@ -96,16 +96,16 @@ const Register = () => {
             </p>
         </section>
 
-        <section className="mt-[16px]">
+        <section className="mt-4">
             <Button variant="filled" text="Crear cuenta" bgColor="bg-accent1" textColor={"text-text-high"} borderColor={"border-accent1"} w="w-[100%]"  onClick={handleRegister}/>
 
             <p className="font-body text-[16px] text-text-low text-center mt-5">o continúa con</p>
         </section>
 
         <section className="flex justify-center gap-2.5 mt-5.5">
-            <button className="bg-surface w-42.5 h-15.25 rounded-[16px] font-body font-semibold text-[24px] text-text-high">Google</button>
+            <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">Google</button>
             
-            <button className="bg-surface w-42.5 h-15.25 rounded-[16px] font-body font-semibold text-[24px] text-text-high">Apple</button>
+            <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">Apple</button>
         </section>
 
         <section className="mt-5.5">

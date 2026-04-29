@@ -929,7 +929,7 @@ const ExerciseSearchFree = () => {
                       </button>
                       <button
                         onClick={() => handleDeleteExercise(exercise)}
-                        className="h-8 w-8 rounded-[8px] border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
+                        className="h-8 w-8 rounded-lg border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
                         title="Eliminar ejercicio permanentemente"
                       >
                         🗑️
