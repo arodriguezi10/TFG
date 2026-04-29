@@ -260,9 +260,9 @@ const Checkout = () => {
         <section className="mx-5 pt-5 flex flex-col gap-3">
           <p className="font-subheading font-bold text-[16px] text-text-low">MÉTODO DE PAGO</p>
 
-          <div className="w-full max-w-sm bg-gradient-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
+          <div className="w-full max-w-sm bg-linear-to-br from-surf to-surface rounded-2xl p-6 border border-white/10 shadow-xl">
             <div className="flex items-start justify-between mb-5">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-linear-to-br from-orange to-accent2/70 rounded-lg flex items-center justify-center">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="1" y="4" width="22" height="16" rx="2"/>
                   <line x1="1" y1="10" x2="23" y2="10"/>
