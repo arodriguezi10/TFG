@@ -38,6 +38,9 @@ const Dashboard = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
 
+  // Estados para rutinas
+  const [routineCompletedToday, setRoutineCompletedToday] = useState(false);
+
   useEffect(() => {
     loadData();
     loadDailyChecks();
@@ -58,6 +61,30 @@ const Dashboard = () => {
 
     return () => clearInterval(checkMidnight);
   }, []);
+
+  const checkIfRoutineCompletedToday = async (routineId) => {
+  try {
+    const todayDate = new Date().toISOString().split('T')[0];
+    
+    const { data, error } = await supabase
+      .from('workout_sessions')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('routine_id', routineId)
+      .eq('session_date', todayDate)
+      .limit(1);
+    
+    if (error) {
+      console.error('Error verificando sesión:', error);
+      return false;
+    }
+    
+    return data && data.length > 0;
+  } catch (error) {
+    console.error('Error:', error);
+    return false;
+  }
+  };
 
   const loadWeekData = async () => {
     try {
@@ -183,6 +210,13 @@ const Dashboard = () => {
       });
 
       setTodayRoutine(routineForToday || null);
+
+      if (routineForToday) {
+        const isCompleted = await checkIfRoutineCompletedToday(routineForToday.id);
+        setRoutineCompletedToday(isCompleted);
+      } else {
+        setRoutineCompletedToday(false);
+      }
 
     } catch (error) {
       console.error("Error:", error);
@@ -533,19 +567,20 @@ const Dashboard = () => {
             <div className="mt-4 flex items-center">
               <Button
                 variant="outlined"
-                text="& Empezar entrenamiento"
-                bgColor={"bg-accent1"}
+                text={routineCompletedToday ? "👁️ Rutina completada" : "⚡ Empezar entrenamiento"}
+                bgColor={routineCompletedToday ? "bg-green" : "bg-accent1"}
                 textColor={"text-text-high"}
-                borderColor={"border-accent1"}
+                borderColor={routineCompletedToday ? "border-green" : "border-accent1"}
                 w="w-[100%]"
-                onClick={handleStartRoutine}
+                onClick={routineCompletedToday ? undefined : handleStartRoutine}
+                disabled={routineCompletedToday}
               />
             </div>
           </Card>
         ) : (
           <Card>
             <div className="flex flex-col items-center text-center py-8">
-              <div className="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-accent2/20 to-accent3/20 border border-accent2/30 flex items-center justify-center">
+              <div className="w-20 h-20 mb-6 rounded-full bg-linear-to-br from-accent2/20 to-accent3/20 border border-accent2/30 flex items-center justify-center">
                 <span className="text-[40px]">😴</span>
               </div>
 
