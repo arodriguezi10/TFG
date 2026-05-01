@@ -61,9 +61,7 @@ const Progression = () => {
   };
 
   const handleCreateProgression = () => {
-    // TODO: Navegar a pantalla de crear progresión
-    // navigate("/createProgression");
-    alert('Función en desarrollo');
+        navigate("/createProgression");
   };
 
   const handleNavigateToSubscription = () => {
