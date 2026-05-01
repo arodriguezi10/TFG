@@ -1,8 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import ModalSelectRoutine from "../components/ModalSelectedRoutine";
+
+// PALETA DE COLORES POSICIONALES
+const POSITION_COLORS = [
+  '#6c63ff', // accent1 - Posición 1
+  '#ff6b9d', // accent2 - Posición 2
+  '#36d9b8', // accent3 - Posición 3
+  '#f5a623', // accent-warm - Posición 4
+  '#9b59b6', // Púrpura - Posición 5
+  '#e74c3c', // Rojo - Posición 6
+  '#3498db', // Azul - Posición 7
+  '#2ecc71', // Verde - Posición 8
+];
+
+// Función para obtener color según posición
+const getColorByPosition = (index) => {
+  return POSITION_COLORS[index % POSITION_COLORS.length];
+};
 
 const CreateProgression = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const [mesocycleExpanded, setMesocycleExpanded] = useState(true);
   const [routinesExpanded, setRoutinesExpanded] = useState(false);
@@ -17,6 +54,82 @@ const CreateProgression = () => {
   const [mesocycleGoal, setMesocycleGoal] = useState("");
   const [mesocycleDuration, setMesocycleDuration] = useState(4);
   const [startDate, setStartDate] = useState("");
+
+  // Estados para rutinas
+  const [showRoutineModal, setShowRoutineModal] = useState(false);
+  const [availableRoutines, setAvailableRoutines] = useState([]);
+  const [selectedRoutines, setSelectedRoutines] = useState([]);
+  const [loadingRoutines, setLoadingRoutines] = useState(false);
+
+  // Sensores para drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Manejar reordenamiento
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSelectedRoutines((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  // Cargar rutinas del usuario
+  useEffect(() => {
+    if (user) {
+      fetchUserRoutines();
+    }
+  }, [user]);
+
+  const fetchUserRoutines = async () => {
+    try {
+      setLoadingRoutines(true);
+      const { data, error } = await supabase
+        .from('routines')
+        .select(`
+          id,
+          name,
+          description,
+          target_muscle_groups,
+          routine_exercises (
+            id
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAvailableRoutines(data || []);
+    } catch (error) {
+      console.error('Error cargando rutinas:', error);
+    } finally {
+      setLoadingRoutines(false);
+    }
+  };
+
+  const handleSelectRoutine = (routine) => {
+    // Verificar que no esté ya añadida
+    if (selectedRoutines.find(r => r.id === routine.id)) {
+      alert('Esta rutina ya está añadida al bloque');
+      return;
+    }
+
+    setSelectedRoutines([...selectedRoutines, routine]);
+    setShowRoutineModal(false);
+  };
+
+  const handleRemoveRoutine = (routineId) => {
+    setSelectedRoutines(selectedRoutines.filter(r => r.id !== routineId));
+  };
 
   // Generar calendario basado en fecha de inicio y duración
   const generateCalendar = () => {
@@ -62,6 +175,10 @@ const CreateProgression = () => {
   };
 
   const handleConfirmRoutines = () => {
+    if (selectedRoutines.length === 0) {
+      alert("Añade al menos una rutina al bloque");
+      return;
+    }
     setRoutinesConfirmed(true);
     setRoutinesExpanded(false);
     setPlanningExpanded(true);
@@ -86,6 +203,73 @@ const CreateProgression = () => {
     if (routinesConfirmed) {
       setPlanningExpanded(!planningExpanded);
     }
+  };
+
+  // Componente para rutina arrastrable
+  const SortableRoutineItem = ({ routine, index, onRemove }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: routine.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="bg-background border border-text-low rounded-xl overflow-hidden flex touch-none"
+      >
+        {/* Franja de color lateral */}
+        <div 
+          className="w-1.5 shrink-0"
+          style={{ backgroundColor: getColorByPosition(index) }}
+        ></div>
+        
+        <div className="flex-1 p-3 flex items-center gap-3">
+          {/* Handle de arrastre */}
+          <div 
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-text-low hover:text-text-high"
+          >
+            ⋮⋮
+          </div>
+
+          <div 
+            className="h-10 w-10 rounded-lg font-heading font-bold text-[14px] flex items-center justify-center shrink-0"
+            style={{ 
+              backgroundColor: `${getColorByPosition(index)}20`,
+              color: getColorByPosition(index)
+            }}
+          >
+            {index + 1}
+          </div>
+          <div className="flex-1">
+            <p className="font-heading font-bold text-[14px] text-text-high">
+              {routine.name}
+            </p>
+            <p className="font-body text-[11px] text-text-low">
+              {routine.routine_exercises?.length || 0} ejercicios
+            </p>
+          </div>
+          <button
+            onClick={() => onRemove(routine.id)}
+            className="text-text-low hover:text-red transition-colors"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -260,7 +444,7 @@ const CreateProgression = () => {
                 Rutinas
               </p>
               <p className="font-body text-[12px] text-text-low">
-                0 rutinas seleccionadas
+                {selectedRoutines.length} rutinas seleccionadas
               </p>
             </div>
 
@@ -283,13 +467,46 @@ const CreateProgression = () => {
                 </div>
               </div>
 
+              {/* Lista de rutinas seleccionadas CON DRAG AND DROP */}
+              {selectedRoutines.length > 0 && (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={selectedRoutines.map(r => r.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {selectedRoutines.map((routine, index) => (
+                        <SortableRoutineItem
+                          key={routine.id}
+                          routine={routine}
+                          index={index}
+                          onRemove={handleRemoveRoutine}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )}
+
               {/* Botones de acción */}
-              <button className="w-full bg-background border border-accent1 text-accent1 py-3 rounded-2xl font-heading font-bold text-[14px] hover:bg-accent1/5 transition-colors">
-                📋 Elegir rutinas existentes
+              <button
+                onClick={() => setShowRoutineModal(true)}
+                className="w-full bg-background border border-accent1 text-accent1 py-3 rounded-2xl font-heading font-bold text-[14px] hover:bg-accent1/5 transition-colors"
+              >
+                📋 Añadir rutina existente
               </button>
 
-              <button className="w-full bg-background border border-accent2 text-accent2 py-3 rounded-2xl font-heading font-bold text-[14px] hover:bg-accent2/5 transition-colors">
-                ➕ Crear nueva rutina
+              <button
+                  onClick={() => navigate('/createRoutines1', { 
+                    state: { returnTo: '/createProgression' }
+                  })}
+                  className="w-full bg-background border border-accent2 text-accent2 py-3 rounded-2xl font-heading font-bold text-[14px] hover:bg-accent2/5 transition-colors"
+                >
+                  ➕ Crear nueva rutina
               </button>
 
               {/* Botón confirmar */}
@@ -411,7 +628,7 @@ const CreateProgression = () => {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-background via-background to-transparent">
         <button
           disabled={!planningConfirmed}
-          className={`w-full py-3 rounded-2xl font-heading font-bold text-[15px] transition-all ${
+          className={`w-full py-3 rounded-lg font-heading font-bold text-[15px] transition-all ${
             planningConfirmed
               ? 'bg-accent3 text-text-high hover:opacity-80'
               : 'bg-surf text-text-low border border-text-low cursor-not-allowed'
@@ -420,6 +637,15 @@ const CreateProgression = () => {
           🚀 Crear progresión
         </button>
       </div>
+
+      {/* MODAL DE SELECCIÓN */}
+      <ModalSelectRoutine
+        isOpen={showRoutineModal}
+        onClose={() => setShowRoutineModal(false)}
+        routines={availableRoutines}
+        onSelectRoutine={handleSelectRoutine}
+        loading={loadingRoutines}
+      />
     </div>
   );
 };

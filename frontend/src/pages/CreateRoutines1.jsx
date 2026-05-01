@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import { useRoutine } from "../context/RoutinesContext";
@@ -9,6 +9,8 @@ import Header from "../components/Header";
 
 const CreateRoutines1 = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const { user } = useContext(AuthContext);
   const {
     selectedExercises,
@@ -247,6 +249,11 @@ const CreateRoutines1 = () => {
       localStorage.removeItem("createRoutineFormData");
       alert("¡Rutina guardada exitosamente!");
       navigate("/routines1");
+      if (location.state?.returnTo){
+        navigate(location.state.returnTo);
+      }else{
+        navigate("/routines1");
+      }
     } catch (err) {
       console.error("Error inesperado:", err);
       setError("Error inesperado al guardar");
