@@ -16,6 +16,7 @@ import PaymentConfirmation from "./pages/PaymentConfirmation";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoutes";
+import Progression from "./pages/Progression";
 import Routines1 from "./pages/Routines1";
 import EditRoutine from "./pages/EditRoutine";
 import ExecuteRoutine from "./pages/ExecuteRoutine";
@@ -244,6 +245,15 @@ const App = () => {
               element={
                 <PrivateRoute>
                   <ConfigExerciseElite />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/progression" 
+              element={
+                <PrivateRoute>
+                  <Progression />
                 </PrivateRoute>
               } 
             />

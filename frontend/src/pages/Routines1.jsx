@@ -15,6 +15,7 @@ const Routines1 = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [activeTab, setActiveTab] = useState('routines'); // 'routines' o 'progression'
 
   useEffect(() => {
     if (user) {
@@ -24,25 +25,24 @@ const Routines1 = () => {
   }, [user]);
 
   const loadUserSubscription = async () => {
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('subscription_tier')
-      .eq('id', user.id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('subscription_tier')
+        .eq('id', user.id)
+        .single();
 
-    if (error) {
-      console.error('Error cargando suscripción:', error);
+      if (error) {
+        console.error('Error cargando suscripción:', error);
+        setSubscriptionTier('free');
+      } else {
+        setSubscriptionTier(data?.subscription_tier || 'free');
+      }
+    } catch (error) {
+      console.error('Error:', error);
       setSubscriptionTier('free');
-    } else {
-      setSubscriptionTier(data?.subscription_tier || 'free');
     }
-  } catch (error) {
-    console.error('Error:', error);
-    setSubscriptionTier('free');
-  }
-};
-
+  };
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -130,6 +130,20 @@ const Routines1 = () => {
     }
   };
 
+  const handleTabClick = (tab) => {
+    if (tab === 'progression' && subscriptionTier === 'free') {
+      // Redirigir a suscripción si es free
+      navigate('/subscription');
+      return;
+    }
+    
+    setActiveTab(tab);
+    // TODO: Aquí irá la navegación cuando esté lista la pantalla de progresión
+      if (tab === 'progression') {
+      navigate('/progression');
+    }
+  };
+
   const getRoutineStats = (routine) => {
     const exerciseCount = routine.routine_exercises?.length || 0;
     const totalSets = routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
@@ -182,11 +196,6 @@ const Routines1 = () => {
 
           <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight">
             Rutinas
-            {routines.length > 0 && (
-              <span className="font-body text-[14px] text-text-low font-normal">
-                {routines.length} {routines.length === 1 ? 'rutina' : 'rutinas'}
-              </span>
-            )}
           </h1>
         </div>
 
@@ -210,6 +219,52 @@ const Routines1 = () => {
           </button>
         </div>
       </section>
+
+      {/* TABS: Rutinas / Progresión */}
+      <section className="mt-3 w-full border-b border-text-low">
+        <div className="flex gap-8">
+          <button
+            onClick={() => handleTabClick('routines')}
+            className={`pb-2 font-subheading font-semibold text-[15px] transition-all relative ${
+              activeTab === 'routines'
+                ? 'text-accent1'
+                : 'text-text-low hover:text-text-high'
+            }`}
+          >
+            Rutinas
+            {activeTab === 'routines' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
+            )}
+          </button>
+          
+          <button
+            onClick={() => handleTabClick('progression')}
+            className={`pb-2 font-subheading font-semibold text-[15px] transition-all flex items-center gap-1.5 relative ${
+              activeTab === 'progression'
+                ? 'text-accent1'
+                : subscriptionTier === 'free'
+                  ? 'text-text-low/50 cursor-pointer'
+                  : 'text-text-low hover:text-text-high'
+            }`}
+          >
+            Progresión
+            {subscriptionTier === 'free' && (
+              <span className="text-[11px]">🔒</span>
+            )}
+            {activeTab === 'progression' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
+            )}
+          </button>
+        </div>
+      </section>
+
+      {routines.length > 0 && (
+        <section className="mt-2">
+          <p className="font-body text-[14px] text-text-low">
+            {routines.length} {routines.length === 1 ? 'rutina' : 'rutinas'}
+          </p>
+        </section>
+      )}
 
       {showSearch && (
         <section className="mt-4 w-full">
@@ -388,43 +443,43 @@ const Routines1 = () => {
       )}
 
       {subscriptionTier !== 'elite' && (
-      <section className="mt-4 pb-4">
-        <button 
-          onClick={handleNavigateToSubscription}
-          className="w-full cursor-pointer"
-        >
-          <Card>
-            <div className="flex items-center justify-between gap-3.75 hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
-              <span className="bg-orange-bg2 h-15 w-15 px-2.5 rounded-2xl border border-orange font-body text-[25px] text-orange flex items-center justify-center">
-                👑
-              </span>
+        <section className="mt-4 pb-4">
+          <button 
+            onClick={handleNavigateToSubscription}
+            className="w-full cursor-pointer"
+          >
+            <Card>
+              <div className="flex items-center justify-between gap-3.75 hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
+                <span className="bg-orange-bg2 h-15 w-15 px-2.5 rounded-2xl border border-orange font-body text-[25px] text-orange flex items-center justify-center">
+                  👑
+                </span>
 
-              <div className="w-[70%] flex flex-col gap-px">
-                <div className="flex gap-0.5">
-                  <div className="flex">
-                    <p className="font-heading font-semibold text-[20px] text-text-high leading-tight text-left">
-                      Crear <br />
-                      progresión
-                    </p>
+                <div className="w-[70%] flex flex-col gap-px">
+                  <div className="flex gap-0.5">
+                    <div className="flex">
+                      <p className="font-heading font-semibold text-[20px] text-text-high leading-tight text-left">
+                        Crear <br />
+                        progresión
+                      </p>
+                    </div>
+
+                    <span className="bg-yellow-bg2 h-5 px-2.5 rounded-2xl border border-yellow font-body text-[12px] text-yellow">
+                      ◆ ÉLITE
+                    </span>
                   </div>
 
-                  <span className="bg-yellow-bg2 h-5 px-2.5 rounded-2xl border border-yellow font-body text-[12px] text-yellow">
-                    ◆ ÉLITE
-                  </span>
+                  <p className="font-body text-[14px] text-text-low text-left">
+                    Planifica la evolución de cargas semana a semana
+                  </p>
                 </div>
 
-                <p className="font-body text-[14px] text-text-low text-left">
-                  Planifica la evolución de cargas semana a semana
-                </p>
+                <div className="bg-orange-bg2 h-9.25 w-9.25 px-2 rounded-lg border border-orange font-body text-[15px] text-orange flex items-center justify-center">
+                  →
+                </div>
               </div>
-
-              <div className="bg-orange-bg2 h-9.25 w-9.25 px-2 rounded-lg border border-orange font-body text-[15px] text-orange flex items-center justify-center">
-                →
-              </div>
-            </div>
-          </Card>
-        </button>
-      </section>
+            </Card>
+          </button>
+        </section>
       )}
     </div>
   );
