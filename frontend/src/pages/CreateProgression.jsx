@@ -61,6 +61,11 @@ const CreateProgression = () => {
   const [selectedRoutines, setSelectedRoutines] = useState([]);
   const [loadingRoutines, setLoadingRoutines] = useState(false);
 
+  // Estados para planificación
+  const [calendarAssignments, setCalendarAssignments] = useState({});
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [showDayModal, setShowDayModal] = useState(false);
+
   // Sensores para drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -270,6 +275,162 @@ const CreateProgression = () => {
         </div>
       </div>
     );
+  };
+
+  // Modal para asignar rutina a un día
+  const DayAssignmentModal = ({ day, isOpen, onClose, routines, currentAssignment, onAssign }) => {
+    if (!isOpen || !day) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        {/* Overlay */}
+        <div 
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+          onClick={onClose}
+        ></div>
+
+        {/* Modal Card */}
+        <div className="relative bg-surf border border-text-low rounded-2xl w-[90%] max-w-md max-h-[70vh] overflow-hidden flex flex-col">
+          {/* Header */}
+          <div className="p-4 border-b border-text-low">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h3 className="font-heading font-bold text-[18px] text-text-high">
+                  {day.dayName} {day.dayNum} de {day.monthName}
+                </h3>
+                <p className="font-body text-[12px] text-text-low">
+                  Asigna una rutina o márcalo como descanso
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="bg-background h-9 w-9 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          {/* Lista de opciones */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {/* Opción: Día de descanso */}
+            <button
+              onClick={() => {
+                onAssign(day.fullDate, { type: 'rest' });
+                onClose();
+              }}
+              className={`w-full p-3 rounded-xl border transition-colors text-left ${
+                currentAssignment?.type === 'rest'
+                  ? 'bg-accent2/10 border-accent2'
+                  : 'bg-background border-text-low hover:border-accent2 hover:bg-accent2/5'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[24px]">😴</span>
+                <div className="flex-1">
+                  <p className="font-heading font-bold text-[15px] text-text-high">
+                    Día de descanso
+                  </p>
+                  <p className="font-body text-[11px] text-text-low">
+                    Sin entrenamiento programado
+                  </p>
+                </div>
+                {currentAssignment?.type === 'rest' && (
+                  <span className="text-accent2">✓</span>
+                )}
+              </div>
+            </button>
+
+            {/* Separador */}
+            <div className="flex items-center gap-2 my-3">
+              <div className="flex-1 h-px bg-text-low"></div>
+              <p className="font-body text-[11px] text-text-low uppercase">O selecciona rutina</p>
+              <div className="flex-1 h-px bg-text-low"></div>
+            </div>
+
+            {/* Lista de rutinas del bloque */}
+            {routines.map((routine, index) => (
+              <button
+                key={routine.id}
+                onClick={() => {
+                  onAssign(day.fullDate, { type: 'routine', routineId: routine.id, routineIndex: index });
+                  onClose();
+                }}
+                className={`w-full p-3 rounded-xl border transition-colors text-left overflow-hidden flex ${
+                  currentAssignment?.routineId === routine.id
+                    ? 'border-primary'
+                    : 'bg-background border-text-low hover:border-primary hover:bg-primary/5'
+                }`}
+              >
+                {/* Franja de color */}
+                <div 
+                  className="w-1 shrink-0 rounded-l-xl -ml-3"
+                  style={{ backgroundColor: getColorByPosition(index) }}
+                ></div>
+                
+                <div className="flex items-center gap-3 flex-1 ml-3">
+                  <div 
+                    className="h-10 w-10 rounded-lg font-heading font-bold text-[14px] flex items-center justify-center shrink-0"
+                    style={{ 
+                      backgroundColor: `${getColorByPosition(index)}20`,
+                      color: getColorByPosition(index)
+                    }}
+                  >
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-heading font-bold text-[14px] text-text-high">
+                      {routine.name}
+                    </p>
+                    <p className="font-body text-[11px] text-text-low">
+                      {routine.routine_exercises?.length || 0} ejercicios
+                    </p>
+                  </div>
+                  {currentAssignment?.routineId === routine.id && (
+                    <span className="text-primary">✓</span>
+                  )}
+                </div>
+              </button>
+            ))}
+
+            {/* Opción: Sin asignar */}
+            {currentAssignment && (
+              <>
+                <div className="flex items-center gap-2 my-3">
+                  <div className="flex-1 h-px bg-text-low"></div>
+                </div>
+                <button
+                  onClick={() => {
+                    onAssign(day.fullDate, null);
+                    onClose();
+                  }}
+                  className="w-full p-3 rounded-xl border bg-background border-text-low hover:border-red hover:bg-red/5 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-[20px]">🗑️</span>
+                    <p className="font-heading font-bold text-[14px] text-text-low">
+                      Quitar asignación
+                    </p>
+                  </div>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const handleDayAssignment = (date, assignment) => {
+    setCalendarAssignments(prev => {
+      const updated = { ...prev };
+      if (assignment === null) {
+        delete updated[date];
+      } else {
+        updated[date] = assignment;
+      }
+      return updated;
+    });
   };
 
   return (
@@ -584,18 +745,49 @@ const CreateProgression = () => {
                         {week.map((day, dayIndex) => (
                           <button
                             key={dayIndex}
-                            className="flex flex-col items-center gap-1 bg-background border border-text-low rounded-lg py-2 hover:border-primary hover:bg-primary/5 transition-colors"
+                            onClick={() => {
+                              setSelectedDay(day);
+                              setShowDayModal(true);
+                            }}
+                            className={`flex flex-col items-center gap-1 rounded-lg py-2 transition-colors relative overflow-hidden ${
+                              calendarAssignments[day.fullDate]?.type === 'rest'
+                                ? 'bg-accent2/10 border border-accent2'
+                                : calendarAssignments[day.fullDate]?.type === 'routine'
+                                  ? 'border-2'
+                                  : 'bg-background border border-text-low hover:border-primary hover:bg-primary/5'
+                            }`}
+                            style={
+                              calendarAssignments[day.fullDate]?.type === 'routine'
+                                ? { borderColor: getColorByPosition(calendarAssignments[day.fullDate].routineIndex) }
+                                : {}
+                            }
                           >
+                            {/* Franja superior de color si hay rutina asignada */}
+                            {calendarAssignments[day.fullDate]?.type === 'routine' && (
+                              <div 
+                                className="absolute top-0 left-0 right-0 h-1"
+                                style={{ backgroundColor: getColorByPosition(calendarAssignments[day.fullDate].routineIndex) }}
+                              ></div>
+                            )}
+
                             <span className="font-subheading font-bold text-[10px] text-text-low">
                               {day.dayName}
                             </span>
                             <span className="font-heading font-bold text-[14px] text-text-high">
                               {day.dayNum}
                             </span>
-                            {weekIndex === 0 && dayIndex === 0 && (
-                              <span className="font-body text-[8px] text-accent1">
-                                {day.monthName}
-                              </span>
+                            
+                            {/* Indicador visual */}
+                            {calendarAssignments[day.fullDate]?.type === 'rest' ? (
+                              <span className="text-[12px]">😴</span>
+                            ) : calendarAssignments[day.fullDate]?.type === 'routine' ? (
+                              <span className="text-[12px]">💪</span>
+                            ) : (
+                              weekIndex === 0 && dayIndex === 0 && (
+                                <span className="font-body text-[8px] text-accent1">
+                                  {day.monthName}
+                                </span>
+                              )
                             )}
                           </button>
                         ))}
@@ -645,6 +837,16 @@ const CreateProgression = () => {
         routines={availableRoutines}
         onSelectRoutine={handleSelectRoutine}
         loading={loadingRoutines}
+      />
+
+      {/* MODAL DE ASIGNACIÓN DE DÍA */}
+      <DayAssignmentModal
+        day={selectedDay}
+        isOpen={showDayModal}
+        onClose={() => setShowDayModal(false)}
+        routines={selectedRoutines}
+        currentAssignment={selectedDay ? calendarAssignments[selectedDay.fullDate] : null}
+        onAssign={handleDayAssignment}
       />
     </div>
   );
