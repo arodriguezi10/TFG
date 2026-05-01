@@ -41,6 +41,8 @@ const CreateProgression = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
+  const [loading, setLoading] = useState(false);
+
   const [mesocycleExpanded, setMesocycleExpanded] = useState(true);
   const [routinesExpanded, setRoutinesExpanded] = useState(false);
   const [planningExpanded, setPlanningExpanded] = useState(false);
@@ -433,6 +435,87 @@ const CreateProgression = () => {
     });
   };
 
+  const handleCreateProgression = async () => {
+  try {
+    setLoading(true);
+
+    // 1. Insertar la progresión principal
+    const { data: progressionData, error: progressionError } = await supabase
+      .from('progressions')
+      .insert([
+        {
+          user_id: user.id,
+          name: mesocycleName,
+          goal: mesocycleGoal,
+          duration_weeks: mesocycleDuration,
+          start_date: startDate,
+        }
+      ])
+      .select()
+      .single();
+
+    if (progressionError) {
+      console.error('Error al crear progresión:', progressionError);
+      alert('Error al guardar la progresión');
+      return;
+    }
+
+    console.log('Progresión creada:', progressionData);
+
+    // 2. Insertar el bloque de rutinas con sus posiciones y colores
+    const routineBlocks = selectedRoutines.map((routine, index) => ({
+      progression_id: progressionData.id,
+      routine_id: routine.id,
+      position: index,
+      color_code: getColorByPosition(index),
+    }));
+
+    const { error: blocksError } = await supabase
+      .from('progression_routine_blocks')
+      .insert(routineBlocks);
+
+    if (blocksError) {
+      console.error('Error al insertar bloques de rutinas:', blocksError);
+      alert('Error al guardar el bloque de rutinas');
+      return;
+    }
+
+    console.log('Bloques de rutinas insertados');
+
+    // 3. Insertar las asignaciones del calendario
+    const calendarEntries = Object.entries(calendarAssignments).map(([date, assignment]) => ({
+      progression_id: progressionData.id,
+      date: date,
+      routine_id: assignment.type === 'routine' ? assignment.routineId : null,
+      is_rest_day: assignment.type === 'rest',
+    }));
+
+    if (calendarEntries.length > 0) {
+      const { error: calendarError } = await supabase
+        .from('progression_calendar')
+        .insert(calendarEntries);
+
+      if (calendarError) {
+        console.error('Error al insertar calendario:', calendarError);
+        alert('Error al guardar el calendario');
+        return;
+      }
+
+      console.log('Calendario insertado');
+    }
+
+    // 4. Limpieza y redirección
+    alert('🎉 ¡Progresión creada exitosamente!');
+    navigate('/progression');
+
+  } catch (err) {
+    console.error('Error inesperado:', err);
+    alert('Error inesperado al crear la progresión');
+  } finally {
+    setLoading(false);
+  }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col pb-25">
       {/* HEADER */}
@@ -817,16 +900,17 @@ const CreateProgression = () => {
       </section>
 
       {/* BOTÓN CREAR PROGRESIÓN */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-background via-background to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent">
         <button
-          disabled={!planningConfirmed}
+          onClick={handleCreateProgression}
+          disabled={!planningConfirmed || loading}
           className={`w-full py-3 rounded-lg font-heading font-bold text-[15px] transition-all ${
-            planningConfirmed
+            planningConfirmed && !loading
               ? 'bg-accent3 text-text-high hover:opacity-80'
               : 'bg-surf text-text-low border border-text-low cursor-not-allowed'
           }`}
         >
-          🚀 Crear progresión
+          {loading ? '⏳ Guardando...' : '🚀 Crear progresión'}
         </button>
       </div>
 
