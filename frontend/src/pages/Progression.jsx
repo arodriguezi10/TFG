@@ -123,7 +123,7 @@ const Progression = () => {
         {/* PANTALLA DE UPGRADE */}
         <section className="mt-16 flex flex-col items-center justify-center gap-3.75 px-4">
           <div className="relative">
-            <span className="bg-gradient-to-br from-yellow/20 to-orange/20 h-32 w-32 rounded-[40px] font-body text-[70px] flex items-center justify-center border border-yellow/30">
+            <span className="bg-linear-to-br from-yellow/20 to-orange/20 h-32 w-32 rounded-[40px] font-body text-[70px] flex items-center justify-center border border-yellow/30">
               👑
             </span>
             <div className="absolute -top-2 -right-2 bg-yellow h-8 w-8 rounded-full flex items-center justify-center text-[16px] animate-pulse">

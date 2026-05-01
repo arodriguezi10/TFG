@@ -16,9 +16,43 @@ const CreateProgression = () => {
   const [mesocycleName, setMesocycleName] = useState("");
   const [mesocycleGoal, setMesocycleGoal] = useState("");
   const [mesocycleDuration, setMesocycleDuration] = useState(4);
+  const [startDate, setStartDate] = useState("");
+
+  // Generar calendario basado en fecha de inicio y duración
+  const generateCalendar = () => {
+    if (!startDate) return [];
+    
+    const start = new Date(startDate);
+    const weeks = [];
+    
+    for (let week = 0; week < mesocycleDuration; week++) {
+      const days = [];
+      for (let day = 0; day < 7; day++) {
+        const currentDate = new Date(start);
+        currentDate.setDate(start.getDate() + (week * 7) + day);
+        
+        const dayName = currentDate.toLocaleDateString('es-ES', { weekday: 'short' });
+        const dayNum = currentDate.getDate();
+        const monthName = currentDate.toLocaleDateString('es-ES', { month: 'short' });
+        
+        days.push({
+          date: currentDate,
+          dayName: dayName.charAt(0).toUpperCase(),
+          dayNum,
+          monthName,
+          fullDate: currentDate.toISOString().split('T')[0]
+        });
+      }
+      weeks.push(days);
+    }
+    
+    return weeks;
+  };
+
+  const calendar = generateCalendar();
 
   const handleConfirmMesocycle = () => {
-    if (!mesocycleName || !mesocycleGoal) {
+    if (!mesocycleName || !mesocycleGoal || !startDate) {
       alert("Por favor completa todos los campos");
       return;
     }
@@ -174,6 +208,23 @@ const CreateProgression = () => {
                 </p>
               </div>
 
+              {/* Fecha de inicio */}
+              <div>
+                <label className="font-subheading font-semibold text-[13px] text-text-low uppercase tracking-wide block mb-2">
+                  Fecha de inicio
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full bg-background border border-text-low rounded-2xl px-4 py-3 text-text-high text-[14px] font-body outline-none focus:border-primary transition-colors"
+                />
+                <p className="font-body text-[11px] text-text-low mt-1">
+                  El mesociclo comenzará en esta fecha
+                </p>
+              </div>
+
               {/* Botón confirmar */}
               <button
                 onClick={handleConfirmMesocycle}
@@ -273,10 +324,10 @@ const CreateProgression = () => {
 
             <div className="flex-1 text-left">
               <p className="font-heading font-bold text-[16px] text-text-high">
-                Planificación semanal
+                Planificación del mesociclo
               </p>
               <p className="font-body text-[12px] text-text-low">
-                Asignar rutinas a días
+                Calendario de {mesocycleDuration} semanas
               </p>
             </div>
 
@@ -295,60 +346,53 @@ const CreateProgression = () => {
                   <span className="text-[16px]">📅</span>
                   <div className="flex-1">
                     <p className="font-heading font-bold text-[13px] text-text-high mb-1">
-                      Secuencia de Rotación
+                      Vista del Mesociclo
                     </p>
                     <p className="font-body text-[12px] text-text-low leading-relaxed">
-                      Crea una secuencia de días (Día 1, Día 2, Día 3...) con las rutinas correspondientes. Esta secuencia se repetirá cíclicamente durante todo el mesociclo.
+                      Este es el calendario completo de tu progresión de {mesocycleDuration} semanas. Haz click en cada día para asignar una rutina o marcarlo como descanso.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Lista de días (estático de momento) */}
-              <div className="space-y-2">
-                <div className="bg-background border border-text-low rounded-2xl p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/20 text-primary font-heading font-bold text-[14px] flex items-center justify-center">
-                      1
-                    </div>
-                    <div>
-                      <p className="font-heading font-bold text-[14px] text-text-high">
-                        Día 1
+              {/* CALENDARIO */}
+              {startDate ? (
+                <div className="space-y-4">
+                  {calendar.map((week, weekIndex) => (
+                    <div key={weekIndex} className="space-y-2">
+                      <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide">
+                        Semana {weekIndex + 1}
                       </p>
-                      <p className="font-body text-[11px] text-text-low">
-                        Sin rutina asignada
-                      </p>
+                      <div className="grid grid-cols-7 gap-1">
+                        {week.map((day, dayIndex) => (
+                          <button
+                            key={dayIndex}
+                            className="flex flex-col items-center gap-1 bg-background border border-text-low rounded-lg py-2 hover:border-primary hover:bg-primary/5 transition-colors"
+                          >
+                            <span className="font-subheading font-bold text-[10px] text-text-low">
+                              {day.dayName}
+                            </span>
+                            <span className="font-heading font-bold text-[14px] text-text-high">
+                              {day.dayNum}
+                            </span>
+                            {weekIndex === 0 && dayIndex === 0 && (
+                              <span className="font-body text-[8px] text-accent1">
+                                {day.monthName}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <button className="text-text-low hover:text-red transition-colors">
-                    🗑️
-                  </button>
+                  ))}
                 </div>
-
-                <div className="bg-background border border-text-low rounded-2xl p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/20 text-primary font-heading font-bold text-[14px] flex items-center justify-center">
-                      2
-                    </div>
-                    <div>
-                      <p className="font-heading font-bold text-[14px] text-text-high">
-                        Día 2
-                      </p>
-                      <p className="font-body text-[11px] text-text-low">
-                        Sin rutina asignada
-                      </p>
-                    </div>
-                  </div>
-                  <button className="text-text-low hover:text-red transition-colors">
-                    🗑️
-                  </button>
+              ) : (
+                <div className="bg-surf border border-text-low rounded-2xl p-8 text-center">
+                  <p className="font-body text-[13px] text-text-low">
+                    Configura la fecha de inicio en el paso 1 para ver el calendario
+                  </p>
                 </div>
-              </div>
-
-              {/* Botón añadir día */}
-              <button className="w-full bg-background border-2 border-dashed border-text-low text-text-low py-3 rounded-2xl font-heading font-bold text-[14px] hover:border-primary hover:text-primary transition-colors">
-                ➕ Añadir día al bloque
-              </button>
+              )}
 
               {/* Botón confirmar */}
               <button
@@ -367,7 +411,7 @@ const CreateProgression = () => {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-background via-background to-transparent">
         <button
           disabled={!planningConfirmed}
-          className={`w-full py-3 rounded-lg font-heading font-bold text-[15px] transition-all ${
+          className={`w-full py-3 rounded-2xl font-heading font-bold text-[15px] transition-all ${
             planningConfirmed
               ? 'bg-accent3 text-text-high hover:opacity-80'
               : 'bg-surf text-text-low border border-text-low cursor-not-allowed'
