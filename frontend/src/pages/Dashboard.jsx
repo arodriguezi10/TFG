@@ -49,17 +49,24 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const checkMidnight = setInterval(() => {
-      const now = new Date();
-      if (now.getHours() === 0 && now.getMinutes() === 0) {
-        resetDailyChecks();
-        loadWeightData();
-        loadWeekData();
-        loadData();
-      }
-    }, 60000);
+  // Guardar la fecha del último check
+  let lastCheckDate = new Date().toDateString();
 
-    return () => clearInterval(checkMidnight);
+  const checkMidnight = setInterval(() => {
+    const currentDate = new Date().toDateString();
+    
+    // Si la fecha cambió desde el último check
+    if (currentDate !== lastCheckDate) {
+      console.log('🌅 Nuevo día detectado - reseteando datos');
+      resetDailyChecks();
+      loadWeightData();
+      loadWeekData();
+      loadData();
+      lastCheckDate = currentDate;
+    }
+  }, 30000); // Revisar cada 30 segundos
+
+  return () => clearInterval(checkMidnight);
   }, []);
 
   const checkIfRoutineCompletedToday = async (routineId) => {
