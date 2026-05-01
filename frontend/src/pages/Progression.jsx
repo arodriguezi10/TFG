@@ -9,9 +9,13 @@ const Progression = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   
-  //const [progressions, setProgressions] = useState([]);
+  const [activeProgression, setActiveProgression] = useState(null);
   const [loading, setLoading] = useState(true);
   const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [weekDays, setWeekDays] = useState([]);
+  const [calendarAssignments, setCalendarAssignments] = useState({});
+  const [progressionBlocks, setProgressionBlocks] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -44,24 +48,139 @@ const Progression = () => {
     try {
       setLoading(true);
       
-      // TODO: Aquí irá la lógica para cargar progresiones desde la base de datos
-      // const { data, error } = await supabase
-      //   .from('progressions')
-      //   .select('*')
-      //   .eq('user_id', user.id);
-      
-      // Por ahora simular que no hay progresiones
-      //setProgressions([]);
+      // Cargar progresión activa
+      const { data: progressionData, error: progressionError } = await supabase
+        .from('progressions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (progressionError) {
+        console.error('Error cargando progresión:', progressionError);
+        setActiveProgression(null);
+        return;
+      }
+
+      if (progressionData) {
+        setActiveProgression(progressionData);
+
+        // Cargar bloques de rutinas
+        const { data: blocks, error: blocksError } = await supabase
+          .from('progression_routine_blocks')
+          .select(`
+            *,
+            routines (
+              id,
+              name,
+              routine_exercises (id)
+            )
+          `)
+          .eq('progression_id', progressionData.id)
+          .order('position', { ascending: true });
+
+        if (!blocksError && blocks) {
+          setProgressionBlocks(blocks);
+        }
+
+        // Cargar asignaciones del calendario
+        const { data: calendar, error: calendarError } = await supabase
+          .from('progression_calendar')
+          .select('*')
+          .eq('progression_id', progressionData.id);
+
+        if (!calendarError && calendar) {
+          const assignments = {};
+          calendar.forEach(entry => {
+            assignments[entry.date] = {
+              type: entry.is_rest_day ? 'rest' : 'routine',
+              routineId: entry.routine_id,
+            };
+          });
+          setCalendarAssignments(assignments);
+        }
+
+        // Calcular semana actual
+        calculateCurrentWeek(progressionData);
+        generateWeekCalendar(progressionData, 0);
+      } else {
+        setActiveProgression(null);
+      }
       
     } catch (error) {
       console.error('Error cargando progresiones:', error);
+      setActiveProgression(null);
     } finally {
       setLoading(false);
     }
   };
 
+  const calculateCurrentWeek = (progression) => {
+    const startDate = new Date(progression.start_date);
+    const today = new Date();
+    const diffTime = today - startDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const weekIndex = Math.floor(diffDays / 7);
+    
+    const clampedWeek = Math.max(0, Math.min(weekIndex, progression.duration_weeks - 1));
+    setCurrentWeekIndex(clampedWeek);
+  };
+
+  const generateWeekCalendar = (progression, weekOffset) => {
+    const startDate = new Date(progression.start_date);
+    startDate.setDate(startDate.getDate() + (weekOffset * 7));
+
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+
+      const dayName = currentDate.toLocaleDateString('es-ES', { weekday: 'short' });
+      const dayNum = currentDate.getDate();
+      const fullDate = currentDate.toISOString().split('T')[0];
+      const isToday = fullDate === new Date().toISOString().split('T')[0];
+
+      days.push({
+        dayName: dayName.charAt(0).toUpperCase(),
+        dayNum,
+        fullDate,
+        isToday,
+      });
+    }
+
+    setWeekDays(days);
+  };
+
+  const handlePreviousWeek = () => {
+    if (currentWeekIndex > 0) {
+      const newIndex = currentWeekIndex - 1;
+      setCurrentWeekIndex(newIndex);
+      generateWeekCalendar(activeProgression, newIndex);
+    }
+  };
+
+  const handleNextWeek = () => {
+    if (currentWeekIndex < activeProgression.duration_weeks - 1) {
+      const newIndex = currentWeekIndex + 1;
+      setCurrentWeekIndex(newIndex);
+      generateWeekCalendar(activeProgression, newIndex);
+    }
+  };
+
+  const getRoutineColor = (routineId) => {
+    const block = progressionBlocks.find(b => b.routine_id === routineId);
+    return block?.color_code || '#6c63ff';
+  };
+
+  const getProgressPercentage = () => {
+    if (!activeProgression) return 0;
+    const weeksPassed = currentWeekIndex + 1;
+    return (weeksPassed / activeProgression.duration_weeks) * 100;
+  };
+
   const handleCreateProgression = () => {
-        navigate("/createProgression");
+    navigate("/createProgression");
   };
 
   const handleNavigateToSubscription = () => {
@@ -215,9 +334,149 @@ const Progression = () => {
     );
   }
 
-  // PANTALLA VACÍA (usuario Elite sin progresiones)
+  // SI NO HAY PROGRESIÓN ACTIVA - EMPTY STATE
+  if (!activeProgression) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col mb-2.5 px-4">
+        <section className="w-full flex items-center justify-between">
+          <div className="flex flex-col gap-1.25">
+            <div className="flex gap-3.75">
+              <p className="font-subheading text-[12px] text-text-low">
+                Biblioteca
+              </p>
+            </div>
+
+            <h1 className="font-heading font-extrabold text-[28px] text-text-high flex flex-col leading-tight">
+              Progresión
+            </h1>
+          </div>
+
+          <div className="flex gap-2.5">
+            <div className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low">
+              ⚙️
+            </div>
+
+            <button
+              onClick={handleCreateProgression}
+              className="bg-accent1 h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              +
+            </button>
+          </div>
+        </section>
+
+        {/* TABS */}
+        <section className="mt-3 w-full border-b border-text-low">
+          <div className="flex gap-8">
+            <button
+              onClick={() => navigate('/routines1')}
+              className="pb-2 font-subheading font-semibold text-[15px] transition-all text-text-low hover:text-text-high"
+            >
+              Rutinas
+            </button>
+            
+            <button
+              className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative"
+            >
+              Progresión
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
+            </button>
+          </div>
+        </section>
+
+        <section className="mt-2">
+          <p className="font-body text-[14px] text-text-low">
+            0 progresiones activas
+          </p>
+        </section>
+
+        {/* EMPTY STATE */}
+        <section className="mt-12.5 flex flex-col items-center justify-center gap-3.75">
+          <div className="relative">
+            <span className="bg-surf h-27.5 w-27.5 px-2.5 rounded-[35px] font-body text-[45px] text-accent1 flex items-center justify-center border border-accent1/20">
+              📈
+            </span>
+            <div className="absolute -bottom-1 -right-1 bg-yellow h-9 w-9 rounded-full flex items-center justify-center text-[18px] border-2 border-background">
+              ✨
+            </div>
+          </div>
+
+          <p className="mt-5 bg-surf px-3.5 py-0.5 rounded-2xl border border-text-low font-subheading font-semibold text-[16px] text-text-low">
+            Sin progresiones todavía
+          </p>
+
+          <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center justify-center text-center">
+            Crea tu primera
+            <span className="text-accent1">progresión automática</span>
+          </p>
+
+          <p className="font-body text-[16px] text-text-low text-center max-w-sm">
+            Diseña un plan de 4-12 semanas con incrementos automáticos de carga y volumen para maximizar tu progreso.
+          </p>
+        </section>
+
+        {/* INFORMACIÓN ADICIONAL */}
+        <section className="mt-8">
+          <Card>
+            <div className="flex items-start gap-3 mb-4">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-[20px] shrink-0">
+                💡
+              </div>
+              <div className="flex-1">
+                <p className="font-heading font-bold text-[16px] text-text-high mb-1">
+                  ¿Cómo funciona?
+                </p>
+                <p className="font-body text-[13px] text-text-low leading-relaxed">
+                  Una progresión es un plan estructurado que incrementa automáticamente tus cargas semana a semana basándose en rutinas existentes o nuevas.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-text-low">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[14px]">📋</span>
+                <p className="font-body text-[13px] text-text-low">
+                  <span className="text-text-high font-semibold">Paso 1:</span> Elige rutinas existentes o crea nuevas
+                </p>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[14px]">⏰</span>
+                <p className="font-body text-[13px] text-text-low">
+                  <span className="text-text-high font-semibold">Paso 2:</span> Define duración del mesociclo (4-12 semanas)
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[14px]">🎯</span>
+                <p className="font-body text-[13px] text-text-low">
+                  <span className="text-text-high font-semibold">Paso 3:</span> Configura incrementos de peso y volumen
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* CTA */}
+        <section className="mt-7.5 flex flex-col gap-2.5">
+          <Button
+            variant="outlined"
+            text="Crear progresión"
+            bgColor={"bg-accent1"}
+            textColor={"text-text-high"}
+            borderColor={"border-accent1"}
+            w="w-[100%]"
+            onClick={handleCreateProgression}
+          />
+        </section>
+      </div>
+    );
+  }
+
+  // ============================================
+  // PANTALLA CON PROGRESIÓN ACTIVA
+  // ============================================
   return (
     <div className="min-h-screen bg-background flex flex-col mb-2.5 px-4">
+      {/* HEADER */}
       <section className="w-full flex items-center justify-between">
         <div className="flex flex-col gap-1.25">
           <div className="flex gap-3.75">
@@ -232,9 +491,11 @@ const Progression = () => {
         </div>
 
         <div className="flex gap-2.5">
-          <div className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low">
+          <button
+            className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors"
+          >
             ⚙️
-          </div>
+          </button>
 
           <button
             onClick={handleCreateProgression}
@@ -264,88 +525,192 @@ const Progression = () => {
         </div>
       </section>
 
-      <section className="mt-2">
-        <p className="font-body text-[14px] text-text-low">
-          0 progresiones activas
-        </p>
-      </section>
-
-      {/* EMPTY STATE */}
-      <section className="mt-12.5 flex flex-col items-center justify-center gap-3.75">
-        <div className="relative">
-          <span className="bg-surf h-27.5 w-27.5 px-2.5 rounded-[35px] font-body text-[45px] text-accent1 flex items-center justify-center border border-accent1/20">
-            📈
-          </span>
-          <div className="absolute -bottom-1 -right-1 bg-yellow h-9 w-9 rounded-full flex items-center justify-center text-[18px] border-2 border-background">
-            ✨
-          </div>
-        </div>
-
-        <p className="mt-5 bg-surf px-3.5 py-0.5 rounded-2xl border border-text-low font-subheading font-semibold text-[16px] text-text-low">
-          Sin progresiones todavía
-        </p>
-
-        <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center justify-center text-center">
-          Crea tu primera
-          <span className="text-accent1">progresión automática</span>
-        </p>
-
-        <p className="font-body text-[16px] text-text-low text-center max-w-sm">
-          Diseña un plan de 4-12 semanas con incrementos automáticos de carga y volumen para maximizar tu progreso.
-        </p>
-      </section>
-
-      {/* INFORMACIÓN ADICIONAL */}
-      <section className="mt-8">
+      {/* NOMBRE DE LA PROGRESIÓN Y SEMANA ACTUAL */}
+      <section className="mt-4">
         <Card>
-          <div className="flex items-start gap-3 mb-4">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-[20px] shrink-0">
-              💡
-            </div>
+          <div className="flex items-center justify-between mb-3">
             <div className="flex-1">
-              <p className="font-heading font-bold text-[16px] text-text-high mb-1">
-                ¿Cómo funciona?
+              <p className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">
+                Mesociclo activo
               </p>
-              <p className="font-body text-[13px] text-text-low leading-relaxed">
-                Una progresión es un plan estructurado que incrementa automáticamente tus cargas semana a semana basándose en rutinas existentes o nuevas.
+              <h2 className="font-heading font-extrabold text-[24px] text-text-high mt-1 leading-tight">
+                {activeProgression.name}
+              </h2>
+              <p className="font-body text-[13px] text-text-low mt-1">
+                Objetivo: {activeProgression.goal} · {activeProgression.duration_weeks} semanas
               </p>
             </div>
-          </div>
 
-          <div className="pt-3 border-t border-text-low">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[14px]">📋</span>
-              <p className="font-body text-[13px] text-text-low">
-                <span className="text-text-high font-semibold">Paso 1:</span> Elige rutinas existentes o crea nuevas
+            <div className="bg-accent1 rounded-2xl px-4 py-3 flex flex-col items-center shrink-0">
+              <p className="font-subheading font-bold text-[11px] text-text-high/80 uppercase">
+                Semana
               </p>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-[14px]">⏰</span>
-              <p className="font-body text-[13px] text-text-low">
-                <span className="text-text-high font-semibold">Paso 2:</span> Define duración del mesociclo (4-12 semanas)
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[14px]">🎯</span>
-              <p className="font-body text-[13px] text-text-low">
-                <span className="text-text-high font-semibold">Paso 3:</span> Configura incrementos de peso y volumen
+              <p className="font-heading font-extrabold text-[32px] text-text-high leading-none">
+                {currentWeekIndex + 1}
               </p>
             </div>
           </div>
         </Card>
       </section>
 
-      {/* CTA */}
-      <section className="mt-7.5 flex flex-col gap-2.5">
-        <Button
-          variant="outlined"
-          text="Crear progresión"
-          bgColor={"bg-accent1"}
-          textColor={"text-text-high"}
-          borderColor={"border-accent1"}
-          w="w-[100%]"
-          onClick={handleCreateProgression}
-        />
+      {/* CALENDARIO SEMANAL CON NAVEGACIÓN */}
+      <section className="mt-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-subheading font-bold text-[16px] text-text-low">
+            SEMANA {currentWeekIndex + 1} DE {activeProgression.duration_weeks}
+          </p>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={handlePreviousWeek}
+              disabled={currentWeekIndex === 0}
+              className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-colors ${
+                currentWeekIndex === 0
+                  ? 'bg-surf border-text-low text-text-low/30 cursor-not-allowed'
+                  : 'bg-surf border-text-low text-text-high hover:bg-surface'
+              }`}
+            >
+              ←
+            </button>
+            <button
+              onClick={handleNextWeek}
+              disabled={currentWeekIndex >= activeProgression.duration_weeks - 1}
+              className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-colors ${
+                currentWeekIndex >= activeProgression.duration_weeks - 1
+                  ? 'bg-surf border-text-low text-text-low/30 cursor-not-allowed'
+                  : 'bg-surf border-text-low text-text-high hover:bg-surface'
+              }`}
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            {weekDays.map((day, index) => {
+              const assignment = calendarAssignments[day.fullDate];
+              const isRest = assignment?.type === 'rest';
+              const routineId = assignment?.routineId;
+              const color = routineId ? getRoutineColor(routineId) : null;
+
+              return (
+                <button
+                  key={index}
+                  className="flex flex-col items-center gap-1.5 relative"
+                >
+                  <p className="font-subheading font-bold text-[12px] text-text-low">
+                    {day.dayName}
+                  </p>
+                  
+                  <div 
+                    className={`h-11 w-11 rounded-xl font-heading font-bold text-[16px] flex items-center justify-center transition-all ${
+                      day.isToday
+                        ? 'border-2 border-accent1 bg-accent1/10 text-accent1'
+                        : 'border border-text-low bg-surf text-text-high'
+                    }`}
+                    style={
+                      color && !day.isToday
+                        ? { borderColor: color, backgroundColor: `${color}15` }
+                        : {}
+                    }
+                  >
+                    {day.dayNum}
+                  </div>
+
+                  <p className="text-[14px]">
+                    {isRest ? '😴' : routineId ? '💪' : '·'}
+                  </p>
+
+                  {/* Indicador de color superior */}
+                  {color && (
+                    <div 
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full"
+                      style={{ backgroundColor: color }}
+                    ></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+      </section>
+
+      {/* BARRA DE PROGRESO */}
+      <section className="mt-4">
+        <Card>
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-subheading font-bold text-[14px] text-text-low">
+              PROGRESO DEL MESOCICLO
+            </p>
+            <p className="font-heading font-bold text-[16px] text-accent1">
+              {Math.round(getProgressPercentage())}%
+            </p>
+          </div>
+
+          <div className="w-full h-3 bg-surf rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-accent1 rounded-full transition-all duration-500"
+              style={{ width: `${getProgressPercentage()}%` }}
+            ></div>
+          </div>
+
+          <div className="flex items-center justify-between mt-2">
+            <p className="font-body text-[12px] text-text-low">
+              Semana {currentWeekIndex + 1}
+            </p>
+            <p className="font-body text-[12px] text-text-low">
+              Semana {activeProgression.duration_weeks}
+            </p>
+          </div>
+        </Card>
+      </section>
+
+      {/* ESTADÍSTICAS */}
+      <section className="mt-4">
+        <Card>
+          <p className="font-subheading font-bold text-[14px] text-text-low mb-4">
+            RESUMEN
+          </p>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="flex flex-col items-center">
+              <div className="bg-accent1/10 h-12 w-12 rounded-xl border border-accent1 flex items-center justify-center text-[20px] mb-2">
+                ⏰
+              </div>
+              <p className="font-heading font-bold text-[20px] text-text-high">
+                {activeProgression.duration_weeks}
+              </p>
+              <p className="font-body text-[11px] text-text-low text-center">
+                Semanas totales
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="bg-accent2/10 h-12 w-12 rounded-xl border border-accent2 flex items-center justify-center text-[20px] mb-2">
+                📋
+              </div>
+              <p className="font-heading font-bold text-[20px] text-text-high">
+                {progressionBlocks.length}
+              </p>
+              <p className="font-body text-[11px] text-text-low text-center">
+                Rutinas en bloque
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="bg-accent3/10 h-12 w-12 rounded-xl border border-accent3 flex items-center justify-center text-[20px] mb-2">
+                🎯
+              </div>
+              <p className="font-heading font-bold text-[20px] text-text-high capitalize">
+                {activeProgression.goal}
+              </p>
+              <p className="font-body text-[11px] text-text-low text-center">
+                Objetivo
+              </p>
+            </div>
+          </div>
+        </Card>
       </section>
     </div>
   );
