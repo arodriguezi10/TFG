@@ -138,8 +138,8 @@ const Routines1 = () => {
     }
     
     setActiveTab(tab);
-    // TODO: Aquí irá la navegación cuando esté lista la pantalla de progresión
-      if (tab === 'progression') {
+    
+    if (tab === 'progression') {
       navigate('/progression');
     }
   };
