@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
@@ -7,58 +7,72 @@ import Button from "../components/Button";
 
 const Progression = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useContext(AuthContext);
-  
+
   const [activeProgression, setActiveProgression] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [subscriptionTier, setSubscriptionTier] = useState('free');
+  const [subscriptionTier, setSubscriptionTier] = useState("free");
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [weekDays, setWeekDays] = useState([]);
   const [calendarAssignments, setCalendarAssignments] = useState({});
   const [progressionBlocks, setProgressionBlocks] = useState([]);
+  const [selectedDayDetail, setSelectedDayDetail] = useState(null);
+  const [completedDays, setCompletedDays] = useState(new Set());
 
   useEffect(() => {
     if (user) {
       loadUserSubscription();
       fetchProgressions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  useEffect(() => {
+    // Recargar si acabamos de completar una rutina
+    if (location.state?.justCompleted) {
+      fetchProgressions();
+      // Limpiar el state para que no se recargue constantemente
+      window.history.replaceState({}, document.title);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   const loadUserSubscription = async () => {
     try {
       const { data, error } = await supabase
-        .from('users')
-        .select('subscription_tier')
-        .eq('id', user.id)
+        .from("users")
+        .select("subscription_tier")
+        .eq("id", user.id)
         .single();
 
       if (error) {
-        console.error('Error cargando suscripción:', error);
-        setSubscriptionTier('free');
+        console.error("Error cargando suscripción:", error);
+        setSubscriptionTier("free");
       } else {
-        setSubscriptionTier(data?.subscription_tier || 'free');
+        setSubscriptionTier(data?.subscription_tier || "free");
       }
     } catch (error) {
-      console.error('Error:', error);
-      setSubscriptionTier('free');
+      console.error("Error:", error);
+      setSubscriptionTier("free");
     }
   };
 
   const fetchProgressions = async () => {
     try {
       setLoading(true);
-      
+
       // Cargar progresión activa
       const { data: progressionData, error: progressionError } = await supabase
-        .from('progressions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        .from("progressions")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
         .limit(1)
         .single();
 
       if (progressionError) {
-        console.error('Error cargando progresión:', progressionError);
+        console.error("Error cargando progresión:", progressionError);
         setActiveProgression(null);
         return;
       }
@@ -68,37 +82,66 @@ const Progression = () => {
 
         // Cargar bloques de rutinas
         const { data: blocks, error: blocksError } = await supabase
-          .from('progression_routine_blocks')
-          .select(`
+          .from("progression_routine_blocks")
+          .select(
+            `
             *,
             routines (
               id,
               name,
+              estimated_duration_min,
               routine_exercises (id)
             )
-          `)
-          .eq('progression_id', progressionData.id)
-          .order('position', { ascending: true });
+          `
+          )
+          .eq("progression_id", progressionData.id)
+          .order("position", { ascending: true });
 
         if (!blocksError && blocks) {
           setProgressionBlocks(blocks);
         }
 
-        // Cargar asignaciones del calendario
+        // Cargar asignaciones del calendario PRIMERO
         const { data: calendar, error: calendarError } = await supabase
-          .from('progression_calendar')
-          .select('*')
-          .eq('progression_id', progressionData.id);
+          .from("progression_calendar")
+          .select("*")
+          .eq("progression_id", progressionData.id);
 
+        let assignments = {};
         if (!calendarError && calendar) {
-          const assignments = {};
-          calendar.forEach(entry => {
+          calendar.forEach((entry) => {
             assignments[entry.date] = {
-              type: entry.is_rest_day ? 'rest' : 'routine',
+              type: entry.is_rest_day ? "rest" : "routine",
               routineId: entry.routine_id,
             };
           });
           setCalendarAssignments(assignments);
+        }
+
+        // AHORA cargar días completados usando las asignaciones
+        const startDate = new Date(progressionData.start_date);
+        const endDate = new Date(startDate);
+        endDate.setDate(
+          startDate.getDate() + progressionData.duration_weeks * 7
+        );
+
+        const { data: sessions, error: sessionsError } = await supabase
+          .from("workout_sessions")
+          .select("session_date, routine_id")
+          .eq("user_id", user.id)
+          .gte("session_date", startDate.toISOString().split("T")[0])
+          .lte("session_date", endDate.toISOString().split("T")[0]);
+
+        if (!sessionsError && sessions) {
+          const completed = new Set();
+          sessions.forEach((session) => {
+            // Verificar que la rutina del día coincide con la planificada
+            const assignment = assignments[session.session_date];
+            if (assignment && assignment.routineId === session.routine_id) {
+              completed.add(session.session_date);
+            }
+          });
+          setCompletedDays(completed);
         }
 
         // Calcular semana actual
@@ -107,9 +150,8 @@ const Progression = () => {
       } else {
         setActiveProgression(null);
       }
-      
     } catch (error) {
-      console.error('Error cargando progresiones:', error);
+      console.error("Error cargando progresiones:", error);
       setActiveProgression(null);
     } finally {
       setLoading(false);
@@ -122,24 +164,29 @@ const Progression = () => {
     const diffTime = today - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const weekIndex = Math.floor(diffDays / 7);
-    
-    const clampedWeek = Math.max(0, Math.min(weekIndex, progression.duration_weeks - 1));
+
+    const clampedWeek = Math.max(
+      0,
+      Math.min(weekIndex, progression.duration_weeks - 1)
+    );
     setCurrentWeekIndex(clampedWeek);
   };
 
   const generateWeekCalendar = (progression, weekOffset) => {
     const startDate = new Date(progression.start_date);
-    startDate.setDate(startDate.getDate() + (weekOffset * 7));
+    startDate.setDate(startDate.getDate() + weekOffset * 7);
 
     const days = [];
     for (let i = 0; i < 7; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
 
-      const dayName = currentDate.toLocaleDateString('es-ES', { weekday: 'short' });
+      const dayName = currentDate.toLocaleDateString("es-ES", {
+        weekday: "short",
+      });
       const dayNum = currentDate.getDate();
-      const fullDate = currentDate.toISOString().split('T')[0];
-      const isToday = fullDate === new Date().toISOString().split('T')[0];
+      const fullDate = currentDate.toISOString().split("T")[0];
+      const isToday = fullDate === new Date().toISOString().split("T")[0];
 
       days.push({
         dayName: dayName.charAt(0).toUpperCase(),
@@ -169,8 +216,8 @@ const Progression = () => {
   };
 
   const getRoutineColor = (routineId) => {
-    const block = progressionBlocks.find(b => b.routine_id === routineId);
-    return block?.color_code || '#6c63ff';
+    const block = progressionBlocks.find((b) => b.routine_id === routineId);
+    return block?.color_code || "#6c63ff";
   };
 
   const getProgressPercentage = () => {
@@ -187,6 +234,44 @@ const Progression = () => {
     navigate("/subscription");
   };
 
+  const handleDayClick = (day) => {
+    const assignment = calendarAssignments[day.fullDate];
+
+    if (!assignment || assignment.type === "rest") {
+      setSelectedDayDetail(null);
+      return;
+    }
+
+    // Si ya está seleccionado el mismo día, colapsar
+    if (selectedDayDetail?.fullDate === day.fullDate) {
+      setSelectedDayDetail(null);
+      return;
+    }
+
+    // Buscar la rutina completa
+    const routineBlock = progressionBlocks.find(
+      (b) => b.routine_id === assignment.routineId
+    );
+
+    if (routineBlock) {
+      setSelectedDayDetail({
+        ...day,
+        routine: routineBlock.routines,
+        color: routineBlock.color_code,
+      });
+    }
+  };
+
+  const handleStartRoutine = (routineId) => {
+    navigate(`/executeRoutine/${routineId}`, {
+      state: {
+        fromProgression: true,
+        progressionId: activeProgression.id,
+        completedDate: selectedDayDetail.fullDate,
+      },
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -196,7 +281,7 @@ const Progression = () => {
   }
 
   // Si el usuario no es Elite, mostrar pantalla de upgrade
-  if (subscriptionTier !== 'elite') {
+  if (subscriptionTier !== "elite") {
     return (
       <div className="min-h-screen bg-background flex flex-col mb-2.5 px-4">
         <section className="w-full flex items-center justify-between">
@@ -213,7 +298,7 @@ const Progression = () => {
           </div>
 
           <button
-            onClick={() => navigate('/routines1')}
+            onClick={() => navigate("/routines1")}
             className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors cursor-pointer"
           >
             ←
@@ -224,15 +309,13 @@ const Progression = () => {
         <section className="mt-3 w-full border-b border-text-low">
           <div className="flex gap-8">
             <button
-              onClick={() => navigate('/routines1')}
+              onClick={() => navigate("/routines1")}
               className="pb-2 font-subheading font-semibold text-[15px] transition-all text-text-low hover:text-text-high"
             >
               Rutinas
             </button>
-            
-            <button
-              className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative"
-            >
+
+            <button className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative">
               Progresión
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
             </button>
@@ -260,7 +343,8 @@ const Progression = () => {
           </p>
 
           <p className="font-body text-[15px] text-text-low text-center max-w-sm">
-            Planifica la evolución de tus cargas semana a semana con progresiones inteligentes diseñadas por tu entrenador.
+            Planifica la evolución de tus cargas semana a semana con
+            progresiones inteligentes diseñadas por tu entrenador.
           </p>
 
           {/* BENEFICIOS */}
@@ -321,10 +405,7 @@ const Progression = () => {
             onClick={handleNavigateToSubscription}
           />
 
-          <button
-            onClick={() => navigate('/routines1')}
-            className="w-full"
-          >
+          <button onClick={() => navigate("/routines1")} className="w-full">
             <p className="font-body text-[14px] text-text-low text-center">
               Volver a rutinas
             </p>
@@ -369,15 +450,13 @@ const Progression = () => {
         <section className="mt-3 w-full border-b border-text-low">
           <div className="flex gap-8">
             <button
-              onClick={() => navigate('/routines1')}
+              onClick={() => navigate("/routines1")}
               className="pb-2 font-subheading font-semibold text-[15px] transition-all text-text-low hover:text-text-high"
             >
               Rutinas
             </button>
-            
-            <button
-              className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative"
-            >
+
+            <button className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative">
               Progresión
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
             </button>
@@ -411,7 +490,8 @@ const Progression = () => {
           </p>
 
           <p className="font-body text-[16px] text-text-low text-center max-w-sm">
-            Diseña un plan de 4-12 semanas con incrementos automáticos de carga y volumen para maximizar tu progreso.
+            Diseña un plan de 4-12 semanas con incrementos automáticos de carga
+            y volumen para maximizar tu progreso.
           </p>
         </section>
 
@@ -427,7 +507,9 @@ const Progression = () => {
                   ¿Cómo funciona?
                 </p>
                 <p className="font-body text-[13px] text-text-low leading-relaxed">
-                  Una progresión es un plan estructurado que incrementa automáticamente tus cargas semana a semana basándose en rutinas existentes o nuevas.
+                  Una progresión es un plan estructurado que incrementa
+                  automáticamente tus cargas semana a semana basándose en
+                  rutinas existentes o nuevas.
                 </p>
               </div>
             </div>
@@ -436,19 +518,22 @@ const Progression = () => {
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[14px]">📋</span>
                 <p className="font-body text-[13px] text-text-low">
-                  <span className="text-text-high font-semibold">Paso 1:</span> Elige rutinas existentes o crea nuevas
+                  <span className="text-text-high font-semibold">Paso 1:</span>{" "}
+                  Elige rutinas existentes o crea nuevas
                 </p>
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[14px]">⏰</span>
                 <p className="font-body text-[13px] text-text-low">
-                  <span className="text-text-high font-semibold">Paso 2:</span> Define duración del mesociclo (4-12 semanas)
+                  <span className="text-text-high font-semibold">Paso 2:</span>{" "}
+                  Define duración del mesociclo (4-12 semanas)
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-[14px]">🎯</span>
                 <p className="font-body text-[13px] text-text-low">
-                  <span className="text-text-high font-semibold">Paso 3:</span> Configura incrementos de peso y volumen
+                  <span className="text-text-high font-semibold">Paso 3:</span>{" "}
+                  Configura incrementos de peso y volumen
                 </p>
               </div>
             </div>
@@ -491,9 +576,7 @@ const Progression = () => {
         </div>
 
         <div className="flex gap-2.5">
-          <button
-            className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors"
-          >
+          <button className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors">
             ⚙️
           </button>
 
@@ -510,15 +593,13 @@ const Progression = () => {
       <section className="mt-3 w-full border-b border-text-low">
         <div className="flex gap-8">
           <button
-            onClick={() => navigate('/routines1')}
+            onClick={() => navigate("/routines1")}
             className="pb-2 font-subheading font-semibold text-[15px] transition-all text-text-low hover:text-text-high"
           >
             Rutinas
           </button>
-          
-          <button
-            className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative"
-          >
+
+          <button className="pb-2 font-subheading font-semibold text-[15px] transition-all text-accent1 relative">
             Progresión
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
           </button>
@@ -537,7 +618,8 @@ const Progression = () => {
                 {activeProgression.name}
               </h2>
               <p className="font-body text-[13px] text-text-low mt-1">
-                Objetivo: {activeProgression.goal} · {activeProgression.duration_weeks} semanas
+                Objetivo: {activeProgression.goal} ·{" "}
+                {activeProgression.duration_weeks} semanas
               </p>
             </div>
 
@@ -559,26 +641,28 @@ const Progression = () => {
           <p className="font-subheading font-bold text-[16px] text-text-low">
             SEMANA {currentWeekIndex + 1} DE {activeProgression.duration_weeks}
           </p>
-          
+
           <div className="flex gap-2">
             <button
               onClick={handlePreviousWeek}
               disabled={currentWeekIndex === 0}
               className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-colors ${
                 currentWeekIndex === 0
-                  ? 'bg-surf border-text-low text-text-low/30 cursor-not-allowed'
-                  : 'bg-surf border-text-low text-text-high hover:bg-surface'
+                  ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed"
+                  : "bg-surf border-text-low text-text-high hover:bg-surface"
               }`}
             >
               ←
             </button>
             <button
               onClick={handleNextWeek}
-              disabled={currentWeekIndex >= activeProgression.duration_weeks - 1}
+              disabled={
+                currentWeekIndex >= activeProgression.duration_weeks - 1
+              }
               className={`h-8 w-8 rounded-lg border flex items-center justify-center transition-colors ${
                 currentWeekIndex >= activeProgression.duration_weeks - 1
-                  ? 'bg-surf border-text-low text-text-low/30 cursor-not-allowed'
-                  : 'bg-surf border-text-low text-text-high hover:bg-surface'
+                  ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed"
+                  : "bg-surf border-text-low text-text-high hover:bg-surface"
               }`}
             >
               →
@@ -590,27 +674,36 @@ const Progression = () => {
           <div className="flex items-center justify-between">
             {weekDays.map((day, index) => {
               const assignment = calendarAssignments[day.fullDate];
-              const isRest = assignment?.type === 'rest';
+              const isRest = assignment?.type === "rest";
               const routineId = assignment?.routineId;
               const color = routineId ? getRoutineColor(routineId) : null;
+              const isCompleted = completedDays.has(day.fullDate);
 
               return (
                 <button
                   key={index}
+                  onClick={() => handleDayClick(day)}
                   className="flex flex-col items-center gap-1.5 relative"
                 >
                   <p className="font-subheading font-bold text-[12px] text-text-low">
                     {day.dayName}
                   </p>
-                  
-                  <div 
+
+                  <div
                     className={`h-11 w-11 rounded-xl font-heading font-bold text-[16px] flex items-center justify-center transition-all ${
                       day.isToday
-                        ? 'border-2 border-accent1 bg-accent1/10 text-accent1'
-                        : 'border border-text-low bg-surf text-text-high'
+                        ? "border-2 border-accent1 bg-accent1/10 text-accent1"
+                        : selectedDayDetail?.fullDate === day.fullDate
+                          ? "border-2 border-primary bg-primary/10 text-primary"
+                          : isCompleted
+                            ? "border-2 border-accent3 bg-accent3/10 text-accent3"
+                            : "border border-text-low bg-surf text-text-high"
                     }`}
                     style={
-                      color && !day.isToday
+                      color &&
+                      !day.isToday &&
+                      !isCompleted &&
+                      selectedDayDetail?.fullDate !== day.fullDate
                         ? { borderColor: color, backgroundColor: `${color}15` }
                         : {}
                     }
@@ -619,12 +712,18 @@ const Progression = () => {
                   </div>
 
                   <p className="text-[14px]">
-                    {isRest ? '😴' : routineId ? '💪' : '·'}
+                    {isCompleted
+                      ? "✅"
+                      : isRest
+                        ? "😴"
+                        : routineId
+                          ? "💪"
+                          : "·"}
                   </p>
 
                   {/* Indicador de color superior */}
-                  {color && (
-                    <div 
+                  {color && !isCompleted && (
+                    <div
                       className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full"
                       style={{ backgroundColor: color }}
                     ></div>
@@ -634,6 +733,76 @@ const Progression = () => {
             })}
           </div>
         </Card>
+
+        {/* DETALLE DE RUTINA DEL DÍA SELECCIONADO */}
+        {selectedDayDetail && (
+          <Card className="mt-3">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-10 w-10 rounded-xl flex items-center justify-center text-[18px]"
+                  style={{
+                    backgroundColor: `${selectedDayDetail.color}20`,
+                    border: `1px solid ${selectedDayDetail.color}`,
+                  }}
+                >
+                  💪
+                </div>
+                <div>
+                  <p className="font-body text-[11px] text-text-low">
+                    {selectedDayDetail.dayName} {selectedDayDetail.dayNum}
+                  </p>
+                  <p className="font-heading font-bold text-[16px] text-text-high">
+                    {selectedDayDetail.routine.name}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setSelectedDayDetail(null)}
+                className="h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex gap-3 mb-4">
+              <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                {selectedDayDetail.routine.routine_exercises?.length || 0}{" "}
+                ejercicios
+              </span>
+              <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                {selectedDayDetail.routine.estimated_duration_min || 0} min
+              </span>
+            </div>
+
+            {completedDays.has(selectedDayDetail.fullDate) ? (
+              <div className="bg-accent3/10 border border-accent3 rounded-xl p-4 flex items-center gap-3">
+                <span className="text-[32px]">✅</span>
+                <div className="flex-1">
+                  <p className="font-heading font-bold text-[15px] text-accent3">
+                    Rutina completada
+                  </p>
+                  <p className="font-body text-[12px] text-text-low">
+                    Ya completaste este entrenamiento
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="outlined"
+                text="⚡ Iniciar entrenamiento"
+                bgColor="bg-accent1"
+                textColor="text-text-high"
+                borderColor="border-accent1"
+                w="w-full"
+                onClick={() =>
+                  handleStartRoutine(selectedDayDetail.routine.id)
+                }
+              />
+            )}
+          </Card>
+        )}
       </section>
 
       {/* BARRA DE PROGRESO */}
@@ -649,7 +818,7 @@ const Progression = () => {
           </div>
 
           <div className="w-full h-3 bg-surf rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-accent1 rounded-full transition-all duration-500"
               style={{ width: `${getProgressPercentage()}%` }}
             ></div>
