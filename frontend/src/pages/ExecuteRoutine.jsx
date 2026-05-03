@@ -25,6 +25,9 @@ const ExecuteRoutine = () => {
   const [subscriptionTier, setSubscriptionTier] = useState("free");
   const [intensityTechniques, setIntensityTechniques] = useState({});
 
+  const viewOnly = location.state?.viewOnly || false; // NUEVO
+  const viewSessionId = location.state?.sessionId || null;
+
   useEffect(() => {
     loadRoutineData();
     loadUserSubscription();
@@ -87,7 +90,7 @@ const ExecuteRoutine = () => {
               equipment
             )
           )
-        `
+        `,
         )
         .eq("id", id)
         .eq("user_id", user.id)
@@ -104,9 +107,7 @@ const ExecuteRoutine = () => {
           routineExerciseId: re.id,
           targetSets: re.target_sets,
           targetReps: Array.isArray(re.target_reps) ? re.target_reps : [],
-          targetWeight: Array.isArray(re.target_weight)
-            ? re.target_weight
-            : [],
+          targetWeight: Array.isArray(re.target_weight) ? re.target_weight : [],
           targetRIR: Array.isArray(re.target_rir) ? re.target_rir : [],
           restSeconds: re.rest_seconds || "90",
           orderIndex: re.order_index,
@@ -136,6 +137,33 @@ const ExecuteRoutine = () => {
         }));
       });
       setExerciseData(initialData);
+      if (viewOnly && viewSessionId) {
+        const { data: logs } = await supabase
+          .from("workout_exercise_logs")
+          .select("*")
+          .eq("session_id", viewSessionId);
+
+        if (logs) {
+          const viewData = {};
+          sortedExercises.forEach((exercise) => {
+            const exerciseLogs = logs
+              .filter((l) => l.exercise_id === exercise.id)
+              .sort((a, b) => a.serie_number - b.serie_number);
+
+            viewData[exercise.id] = exerciseLogs.map((log) => ({
+              serieNumber: log.serie_number,
+              targetReps: log.target_reps,
+              targetWeight: log.target_weight,
+              targetRIR: log.target_rir,
+              actualReps: log.actual_reps?.toString() || "",
+              actualWeight: log.actual_weight?.toString() || "",
+              actualRIR: log.actual_rir?.toString() || "",
+              completed: log.completed,
+            }));
+          });
+          setExerciseData(viewData);
+        }
+      }
     } catch (error) {
       console.error("Error cargando rutina:", error);
       alert("Error al cargar la rutina");
@@ -180,7 +208,7 @@ const ExecuteRoutine = () => {
     setExerciseData((prev) => ({
       ...prev,
       [exerciseId]: prev[exerciseId].map((serie, idx) =>
-        idx === serieIndex ? { ...serie, [field]: value } : serie
+        idx === serieIndex ? { ...serie, [field]: value } : serie,
       ),
     }));
   };
@@ -195,7 +223,9 @@ const ExecuteRoutine = () => {
       setExerciseData((prev) => ({
         ...prev,
         [exerciseId]: prev[exerciseId].map((serie, idx) =>
-          idx === serieIndex ? { ...serie, completed: !serie.completed } : serie
+          idx === serieIndex
+            ? { ...serie, completed: !serie.completed }
+            : serie,
         ),
       }));
     }
@@ -224,13 +254,13 @@ const ExecuteRoutine = () => {
     const completedExercises = getCompletedExercisesCount();
     const totalSets = Object.values(exerciseData).reduce(
       (sum, series) => sum + series.filter((s) => s.completed).length,
-      0
+      0,
     );
 
     if (completedExercises === 0) {
       if (
         !window.confirm(
-          "No has completado ningún ejercicio. ¿Seguro que quieres finalizar?"
+          "No has completado ningún ejercicio. ¿Seguro que quieres finalizar?",
         )
       ) {
         return;
@@ -239,7 +269,8 @@ const ExecuteRoutine = () => {
 
     try {
       // ✅ FECHA ACTUAL (no la del calendario de progresión)
-      const sessionDate = completedDate || new Date().toISOString().split("T")[0];
+      const sessionDate =
+        completedDate || new Date().toISOString().split("T")[0];
 
       const { data: sessionData, error } = await supabase
         .from("workout_sessions")
@@ -294,7 +325,7 @@ const ExecuteRoutine = () => {
           (serie) => ({
             ...serie,
             exerciseName: exercise.name,
-          })
+          }),
         );
       });
 
@@ -336,7 +367,7 @@ const ExecuteRoutine = () => {
             onClick={() => {
               if (
                 window.confirm(
-                  "¿Seguro que quieres salir? Se perderá el progreso."
+                  "¿Seguro que quieres salir? Se perderá el progreso.",
                 )
               ) {
                 navigate(fromProgression ? "/progression" : "/dashboard");
@@ -349,7 +380,7 @@ const ExecuteRoutine = () => {
 
           <div className="flex flex-col items-center flex-1 mx-4">
             <p className="font-subheading text-[11px] text-text-low uppercase tracking-wider">
-              EN CURSO - {routine.training_type || "RUTINA"}
+              {viewOnly ? "MODO ESPECTADOR" : `EN CURSO - ${routine.training_type || "RUTINA"}`}
             </p>
             <h1 className="font-heading font-extrabold text-[20px] text-text-high leading-tight">
               {routine.name}
@@ -482,10 +513,10 @@ const ExecuteRoutine = () => {
                                 exercise.id,
                                 serieIndex,
                                 "actualReps",
-                                e.target.value
+                                e.target.value,
                               )
                             }
-                            disabled={serie.completed}
+                            disabled={serie.completed || viewOnly}
                             className="w-full bg-background border border-text-low rounded-lg px-2 py-1.5 text-text-high text-[14px] font-heading font-semibold text-center outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-text-low/40"
                           />
                         </div>
@@ -505,10 +536,10 @@ const ExecuteRoutine = () => {
                                 exercise.id,
                                 serieIndex,
                                 "actualWeight",
-                                e.target.value
+                                e.target.value,
                               )
                             }
-                            disabled={serie.completed}
+                            disabled={serie.completed || viewOnly}
                             className="w-full bg-background border border-text-low rounded-lg px-2 py-1.5 text-text-high text-[14px] font-heading font-semibold text-center outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-text-low/40"
                           />
                         </div>
@@ -529,10 +560,10 @@ const ExecuteRoutine = () => {
                                   exercise.id,
                                   serieIndex,
                                   "actualRIR",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
-                              disabled={serie.completed}
+                              disabled={serie.completed || viewOnly}
                               className="w-full bg-background border border-text-low rounded-lg px-2 py-1.5 text-text-high text-[14px] font-heading font-semibold text-center outline-none focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-text-low/40"
                             />
                           ) : (
@@ -556,9 +587,7 @@ const ExecuteRoutine = () => {
                           onClick={() =>
                             toggleSerieComplete(exercise.id, serieIndex)
                           }
-                          disabled={
-                            !isSerieComplete(exercise.id, serieIndex)
-                          }
+                          disabled={!isSerieComplete(exercise.id, serieIndex) || viewOnly}
                           className={`h-7 w-7 rounded-lg flex items-center justify-center transition-all ${
                             serie.completed
                               ? "bg-primary text-text-high"
@@ -580,16 +609,29 @@ const ExecuteRoutine = () => {
       </section>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-background via-background to-transparent">
-        <Button
-          variant="outlined"
-          text="✓ Finalizar entrenamiento"
-          bgColor="bg-accent3"
-          textColor="text-green"
-          borderColor="border-accent3"
-          w="w-full"
-          onClick={handleFinishSession}
-        />
+        {viewOnly ? (
+          <Button
+            variant="outlined"
+            text="← Volver al panel"
+            bgColor="bg-surf"
+            textColor="text-text-high"
+            borderColor="border-text-low"
+            w="w-full"
+            onClick={() => navigate("/dashboard")}
+          />
+        ) : (
+          <Button
+            variant="outlined"
+            text="✓ Finalizar entrenamiento"
+            bgColor="bg-accent3"
+            textColor="text-green"
+            borderColor="border-accent3"
+            w="w-full"
+            onClick={handleFinishSession}
+          />
+        )}
       </div>
+
     </div>
   );
 };

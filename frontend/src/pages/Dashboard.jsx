@@ -701,21 +701,45 @@ const Dashboard = () => {
     }
   };
 
-  const handleStartRoutine = () => {
-    if (todayProgressionRoutine) {
-      const todayDate = new Date().toISOString().split("T")[0];
+  const handleStartRoutine = async () => {
+  if (todayProgressionRoutine) {
+    const todayDate = new Date().toISOString().split("T")[0];
+    if (routineCompletedToday) {
+      // Buscar la sesión de hoy para ver los logs
+      const { data: session } = await supabase
+        .from("workout_sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("routine_id", todayProgressionRoutine.id)
+        .eq("session_date", todayDate)
+        .single();
       navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
-        state: {
-          fromProgression: true,
-          progressionId: activeProgression.id,
-          completedDate: todayDate,
-        },
+        state: { viewOnly: true, sessionId: session?.id },
       });
-    } else if (todayRoutine) {
-      navigate(`/executeRoutine/${todayRoutine.id}`);
     } else {
-      navigate("/routines1");
+      navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
+        state: { fromProgression: true, progressionId: activeProgression.id, completedDate: todayDate },
+      });
     }
+  } else if (todayRoutine) {
+    if (routineCompletedToday) {
+      const todayDate = new Date().toISOString().split("T")[0];
+      const { data: session } = await supabase
+        .from("workout_sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("routine_id", todayRoutine.id)
+        .eq("session_date", todayDate)
+        .single();
+      navigate(`/executeRoutine/${todayRoutine.id}`, {
+        state: { viewOnly: true, sessionId: session?.id },
+      });
+    } else {
+      navigate(`/executeRoutine/${todayRoutine.id}`);
+    }
+  } else {
+    navigate("/routines1");
+  }
   };
 
   const handleNavigateToProfile = () => {
@@ -1123,8 +1147,8 @@ const Dashboard = () => {
                   routineCompletedToday ? "border-green" : "border-accent1"
                 }
                 w="w-[100%]"
-                onClick={routineCompletedToday ? undefined : handleStartRoutine}
-                disabled={routineCompletedToday}
+                onClick={handleStartRoutine}
+  disabled={false}
               />
             </div>
           </Card>
