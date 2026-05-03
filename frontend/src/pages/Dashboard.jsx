@@ -47,6 +47,7 @@ const Dashboard = () => {
   const [progressionAssignments, setProgressionAssignments] = useState({});
   const [progressionCompletedDays, setProgressionCompletedDays] = useState(new Set());
   const [progressionBlocks, setProgressionBlocks] = useState([]);
+  const [todayProgressionRoutine, setTodayProgressionRoutine] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -92,6 +93,7 @@ const Dashboard = () => {
 
       if (progressionError || !progressionData) {
         setActiveProgression(null);
+        setTodayProgressionRoutine(null);
         return;
       }
 
@@ -106,7 +108,10 @@ const Dashboard = () => {
             id,
             name,
             estimated_duration_min,
-            routine_exercises (id)
+            routine_exercises (
+              id,
+              target_sets
+            )
           )
         `)
         .eq("progression_id", progressionData.id)
@@ -131,6 +136,25 @@ const Dashboard = () => {
           };
         });
         setProgressionAssignments(assignments);
+
+        // ✅ VERIFICAR SI HOY HAY RUTINA DE PROGRESIÓN
+        const todayDate = new Date().toISOString().split("T")[0];
+        const todayAssignment = assignments[todayDate];
+
+        if (todayAssignment && todayAssignment.type === "routine" && blocks) {
+          const routineBlock = blocks.find(
+            (b) => b.routine_id === todayAssignment.routineId
+          );
+          if (routineBlock) {
+            setTodayProgressionRoutine(routineBlock.routines);
+            
+            // Verificar si ya se completó hoy
+            const isCompleted = await checkIfRoutineCompletedToday(routineBlock.routines.id);
+            setRoutineCompletedToday(isCompleted);
+          }
+        } else {
+          setTodayProgressionRoutine(null);
+        }
       }
 
       // Cargar días completados
@@ -157,11 +181,12 @@ const Dashboard = () => {
       }
 
       // Generar calendario semanal de progresión
-      generateProgressionWeekCalendar(progressionData);
+      generateProgressionWeekCalendar();
 
     } catch (error) {
       console.error("Error cargando progresión:", error);
       setActiveProgression(null);
+      setTodayProgressionRoutine(null);
     }
   };
 
@@ -340,44 +365,51 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
-      // Obtener todas las rutinas del usuario
-      const { data: routines, error } = await supabase
-        .from("routines")
-        .select(`
-          *,
-          routine_exercises (
-            id,
-            target_sets
-          )
-        `)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+      // ✅ SOLO CARGAR RUTINAS NORMALES SI NO HAY PROGRESIÓN
+      // Si hay progresión activa, no mostrar rutinas normales
+      if (!activeProgression) {
+        // Obtener todas las rutinas del usuario
+        const { data: routines, error } = await supabase
+          .from("routines")
+          .select(`
+            *,
+            routine_exercises (
+              id,
+              target_sets
+            )
+          `)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Error al consultar rutinas:", error);
-        setTodayRoutine(null);
-        return;
-      }
-
-      // Buscar la rutina que corresponde al día de hoy
-      const todayDayName = getTodayDayName();
-      
-      const routineForToday = routines?.find(routine => {
-        try {
-          const assignedDays = JSON.parse(routine.assigned_days || '[]');
-          return assignedDays.includes(todayDayName);
-        } catch {
-          return false;
+        if (error) {
+          console.error("Error al consultar rutinas:", error);
+          setTodayRoutine(null);
+          return;
         }
-      });
 
-      setTodayRoutine(routineForToday || null);
+        // Buscar la rutina que corresponde al día de hoy
+        const todayDayName = getTodayDayName();
+        
+        const routineForToday = routines?.find(routine => {
+          try {
+            const assignedDays = JSON.parse(routine.assigned_days || '[]');
+            return assignedDays.includes(todayDayName);
+          } catch {
+            return false;
+          }
+        });
 
-      if (routineForToday) {
-        const isCompleted = await checkIfRoutineCompletedToday(routineForToday.id);
-        setRoutineCompletedToday(isCompleted);
+        setTodayRoutine(routineForToday || null);
+
+        if (routineForToday) {
+          const isCompleted = await checkIfRoutineCompletedToday(routineForToday.id);
+          setRoutineCompletedToday(isCompleted);
+        } else {
+          setRoutineCompletedToday(false);
+        }
       } else {
-        setRoutineCompletedToday(false);
+        // Si hay progresión, no cargar rutinas normales
+        setTodayRoutine(null);
       }
 
     } catch (error) {
@@ -564,9 +596,23 @@ const Dashboard = () => {
   };
 
   const handleStartRoutine = () => {
-    if (todayRoutine) {
+    // ✅ Si hay progresión con rutina hoy, iniciar esa
+    if (todayProgressionRoutine) {
+      const todayDate = new Date().toISOString().split("T")[0];
+      navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
+        state: {
+          fromProgression: true,
+          progressionId: activeProgression.id,
+          completedDate: todayDate,
+        },
+      });
+    } 
+    // Si no hay progresión pero hay rutina normal hoy
+    else if (todayRoutine) {
       navigate(`/executeRoutine/${todayRoutine.id}`);
-    } else {
+    } 
+    // Si no hay ninguna rutina, ir a ver rutinas
+    else {
       navigate("/routines1");
     }
   };
@@ -587,12 +633,12 @@ const Dashboard = () => {
     }
   };
 
-  const getRoutineStats = () => {
-    if (!todayRoutine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
+  const getRoutineStats = (routine) => {
+    if (!routine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
 
-    const exerciseCount = todayRoutine.routine_exercises?.length || 0;
-    const totalSets = todayRoutine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
-    const duration = todayRoutine.estimated_duration_min || 0;
+    const exerciseCount = routine.routine_exercises?.length || 0;
+    const totalSets = routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const duration = routine.estimated_duration_min || 0;
 
     return { exerciseCount, totalSets, duration };
   };
@@ -651,7 +697,9 @@ const Dashboard = () => {
     );
   };
 
-  const stats = getRoutineStats();
+  // ✅ DETERMINAR QUÉ RUTINA MOSTRAR (PROGRESIÓN O NORMAL)
+  const displayRoutine = todayProgressionRoutine || todayRoutine;
+  const stats = getRoutineStats(displayRoutine);
 
   return (
     <div className="min-h-screen bg-background flex flex-col mb-2.5">
@@ -759,7 +807,7 @@ const Dashboard = () => {
         </section>
       )}
 
-      {/* RUTINA DE HOY (RUTINAS NORMALES) */}
+      {/* ✅ RUTINA DE HOY (PROGRESIÓN O NORMAL) */}
       <section className="mt-4 flex flex-col px-4 items-center justify-center leading-tight">
         {loading ? (
           <Card>
@@ -767,24 +815,26 @@ const Dashboard = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent1"></div>
             </div>
           </Card>
-        ) : todayRoutine ? (
+        ) : displayRoutine ? (
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
-              · RUTINA DE HOY
+              {todayProgressionRoutine ? "· RUTINA DE PROGRESIÓN HOY" : "· RUTINA DE HOY"}
             </p>
 
             <div className="mt-4">
               <p className="font-heading font-extrabold text-text-high text-[28px]">
-                {todayRoutine.name}
+                {displayRoutine.name}
               </p>
 
               <div className="flex space-x-2">
                 <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
                   {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
                 </span>
-                <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  {parseMuscles(todayRoutine.target_muscle_groups)}
-                </span>
+                {displayRoutine.target_muscle_groups && (
+                  <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
+                    {parseMuscles(displayRoutine.target_muscle_groups)}
+                  </span>
+                )}
               </div>
             </div>
 
