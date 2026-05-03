@@ -155,35 +155,57 @@ const Routines1 = () => {
   };
 
   const handleDuplicate = async () => {
-    try {
-      const { data: original } = await supabase
-        .from('routines')
-        .select(`*, routine_exercises(*)`)
-        .eq('id', selectedRoutine.id)
-        .single();
+  try {
+    const { data: original, error: fetchError } = await supabase
+      .from('routines')
+      .select(`*, routine_exercises(*)`)
+      .eq('id', selectedRoutine.id)
+      .single();
 
-      const { data: newRoutine } = await supabase
-        .from('routines')
-        .insert({ ...original, id: undefined, name: `${original.name} (copia)`, created_at: undefined })
-        .select()
-        .single();
+    if (fetchError) throw fetchError;
 
-      if (newRoutine && original.routine_exercises?.length > 0) {
-        const newExercises = original.routine_exercises.map(ex => ({
-          ...ex,
-          id: undefined,
-          routine_id: newRoutine.id,
-          created_at: undefined
-        }));
-        await supabase.from('routine_exercises').insert(newExercises);
-      }
+    const { data: newRoutine, error: insertError } = await supabase
+      .from('routines')
+      .insert({
+        user_id: original.user_id,
+        name: `${original.name} (copia)`,
+        description: original.description,
+        training_type: original.training_type,
+        estimated_duration_min: original.estimated_duration_min,
+        assigned_days: original.assigned_days,
+        target_muscle_groups: original.target_muscle_groups,
+      })
+      .select()
+      .single();
 
-      await fetchRoutines();
-      alert('✅ Rutina duplicada correctamente');
-    } catch (err) {
-      console.error(err);
-      alert('❌ Error al duplicar');
+    if (insertError) throw insertError;
+
+    if (original.routine_exercises?.length > 0) {
+      const newExercises = original.routine_exercises.map(ex => ({
+        routine_id: newRoutine.id,
+        exercise_id: ex.exercise_id,
+        order_index: ex.order_index,
+        target_sets: ex.target_sets,
+        target_reps: ex.target_reps,
+        target_weight: ex.target_weight,
+        target_rir: ex.target_rir,
+        rest_seconds: ex.rest_seconds,
+        intensity_technique: ex.intensity_technique,
+      }));
+
+      const { error: exError } = await supabase
+        .from('routine_exercises')
+        .insert(newExercises);
+
+      if (exError) throw exError;
     }
+
+    await fetchRoutines();
+    alert('✅ Rutina duplicada correctamente');
+  } catch (err) {
+    console.error(err);
+    alert('❌ Error al duplicar: ' + err.message);
+  }
   };
 
   const handleHistory = () => {
