@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import ModalRoutineOptions from "../components/ModalRoutineOptions";
 
 const Routines1 = () => {
   const navigate = useNavigate();
@@ -16,6 +17,9 @@ const Routines1 = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState('free');
   const [activeTab, setActiveTab] = useState('routines'); // 'routines' o 'progression'
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRoutine, setSelectedRoutine] = useState(null);
+
 
   useEffect(() => {
     if (user) {
@@ -142,6 +146,56 @@ const Routines1 = () => {
     if (tab === 'progression') {
       navigate('/progression');
     }
+  };
+
+  const handleOpenOptions = (e, routine) => {
+    e.stopPropagation();
+    setSelectedRoutine(routine);
+    setModalOpen(true);
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      const { data: original } = await supabase
+        .from('routines')
+        .select(`*, routine_exercises(*)`)
+        .eq('id', selectedRoutine.id)
+        .single();
+
+      const { data: newRoutine } = await supabase
+        .from('routines')
+        .insert({ ...original, id: undefined, name: `${original.name} (copia)`, created_at: undefined })
+        .select()
+        .single();
+
+      if (newRoutine && original.routine_exercises?.length > 0) {
+        const newExercises = original.routine_exercises.map(ex => ({
+          ...ex,
+          id: undefined,
+          routine_id: newRoutine.id,
+          created_at: undefined
+        }));
+        await supabase.from('routine_exercises').insert(newExercises);
+      }
+
+      await fetchRoutines();
+      alert('✅ Rutina duplicada correctamente');
+    } catch (err) {
+      console.error(err);
+      alert('❌ Error al duplicar');
+    }
+  };
+
+  const handleHistory = () => {
+    navigate(`/routineHistory/${selectedRoutine.id}`);
+  };
+
+  const handleShare = () => {
+    alert('🔗 Función de compartir próximamente');
+  };
+
+  const handleHide = () => {
+    alert('👁️ Función de ocultar próximamente');
   };
 
   const getRoutineStats = (routine) => {
@@ -360,10 +414,10 @@ const Routines1 = () => {
                         </div>
 
                         <button
-                          onClick={() => handleDeleteRoutine(routine.id)}
-                          className="bg-surf h-8 w-8 rounded-lg border border-red flex items-center justify-center text-red text-[16px] hover:bg-red/10 transition-colors shrink-0"
+                          onClick={(e) => handleOpenOptions(e, routine)}
+                          className="bg-surf h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low text-[18px] hover:bg-surface transition-colors shrink-0"
                         >
-                          🗑️
+                          ⋮
                         </button>
                       </div>
 
@@ -481,6 +535,16 @@ const Routines1 = () => {
           </button>
         </section>
       )}
+      <ModalRoutineOptions
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        routine={selectedRoutine}
+        onDelete={() => handleDeleteRoutine(selectedRoutine?.id)}
+        onDuplicate={handleDuplicate}
+        onHistory={handleHistory}
+        onShare={handleShare}
+        onHide={handleHide}
+      />
     </div>
   );
 };
