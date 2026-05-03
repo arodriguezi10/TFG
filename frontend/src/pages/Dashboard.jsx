@@ -10,6 +10,7 @@ import { useContext, useState, useEffect } from "react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
   const today = new Date().toLocaleDateString("es-ES", {
     weekday: "long",
     day: "numeric",
@@ -41,21 +42,25 @@ const Dashboard = () => {
   // Estados para rutinas
   const [routineCompletedToday, setRoutineCompletedToday] = useState(false);
 
-  // ✅ NUEVOS ESTADOS PARA PROGRESIÓN
+  // ESTADOS PARA PROGRESIÓN
   const [activeProgression, setActiveProgression] = useState(null);
   const [progressionWeekDays, setProgressionWeekDays] = useState([]);
   const [progressionAssignments, setProgressionAssignments] = useState({});
-  const [progressionCompletedDays, setProgressionCompletedDays] = useState(new Set());
+  const [progressionCompletedDays, setProgressionCompletedDays] = useState(
+    new Set(),
+  );
   const [progressionBlocks, setProgressionBlocks] = useState([]);
   const [todayProgressionRoutine, setTodayProgressionRoutine] = useState(null);
   const [currentProgressionWeek, setCurrentProgressionWeek] = useState(0);
 
+  // Estado para mostrar detalles de día seleccionado en calendario de progresión
+  const [selectedProgressionDay, setSelectedProgressionDay] = useState(null);
+
   useEffect(() => {
-    loadData();
+    loadInitialData();
     loadDailyChecks();
     loadWeightData();
     loadWeekData();
-    loadProgressionData();
   }, []);
 
   useEffect(() => {
@@ -63,14 +68,13 @@ const Dashboard = () => {
 
     const checkMidnight = setInterval(() => {
       const currentDate = new Date().toDateString();
-      
+
       if (currentDate !== lastCheckDate) {
-        console.log('🌅 Nuevo día detectado - reseteando datos');
+        console.log("🌅 Nuevo día detectado - reseteando datos");
         resetDailyChecks();
         loadWeightData();
         loadWeekData();
-        loadData();
-        loadProgressionData();
+        loadInitialData();
         lastCheckDate = currentDate;
       }
     }, 30000);
@@ -78,7 +82,46 @@ const Dashboard = () => {
     return () => clearInterval(checkMidnight);
   }, []);
 
-  // ✅ FUNCIÓN PARA CARGAR PROGRESIÓN
+  const checkTodayHasProgressionRoutine = async (progressionData) => {
+    const todayDate = new Date().toISOString().split("T")[0];
+    const { data: calendar } = await supabase
+      .from("progression_calendar")
+      .select("*")
+      .eq("progression_id", progressionData.id)
+      .eq("date", todayDate)
+      .eq("is_rest_day", false)
+      .single();
+
+    return !!(calendar && calendar.routine_id);
+  };
+
+  // Cargar datos en el orden correcto
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      const progressionData = await loadProgressionData();
+      const todayStr = new Date().toISOString().split("T")[0];
+      const inRange = progressionData
+        ? (() => {
+            const end = new Date(progressionData.start_date);
+            end.setDate(end.getDate() + progressionData.duration_weeks * 7 - 1);
+            return (
+              todayStr >= progressionData.start_date &&
+              todayStr <= end.toISOString().split("T")[0]
+            );
+          })()
+        : false;
+      await loadData(
+        inRange && (await checkTodayHasProgressionRoutine(progressionData)),
+      );
+    } catch (error) {
+      console.error("Error cargando datos iniciales:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // FUNCIÓN PARA CARGAR PROGRESIÓN (ahora retorna una promesa)
   const loadProgressionData = async () => {
     try {
       const { data: progressionData, error: progressionError } = await supabase
@@ -92,14 +135,15 @@ const Dashboard = () => {
       if (progressionError || !progressionData) {
         setActiveProgression(null);
         setTodayProgressionRoutine(null);
-        return;
+        return null;
       }
 
       setActiveProgression(progressionData);
 
       const { data: blocks } = await supabase
         .from("progression_routine_blocks")
-        .select(`
+        .select(
+          `
           *,
           routines (
             id,
@@ -110,7 +154,8 @@ const Dashboard = () => {
               target_sets
             )
           )
-        `)
+        `,
+        )
         .eq("progression_id", progressionData.id)
         .order("position", { ascending: true });
 
@@ -136,18 +181,31 @@ const Dashboard = () => {
         const todayDate = new Date().toISOString().split("T")[0];
         const todayAssignment = assignments[todayDate];
 
-        if (todayAssignment && todayAssignment.type === "routine" && blocks) {
+        // Verificar que HOY tenga una rutina asignada (no sea descanso ni vacío)
+        if (
+          todayAssignment &&
+          todayAssignment.type === "routine" &&
+          todayAssignment.routineId &&
+          blocks
+        ) {
           const routineBlock = blocks.find(
-            (b) => b.routine_id === todayAssignment.routineId
+            (b) => b.routine_id === todayAssignment.routineId,
           );
           if (routineBlock) {
             setTodayProgressionRoutine(routineBlock.routines);
-            
-            const isCompleted = await checkIfRoutineCompletedToday(routineBlock.routines.id);
+
+            const isCompleted = await checkIfRoutineCompletedToday(
+              routineBlock.routines.id,
+            );
             setRoutineCompletedToday(isCompleted);
+          } else {
+            setTodayProgressionRoutine(null);
+            setRoutineCompletedToday(false);
           }
         } else {
+          // Si hoy NO hay rutina de progresión (descanso o vacío), limpiar estado
           setTodayProgressionRoutine(null);
+          setRoutineCompletedToday(false);
         }
       }
 
@@ -173,18 +231,18 @@ const Dashboard = () => {
         setProgressionCompletedDays(completed);
       }
 
-      // ✅ Calcular semana actual basada en TODAY
       calculateCurrentProgressionWeek(progressionData);
       generateProgressionWeekCalendar(progressionData, currentProgressionWeek);
 
+      return progressionData;
     } catch (error) {
       console.error("Error cargando progresión:", error);
       setActiveProgression(null);
       setTodayProgressionRoutine(null);
+      return null;
     }
   };
 
-  // ✅ CALCULAR SEMANA ACTUAL DE PROGRESIÓN
   const calculateCurrentProgressionWeek = (progression) => {
     const startDate = new Date(progression.start_date);
     const today = new Date();
@@ -194,12 +252,11 @@ const Dashboard = () => {
 
     const clampedWeek = Math.max(
       0,
-      Math.min(weekIndex, progression.duration_weeks - 1)
+      Math.min(weekIndex, progression.duration_weeks - 1),
     );
     setCurrentProgressionWeek(clampedWeek);
   };
 
-  // ✅ GENERAR CALENDARIO SEMANAL DE PROGRESIÓN
   const generateProgressionWeekCalendar = (progression, weekOffset) => {
     const startDate = new Date(progression.start_date);
     startDate.setDate(startDate.getDate() + weekOffset * 7);
@@ -227,12 +284,12 @@ const Dashboard = () => {
     setProgressionWeekDays(days);
   };
 
-  // ✅ NAVEGACIÓN DE SEMANAS EN DASHBOARD
   const handlePreviousProgressionWeek = () => {
     if (currentProgressionWeek > 0) {
       const newWeek = currentProgressionWeek - 1;
       setCurrentProgressionWeek(newWeek);
       generateProgressionWeekCalendar(activeProgression, newWeek);
+      setSelectedProgressionDay(null);
     }
   };
 
@@ -241,6 +298,7 @@ const Dashboard = () => {
       const newWeek = currentProgressionWeek + 1;
       setCurrentProgressionWeek(newWeek);
       generateProgressionWeekCalendar(activeProgression, newWeek);
+      setSelectedProgressionDay(null);
     }
   };
 
@@ -249,56 +307,74 @@ const Dashboard = () => {
     return block?.color_code || "#6c63ff";
   };
 
-  // ✅ MANEJAR CLICK EN DÍA DE PROGRESIÓN (SOLO HOY)
   const handleProgressionDayClick = (day) => {
     const assignment = progressionAssignments[day.fullDate];
 
     if (!assignment || assignment.type === "rest") {
+      setSelectedProgressionDay(null);
       return;
     }
 
-    // ✅ SOLO PERMITIR INICIAR SI ES HOY
+    if (selectedProgressionDay?.fullDate === day.fullDate) {
+      setSelectedProgressionDay(null);
+      return;
+    }
+
+    const routineBlock = progressionBlocks.find(
+      (b) => b.routine_id === assignment.routineId,
+    );
+
+    if (routineBlock) {
+      setSelectedProgressionDay({
+        ...day,
+        routine: routineBlock.routines,
+        color: routineBlock.color_code,
+      });
+    }
+  };
+
+  const handleStartProgressionRoutine = () => {
+    if (!selectedProgressionDay) return;
+
     const todayDate = new Date().toISOString().split("T")[0];
-    if (day.fullDate !== todayDate) {
+
+    if (selectedProgressionDay.fullDate !== todayDate) {
       return;
     }
 
-    // Si ya está completado, no hacer nada
-    if (progressionCompletedDays.has(day.fullDate)) {
+    if (progressionCompletedDays.has(selectedProgressionDay.fullDate)) {
       return;
     }
 
-    // Navegar a ejecutar rutina
-    const routineId = assignment.routineId;
-    navigate(`/executeRoutine/${routineId}`, {
+    navigate(`/executeRoutine/${selectedProgressionDay.routine.id}`, {
       state: {
         fromProgression: true,
         progressionId: activeProgression.id,
-        completedDate: day.fullDate,
+        completedDate: selectedProgressionDay.fullDate,
       },
     });
   };
 
   const checkIfRoutineCompletedToday = async (routineId) => {
     try {
-      const todayDate = new Date().toISOString().split('T')[0];
-      
+      const todayDate = new Date().toISOString().split("T")[0];
+
       const { data, error } = await supabase
-        .from('workout_sessions')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('routine_id', routineId)
-        .eq('session_date', todayDate)
+        .from("workout_sessions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("routine_id", routineId)
+        .eq("session_date", todayDate)
         .limit(1);
-      
+
       if (error) {
-        console.error('Error verificando sesión:', error);
+        console.error("Error verificando sesión:", error);
         return false;
       }
-      
+
       return data && data.length > 0;
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       return false;
     }
   };
@@ -312,57 +388,64 @@ const Dashboard = () => {
       const endOfWeek = currentWeek[6].fullDate;
 
       const { data: sessions } = await supabase
-        .from('workout_sessions')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('session_date', startOfWeek)
-        .lte('session_date', endOfWeek)
-        .order('session_date', { ascending: true });
+        .from("workout_sessions")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("session_date", startOfWeek)
+        .lte("session_date", endOfWeek)
+        .order("session_date", { ascending: true });
 
       setCompletedSessions(sessions || []);
     } catch (error) {
-      console.error('Error cargando datos de la semana:', error);
+      console.error("Error cargando datos de la semana:", error);
     }
   };
 
   const getCurrentWeekDays = () => {
     const today = new Date();
     const currentDay = today.getDay();
-    
+
     const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
-    
+
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + mondayOffset + i);
-      
-      const dayStr = date.toLocaleDateString('es-ES', { weekday: 'short' }).charAt(0).toUpperCase();
+
+      const dayStr = date
+        .toLocaleDateString("es-ES", { weekday: "short" })
+        .charAt(0)
+        .toUpperCase();
       const dayNum = date.getDate();
-      const fullDate = date.toISOString().split('T')[0];
-      const isToday = fullDate === new Date().toISOString().split('T')[0];
-      
+      const fullDate = date.toISOString().split("T")[0];
+      const isToday = fullDate === new Date().toISOString().split("T")[0];
+
       weekDays.push({
         dayStr,
         dayNum,
         fullDate,
-        isToday
+        isToday,
       });
     }
-    
+
     return weekDays;
   };
 
   const isDateCompleted = (dateStr) => {
-    return completedSessions.some(session => session.session_date === dateStr);
+    return completedSessions.some(
+      (session) => session.session_date === dateStr,
+    );
   };
 
   const getSessionForDate = (dateStr) => {
-    return completedSessions.find(session => session.session_date === dateStr);
+    return completedSessions.find(
+      (session) => session.session_date === dateStr,
+    );
   };
 
   const handleDayClick = (day) => {
     const session = getSessionForDate(day.fullDate);
-    
+
     if (session) {
       setSelectedDay(day);
       setSelectedSession(session);
@@ -373,14 +456,20 @@ const Dashboard = () => {
   };
 
   const getTodayDayName = () => {
-    const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const days = [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+    ];
     return days[new Date().getDay()];
   };
 
-  const loadData = async () => {
+  const loadData = async (hasProgression = false) => {
     try {
-      setLoading(true);
-
       const { data: userData } = await supabase
         .from("users")
         .select("first_name")
@@ -389,16 +478,18 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
-      if (!activeProgression) {
+      if (!hasProgression) {
         const { data: routines, error } = await supabase
           .from("routines")
-          .select(`
+          .select(
+            `
             *,
             routine_exercises (
               id,
               target_sets
             )
-          `)
+          `,
+          )
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
@@ -409,10 +500,10 @@ const Dashboard = () => {
         }
 
         const todayDayName = getTodayDayName();
-        
-        const routineForToday = routines?.find(routine => {
+
+        const routineForToday = routines?.find((routine) => {
           try {
-            const assignedDays = JSON.parse(routine.assigned_days || '[]');
+            const assignedDays = JSON.parse(routine.assigned_days || "[]");
             return assignedDays.includes(todayDayName);
           } catch {
             return false;
@@ -422,7 +513,9 @@ const Dashboard = () => {
         setTodayRoutine(routineForToday || null);
 
         if (routineForToday) {
-          const isCompleted = await checkIfRoutineCompletedToday(routineForToday.id);
+          const isCompleted = await checkIfRoutineCompletedToday(
+            routineForToday.id,
+          );
           setRoutineCompletedToday(isCompleted);
         } else {
           setRoutineCompletedToday(false);
@@ -430,46 +523,43 @@ const Dashboard = () => {
       } else {
         setTodayRoutine(null);
       }
-
     } catch (error) {
       console.error("Error:", error);
       setTodayRoutine(null);
-    } finally {
-      setLoading(false);
     }
   };
 
   const loadWeightData = async () => {
     try {
-      const todayDate = new Date().toISOString().split('T')[0];
+      const todayDate = new Date().toISOString().split("T")[0];
 
       const { data: todayData } = await supabase
-        .from('weight_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('log_date', todayDate)
+        .from("weight_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("log_date", todayDate)
         .single();
 
       setTodayWeight(todayData);
 
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().split('T')[0];
+      const thirtyDaysAgoDate = thirtyDaysAgo.toISOString().split("T")[0];
 
       const { data: recentWeights } = await supabase
-        .from('weight_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('log_date', thirtyDaysAgoDate)
-        .order('log_date', { ascending: false });
+        .from("weight_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("log_date", thirtyDaysAgoDate)
+        .order("log_date", { ascending: false });
 
       if (recentWeights && recentWeights.length > 0) {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+        const sevenDaysAgoDate = sevenDaysAgo.toISOString().split("T")[0];
 
         const weightSevenDaysAgo = recentWeights.find(
-          w => w.log_date <= sevenDaysAgoDate
+          (w) => w.log_date <= sevenDaysAgoDate,
         );
 
         if (todayData && weightSevenDaysAgo) {
@@ -486,80 +576,78 @@ const Dashboard = () => {
 
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-      const sevenDaysAgoDate = sevenDaysAgo.toISOString().split('T')[0];
+      const sevenDaysAgoDate = sevenDaysAgo.toISOString().split("T")[0];
 
       const { data: last7DaysData } = await supabase
-        .from('weight_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('log_date', sevenDaysAgoDate)
-        .order('log_date', { ascending: true});
+        .from("weight_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("log_date", sevenDaysAgoDate)
+        .order("log_date", { ascending: true });
 
       const last7DaysArray = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        
-        const weightLog = last7DaysData?.find(w => w.log_date === dateStr);
-        
-        const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
-        const firstLetter = dayName === 'mié' ? 'X' : dayName.charAt(0).toUpperCase();
-        
+        const dateStr = date.toISOString().split("T")[0];
+
+        const weightLog = last7DaysData?.find((w) => w.log_date === dateStr);
+
+        const dayName = date.toLocaleDateString("es-ES", { weekday: "short" });
+        const firstLetter =
+          dayName === "mié" ? "X" : dayName.charAt(0).toUpperCase();
+
         last7DaysArray.push({
           date: dateStr,
           weight: weightLog?.weight || null,
-          dayName: firstLetter
+          dayName: firstLetter,
         });
       }
 
       setLast7Days(last7DaysArray);
-
     } catch (error) {
-      console.error('Error cargando datos de peso:', error);
+      console.error("Error cargando datos de peso:", error);
     }
   };
 
   const handleSaveWeight = async () => {
     if (!weightInput || isNaN(weightInput)) {
-      alert('Por favor ingresa un peso válido');
+      alert("Por favor ingresa un peso válido");
       return;
     }
 
     const weight = parseFloat(weightInput);
     if (weight <= 0 || weight > 500) {
-      alert('El peso debe estar entre 0 y 500 kg');
+      alert("El peso debe estar entre 0 y 500 kg");
       return;
     }
 
-    const todayDate = new Date().toISOString().split('T')[0];
+    const todayDate = new Date().toISOString().split("T")[0];
 
     try {
       const { data: existing } = await supabase
-        .from('weight_logs')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('log_date', todayDate)
+        .from("weight_logs")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("log_date", todayDate)
         .single();
 
       if (existing) {
         const { error } = await supabase
-          .from('weight_logs')
-          .update({ 
+          .from("weight_logs")
+          .update({
             weight: weight,
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           })
-          .eq('id', existing.id);
+          .eq("id", existing.id);
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('weight_logs')
-          .insert({
-            user_id: user.id,
-            weight: weight,
-            log_date: todayDate
-          });
+        const { error } = await supabase.from("weight_logs").insert({
+          user_id: user.id,
+          weight: weight,
+          log_date: todayDate,
+        });
 
         if (error) throw error;
       }
@@ -567,20 +655,20 @@ const Dashboard = () => {
       setShowWeightInput(false);
       setWeightInput("");
       await loadWeightData();
-      alert('✅ Peso guardado correctamente');
+      alert("✅ Peso guardado correctamente");
     } catch (error) {
-      console.error('Error guardando peso:', error);
-      alert('❌ Error al guardar el peso');
+      console.error("Error guardando peso:", error);
+      alert("❌ Error al guardar el peso");
     }
   };
 
   const loadDailyChecks = () => {
     const today = new Date().toDateString();
-    const savedDate = localStorage.getItem('dailyChecksDate');
-    
+    const savedDate = localStorage.getItem("dailyChecksDate");
+
     if (savedDate === today) {
-      const preWorkoutStatus = localStorage.getItem('preWorkout') === 'true';
-      const postWorkoutStatus = localStorage.getItem('postWorkout') === 'true';
+      const preWorkoutStatus = localStorage.getItem("preWorkout") === "true";
+      const postWorkoutStatus = localStorage.getItem("postWorkout") === "true";
       setPreWorkout(preWorkoutStatus);
       setPostWorkout(postWorkoutStatus);
     } else {
@@ -592,24 +680,24 @@ const Dashboard = () => {
     setPreWorkout(false);
     setPostWorkout(false);
     const today = new Date().toDateString();
-    localStorage.setItem('dailyChecksDate', today);
-    localStorage.setItem('preWorkout', 'false');
-    localStorage.setItem('postWorkout', 'false');
+    localStorage.setItem("dailyChecksDate", today);
+    localStorage.setItem("preWorkout", "false");
+    localStorage.setItem("postWorkout", "false");
   };
 
   const handlePreWorkoutToggle = () => {
-    if (window.confirm('¿Confirmas que has completado tu pre-entreno?')) {
+    if (window.confirm("¿Confirmas que has completado tu pre-entreno?")) {
       const newStatus = !preWorkout;
       setPreWorkout(newStatus);
-      localStorage.setItem('preWorkout', String(newStatus));
+      localStorage.setItem("preWorkout", String(newStatus));
     }
   };
 
   const handlePostWorkoutToggle = () => {
-    if (window.confirm('¿Confirmas que has completado tu post-entreno?')) {
+    if (window.confirm("¿Confirmas que has completado tu post-entreno?")) {
       const newStatus = !postWorkout;
       setPostWorkout(newStatus);
-      localStorage.setItem('postWorkout', String(newStatus));
+      localStorage.setItem("postWorkout", String(newStatus));
     }
   };
 
@@ -623,11 +711,9 @@ const Dashboard = () => {
           completedDate: todayDate,
         },
       });
-    } 
-    else if (todayRoutine) {
+    } else if (todayRoutine) {
       navigate(`/executeRoutine/${todayRoutine.id}`);
-    } 
-    else {
+    } else {
       navigate("/routines1");
     }
   };
@@ -652,7 +738,11 @@ const Dashboard = () => {
     if (!routine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
 
     const exerciseCount = routine.routine_exercises?.length || 0;
-    const totalSets = routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const totalSets =
+      routine.routine_exercises?.reduce(
+        (sum, ex) => sum + (ex.target_sets || 0),
+        0,
+      ) || 0;
     const duration = routine.estimated_duration_min || 0;
 
     return { exerciseCount, totalSets, duration };
@@ -660,18 +750,22 @@ const Dashboard = () => {
 
   const formatWeight = (weight) => {
     const integerPart = Math.floor(weight);
-    const decimalPart = ((weight % 1) * 100).toFixed(0).padStart(2, '0');
+    const decimalPart = ((weight % 1) * 100).toFixed(0).padStart(2, "0");
     return { integer: integerPart, decimal: decimalPart };
   };
 
   const renderWeightChart = () => {
     if (last7Days.length === 0) return null;
 
-    const validWeights = last7Days.filter(d => d.weight !== null).map(d => d.weight);
+    const validWeights = last7Days
+      .filter((d) => d.weight !== null)
+      .map((d) => d.weight);
     if (validWeights.length === 0) {
       return (
         <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 flex items-center justify-center">
-          <p className="text-text-low text-[12px]">Sin datos suficientes para gráfico</p>
+          <p className="text-text-low text-[12px]">
+            Sin datos suficientes para gráfico
+          </p>
         </div>
       );
     }
@@ -683,19 +777,25 @@ const Dashboard = () => {
     return (
       <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 p-3 flex items-end justify-between gap-1">
         {last7Days.map((day, index) => {
-          const height = day.weight 
-            ? ((day.weight - minWeight) / range) * 100 
+          const height = day.weight
+            ? ((day.weight - minWeight) / range) * 100
             : 0;
-          
+
           return (
-            <div key={index} className="flex flex-col items-center flex-1 gap-1">
-              <div className="w-full flex items-end justify-center" style={{ height: '40px' }}>
+            <div
+              key={index}
+              className="flex flex-col items-center flex-1 gap-1"
+            >
+              <div
+                className="w-full flex items-end justify-center"
+                style={{ height: "40px" }}
+              >
                 {day.weight ? (
-                  <div 
+                  <div
                     className="w-full bg-accent1 rounded-t-sm transition-all"
-                    style={{ 
+                    style={{
                       height: `${Math.max(height, 10)}%`,
-                      minHeight: '4px'
+                      minHeight: "4px",
                     }}
                   />
                 ) : (
@@ -712,7 +812,22 @@ const Dashboard = () => {
     );
   };
 
-  const displayRoutine = todayProgressionRoutine || todayRoutine;
+  const todayDate = new Date().toISOString().split("T")[0];
+  const progressionStartDate = activeProgression?.start_date;
+  const progressionEndDate = activeProgression
+    ? (() => {
+        const end = new Date(activeProgression.start_date);
+        end.setDate(end.getDate() + activeProgression.duration_weeks * 7 - 1);
+        return end.toISOString().split("T")[0];
+      })()
+    : null;
+  const isTodayInProgressionRange =
+    activeProgression &&
+    todayDate >= progressionStartDate &&
+    todayDate <= progressionEndDate;
+  const displayRoutine = isTodayInProgressionRange
+    ? todayProgressionRoutine
+    : todayRoutine;
   const stats = getRoutineStats(displayRoutine);
 
   return (
@@ -756,7 +871,6 @@ const Dashboard = () => {
                 {activeProgression.name}
               </p>
 
-              {/* ✅ BOTONES DE NAVEGACIÓN */}
               <div className="flex gap-2">
                 <button
                   onClick={handlePreviousProgressionWeek}
@@ -771,9 +885,13 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={handleNextProgressionWeek}
-                  disabled={currentProgressionWeek >= activeProgression.duration_weeks - 1}
+                  disabled={
+                    currentProgressionWeek >=
+                    activeProgression.duration_weeks - 1
+                  }
                   className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] transition-colors ${
-                    currentProgressionWeek >= activeProgression.duration_weeks - 1
+                    currentProgressionWeek >=
+                    activeProgression.duration_weeks - 1
                       ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed"
                       : "bg-surf border-text-low text-text-high hover:bg-surface"
                   }`}
@@ -790,17 +908,12 @@ const Dashboard = () => {
                 const routineId = assignment?.routineId;
                 const color = routineId ? getRoutineColor(routineId) : null;
                 const isCompleted = progressionCompletedDays.has(day.fullDate);
-                const todayDate = new Date().toISOString().split("T")[0];
-                const canStart = day.fullDate === todayDate && !isCompleted && !isRest && assignment;
 
                 return (
                   <button
                     key={index}
                     onClick={() => handleProgressionDayClick(day)}
-                    disabled={!canStart}
-                    className={`flex flex-col items-center gap-1.5 relative transition-all ${
-                      canStart ? 'cursor-pointer' : 'cursor-default'
-                    }`}
+                    className="flex flex-col items-center gap-1.5 relative transition-all cursor-pointer"
                   >
                     <p className="font-subheading font-bold text-[12px] text-text-low">
                       {day.dayName}
@@ -810,13 +923,21 @@ const Dashboard = () => {
                       className={`h-11 w-11 rounded-xl font-heading font-bold text-[16px] flex items-center justify-center transition-all ${
                         day.isToday
                           ? "border-2 border-accent1 bg-accent1/10 text-accent1"
-                          : isCompleted
-                            ? "border-2 border-accent3 bg-accent3/10 text-accent3"
-                            : "border border-text-low bg-surf text-text-high"
+                          : selectedProgressionDay?.fullDate === day.fullDate
+                            ? "border-2 border-primary bg-primary/10 text-primary"
+                            : isCompleted
+                              ? "border-2 border-accent3 bg-accent3/10 text-accent3"
+                              : "border border-text-low bg-surf text-text-high"
                       }`}
                       style={
-                        color && !day.isToday && !isCompleted
-                          ? { borderColor: color, backgroundColor: `${color}15` }
+                        color &&
+                        !day.isToday &&
+                        !isCompleted &&
+                        selectedProgressionDay?.fullDate !== day.fullDate
+                          ? {
+                              borderColor: color,
+                              backgroundColor: `${color}15`,
+                            }
                           : {}
                       }
                     >
@@ -844,6 +965,88 @@ const Dashboard = () => {
               })}
             </div>
           </Card>
+
+          {selectedProgressionDay && (
+            <Card>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-10 w-10 rounded-xl flex items-center justify-center text-[18px]"
+                    style={{
+                      backgroundColor: `${selectedProgressionDay.color}20`,
+                      border: `1px solid ${selectedProgressionDay.color}`,
+                    }}
+                  >
+                    💪
+                  </div>
+                  <div>
+                    <p className="font-body text-[11px] text-text-low">
+                      {selectedProgressionDay.dayName}{" "}
+                      {selectedProgressionDay.dayNum}
+                    </p>
+                    <p className="font-heading font-bold text-[16px] text-text-high">
+                      {selectedProgressionDay.routine.name}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedProgressionDay(null)}
+                  className="h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="flex gap-3 mb-4">
+                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                  {selectedProgressionDay.routine.routine_exercises?.length ||
+                    0}{" "}
+                  ejercicios
+                </span>
+                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                  {selectedProgressionDay.routine.estimated_duration_min || 0}{" "}
+                  min
+                </span>
+              </div>
+
+              {progressionCompletedDays.has(selectedProgressionDay.fullDate) ? (
+                <div className="bg-accent3/10 border border-accent3 rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-[32px]">✅</span>
+                  <div className="flex-1">
+                    <p className="font-heading font-bold text-[15px] text-accent3">
+                      Rutina completada
+                    </p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Ya completaste este entrenamiento
+                    </p>
+                  </div>
+                </div>
+              ) : selectedProgressionDay.isToday ? (
+                <Button
+                  variant="outlined"
+                  text="⚡ Iniciar entrenamiento"
+                  bgColor="bg-accent1"
+                  textColor="text-text-high"
+                  borderColor="border-accent1"
+                  w="w-full"
+                  onClick={handleStartProgressionRoutine}
+                />
+              ) : (
+                <div className="bg-surf/50 border border-text-low rounded-xl p-4 flex items-center gap-3">
+                  <span className="text-[24px]">🔒</span>
+                  <div className="flex-1">
+                    <p className="font-heading font-bold text-[14px] text-text-low">
+                      Solo disponible el día indicado
+                    </p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Podrás iniciar esta rutina cuando llegue su día
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
         </section>
       )}
 
@@ -858,7 +1061,9 @@ const Dashboard = () => {
         ) : displayRoutine ? (
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
-              {todayProgressionRoutine ? "· RUTINA DE PROGRESIÓN HOY" : "· RUTINA DE HOY"}
+              {todayProgressionRoutine
+                ? "· RUTINA DE PROGRESIÓN HOY"
+                : "· RUTINA DE HOY"}
             </p>
 
             <div className="mt-4">
@@ -868,7 +1073,8 @@ const Dashboard = () => {
 
               <div className="flex space-x-2">
                 <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? 's' : ''}
+                  {stats.exerciseCount} ejercicio
+                  {stats.exerciseCount !== 1 ? "s" : ""}
                 </span>
                 {displayRoutine.target_muscle_groups && (
                   <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
@@ -906,10 +1112,16 @@ const Dashboard = () => {
             <div className="mt-4 flex items-center">
               <Button
                 variant="outlined"
-                text={routineCompletedToday ? "👁️ Rutina completada" : "⚡ Empezar entrenamiento"}
+                text={
+                  routineCompletedToday
+                    ? "👁️ Rutina completada"
+                    : "⚡ Empezar entrenamiento"
+                }
                 bgColor={routineCompletedToday ? "bg-green" : "bg-accent1"}
                 textColor={"text-text-high"}
-                borderColor={routineCompletedToday ? "border-green" : "border-accent1"}
+                borderColor={
+                  routineCompletedToday ? "border-green" : "border-accent1"
+                }
                 w="w-[100%]"
                 onClick={routineCompletedToday ? undefined : handleStartRoutine}
                 disabled={routineCompletedToday}
@@ -928,7 +1140,8 @@ const Dashboard = () => {
               </h3>
 
               <p className="text-text-low text-sm font-light leading-relaxed mb-6 max-w-xs">
-                No tienes rutinas programadas para hoy. ¡Aprovecha para recuperar!
+                No tienes rutinas programadas para hoy. ¡Aprovecha para
+                recuperar!
               </p>
 
               <Button
@@ -945,6 +1158,9 @@ const Dashboard = () => {
         )}
       </section>
 
+      {/* Secciones de Pre/Post entreno, Peso y Historial... */}
+      {/* (El resto del código continúa igual) */}
+
       <section className="mt-4 flex flex-col px-4 gap-3">
         <p className="font-subheading font-bold text-text-high text-[16px]">
           ¿TODO MARCADO HOY?
@@ -956,16 +1172,20 @@ const Dashboard = () => {
             className="flex-1 cursor-pointer"
           >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
-                preWorkout 
-                  ? 'bg-accent1 border-accent1 text-text-high' 
-                  : 'bg-surf border-white/27 text-text-low'
-              }`}>
-                {preWorkout ? '✓' : '&'}
+              <div
+                className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
+                  preWorkout
+                    ? "bg-accent1 border-accent1 text-text-high"
+                    : "bg-surf border-white/27 text-text-low"
+                }`}
+              >
+                {preWorkout ? "✓" : "&"}
               </div>
-              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
-                preWorkout ? 'text-accent1' : 'text-text-high'
-              }`}>
+              <p
+                className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
+                  preWorkout ? "text-accent1" : "text-text-high"
+                }`}
+              >
                 Pre-entreno
               </p>
               <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
@@ -979,16 +1199,20 @@ const Dashboard = () => {
             className="flex-1 cursor-pointer"
           >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
-                postWorkout 
-                  ? 'bg-accent1 border-accent1 text-text-high' 
-                  : 'bg-surf border-white/27 text-text-low'
-              }`}>
-                {postWorkout ? '✓' : '&'}
+              <div
+                className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${
+                  postWorkout
+                    ? "bg-accent1 border-accent1 text-text-high"
+                    : "bg-surf border-white/27 text-text-low"
+                }`}
+              >
+                {postWorkout ? "✓" : "&"}
               </div>
-              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
-                postWorkout ? 'text-accent1' : 'text-text-high'
-              }`}>
+              <p
+                className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${
+                  postWorkout ? "text-accent1" : "text-text-high"
+                }`}
+              >
                 Post-entreno
               </p>
               <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
@@ -1005,7 +1229,7 @@ const Dashboard = () => {
             PESO DE HOY
           </p>
           <button
-            onClick={() => navigate('#')}
+            onClick={() => navigate("#")}
             className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
           >
             Historial &
@@ -1021,7 +1245,7 @@ const Dashboard = () => {
               onClick={() => setShowWeightInput(!showWeightInput)}
               className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm"
             >
-              {todayWeight ? '✏️' : '+'}
+              {todayWeight ? "✏️" : "+"}
             </button>
           </div>
 
@@ -1067,7 +1291,8 @@ const Dashboard = () => {
                 {monthlyChange !== null && (
                   <div className="bg-surf rounded-xl py-2 px-3.5 border border-accent2 shadow-sm">
                     <p className="font-heading font-extrabold text-accent2 text-[20px] leading-tight">
-                      {monthlyChange > 0 ? '+' : ''}{monthlyChange.toFixed(1)}
+                      {monthlyChange > 0 ? "+" : ""}
+                      {monthlyChange.toFixed(1)}
                     </p>
                     <p className="font-subheading font-semibold text-text-low text-[11px] leading-tight mt-0.5">
                       kg/mes
@@ -1080,7 +1305,8 @@ const Dashboard = () => {
                 <div className="mt-3">
                   <span className="inline-flex items-center bg-surf rounded-xl py-1.5 px-3.5 border border-accent2 font-subheading font-semibold text-[14px] text-accent2 shadow-sm">
                     <span className="mr-1.5">📊</span>
-                    {weeklyChange > 0 ? '+' : ''}{weeklyChange.toFixed(1)} kg esta semana
+                    {weeklyChange > 0 ? "+" : ""}
+                    {weeklyChange.toFixed(1)} kg esta semana
                   </span>
                 </div>
               )}
@@ -1112,7 +1338,7 @@ const Dashboard = () => {
             HISTORIAL SEMANAL
           </p>
           <button
-            onClick={() => navigate('#')}
+            onClick={() => navigate("#")}
             className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
           >
             Ver todo &
@@ -1121,39 +1347,41 @@ const Dashboard = () => {
 
         <Card>
           <p className="font-subheading font-bold text-text-low text-[16px] mb-4">
-            {new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase()}
+            {new Date()
+              .toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+              .toUpperCase()}
           </p>
 
           <div className="flex items-center justify-between">
             {weekDays.map((day, index) => {
               const isCompleted = isDateCompleted(day.fullDate);
-              
+
               return (
                 <button
                   key={index}
                   onClick={() => handleDayClick(day)}
                   className={`flex flex-col items-center gap-1.75 transition-all ${
-                    isCompleted ? 'cursor-pointer' : 'cursor-default'
+                    isCompleted ? "cursor-pointer" : "cursor-default"
                   }`}
                   disabled={!isCompleted}
                 >
                   <p className="font-subheading font-bold text-text-low text-[16px]">
                     {day.dayStr}
                   </p>
-                  
-                  <div className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${
-                    isCompleted 
-                      ? 'bg-accent1' 
-                      : day.isToday 
-                        ? 'bg-transparent border-2 border-accent1 text-accent1' 
-                        : 'bg-transparent text-text-low'
-                  }`}>
+
+                  <div
+                    className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${
+                      isCompleted
+                        ? "bg-accent1"
+                        : day.isToday
+                          ? "bg-transparent border-2 border-accent1 text-accent1"
+                          : "bg-transparent text-text-low"
+                    }`}
+                  >
                     {day.dayNum}
                   </div>
-                  
-                  <p className="text-[14px]">
-                    {isCompleted ? '✓' : '·'}
-                  </p>
+
+                  <p className="text-[14px]">{isCompleted ? "✓" : "·"}</p>
                 </button>
               );
             })}
@@ -1166,7 +1394,9 @@ const Dashboard = () => {
               </p>
               <div className="flex gap-3 text-[14px] text-text-low">
                 <span>⏱️ {selectedSession.duration_minutes || 0} min</span>
-                <span>💪 {selectedSession.exercises_completed || 0} ejercicios</span>
+                <span>
+                  💪 {selectedSession.exercises_completed || 0} ejercicios
+                </span>
                 <span>🔢 {selectedSession.total_sets || 0} series</span>
               </div>
               {selectedSession.notes && (
