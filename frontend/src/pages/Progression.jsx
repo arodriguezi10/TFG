@@ -25,17 +25,14 @@ const Progression = () => {
       loadUserSubscription();
       fetchProgressions();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
-    // Recargar si acabamos de completar una rutina
+    // ✅ Recargar si acabamos de completar una rutina
     if (location.state?.justCompleted) {
       fetchProgressions();
-      // Limpiar el state para que no se recargue constantemente
       window.history.replaceState({}, document.title);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const loadUserSubscription = async () => {
@@ -62,7 +59,6 @@ const Progression = () => {
     try {
       setLoading(true);
 
-      // Cargar progresión activa
       const { data: progressionData, error: progressionError } = await supabase
         .from("progressions")
         .select("*")
@@ -80,7 +76,6 @@ const Progression = () => {
       if (progressionData) {
         setActiveProgression(progressionData);
 
-        // Cargar bloques de rutinas
         const { data: blocks, error: blocksError } = await supabase
           .from("progression_routine_blocks")
           .select(
@@ -101,7 +96,7 @@ const Progression = () => {
           setProgressionBlocks(blocks);
         }
 
-        // Cargar asignaciones del calendario PRIMERO
+        // ✅ Cargar asignaciones del calendario PRIMERO
         const { data: calendar, error: calendarError } = await supabase
           .from("progression_calendar")
           .select("*")
@@ -118,7 +113,7 @@ const Progression = () => {
           setCalendarAssignments(assignments);
         }
 
-        // AHORA cargar días completados usando las asignaciones
+        // ✅ AHORA cargar días completados usando las asignaciones
         const startDate = new Date(progressionData.start_date);
         const endDate = new Date(startDate);
         endDate.setDate(
@@ -135,7 +130,7 @@ const Progression = () => {
         if (!sessionsError && sessions) {
           const completed = new Set();
           sessions.forEach((session) => {
-            // Verificar que la rutina del día coincide con la planificada
+            // ✅ Verificar que la rutina del día coincide con la planificada
             const assignment = assignments[session.session_date];
             if (assignment && assignment.routineId === session.routine_id) {
               completed.add(session.session_date);
@@ -204,6 +199,7 @@ const Progression = () => {
       const newIndex = currentWeekIndex - 1;
       setCurrentWeekIndex(newIndex);
       generateWeekCalendar(activeProgression, newIndex);
+      setSelectedDayDetail(null); // Cerrar detalle al cambiar semana
     }
   };
 
@@ -212,6 +208,7 @@ const Progression = () => {
       const newIndex = currentWeekIndex + 1;
       setCurrentWeekIndex(newIndex);
       generateWeekCalendar(activeProgression, newIndex);
+      setSelectedDayDetail(null); // Cerrar detalle al cambiar semana
     }
   };
 
@@ -220,10 +217,12 @@ const Progression = () => {
     return block?.color_code || "#6c63ff";
   };
 
+  // ✅ PROGRESO BASADO EN DÍAS COMPLETADOS
   const getProgressPercentage = () => {
     if (!activeProgression) return 0;
-    const weeksPassed = currentWeekIndex + 1;
-    return (weeksPassed / activeProgression.duration_weeks) * 100;
+    const totalDays = activeProgression.duration_weeks * 7;
+    const completedCount = completedDays.size;
+    return (completedCount / totalDays) * 100;
   };
 
   const handleCreateProgression = () => {
@@ -262,12 +261,21 @@ const Progression = () => {
     }
   };
 
-  const handleStartRoutine = (routineId) => {
+  // ✅ SOLO PERMITIR INICIAR RUTINA SI ES HOY
+  const handleStartRoutine = (routineId, dayFullDate) => {
+    const todayDate = new Date().toISOString().split("T")[0];
+    
+    // Verificar que sea el día de hoy
+    if (dayFullDate !== todayDate) {
+      alert("⚠️ Solo puedes iniciar la rutina el día que te toca");
+      return;
+    }
+
     navigate(`/executeRoutine/${routineId}`, {
       state: {
         fromProgression: true,
         progressionId: activeProgression.id,
-        completedDate: selectedDayDetail.fullDate,
+        completedDate: dayFullDate,
       },
     });
   };
@@ -788,7 +796,7 @@ const Progression = () => {
                   </p>
                 </div>
               </div>
-            ) : (
+            ) : selectedDayDetail.isToday ? (
               <Button
                 variant="outlined"
                 text="⚡ Iniciar entrenamiento"
@@ -797,15 +805,27 @@ const Progression = () => {
                 borderColor="border-accent1"
                 w="w-full"
                 onClick={() =>
-                  handleStartRoutine(selectedDayDetail.routine.id)
+                  handleStartRoutine(selectedDayDetail.routine.id, selectedDayDetail.fullDate)
                 }
               />
+            ) : (
+              <div className="bg-surf/50 border border-text-low rounded-xl p-4 flex items-center gap-3">
+                <span className="text-[24px]">🔒</span>
+                <div className="flex-1">
+                  <p className="font-heading font-bold text-[14px] text-text-low">
+                    Solo disponible el día indicado
+                  </p>
+                  <p className="font-body text-[12px] text-text-low">
+                    Podrás iniciar esta rutina cuando llegue su día
+                  </p>
+                </div>
+              </div>
             )}
           </Card>
         )}
       </section>
 
-      {/* BARRA DE PROGRESO */}
+      {/* BARRA DE PROGRESO - BASADA EN COMPLETADOS */}
       <section className="mt-4">
         <Card>
           <div className="flex items-center justify-between mb-2">
@@ -826,10 +846,10 @@ const Progression = () => {
 
           <div className="flex items-center justify-between mt-2">
             <p className="font-body text-[12px] text-text-low">
-              Semana {currentWeekIndex + 1}
+              {completedDays.size} días completados
             </p>
             <p className="font-body text-[12px] text-text-low">
-              Semana {activeProgression.duration_weeks}
+              {activeProgression.duration_weeks * 7} días totales
             </p>
           </div>
         </Card>

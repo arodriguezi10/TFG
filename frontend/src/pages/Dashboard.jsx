@@ -48,33 +48,32 @@ const Dashboard = () => {
   const [progressionCompletedDays, setProgressionCompletedDays] = useState(new Set());
   const [progressionBlocks, setProgressionBlocks] = useState([]);
   const [todayProgressionRoutine, setTodayProgressionRoutine] = useState(null);
+  const [currentProgressionWeek, setCurrentProgressionWeek] = useState(0);
 
   useEffect(() => {
     loadData();
     loadDailyChecks();
     loadWeightData();
     loadWeekData();
-    loadProgressionData(); // ✅ CARGAR PROGRESIÓN
+    loadProgressionData();
   }, []);
 
   useEffect(() => {
-    // Guardar la fecha del último check
     let lastCheckDate = new Date().toDateString();
 
     const checkMidnight = setInterval(() => {
       const currentDate = new Date().toDateString();
       
-      // Si la fecha cambió desde el último check
       if (currentDate !== lastCheckDate) {
         console.log('🌅 Nuevo día detectado - reseteando datos');
         resetDailyChecks();
         loadWeightData();
         loadWeekData();
         loadData();
-        loadProgressionData(); // ✅ RECARGAR PROGRESIÓN
+        loadProgressionData();
         lastCheckDate = currentDate;
       }
-    }, 30000); // Revisar cada 30 segundos
+    }, 30000);
 
     return () => clearInterval(checkMidnight);
   }, []);
@@ -82,7 +81,6 @@ const Dashboard = () => {
   // ✅ FUNCIÓN PARA CARGAR PROGRESIÓN
   const loadProgressionData = async () => {
     try {
-      // Cargar progresión activa
       const { data: progressionData, error: progressionError } = await supabase
         .from("progressions")
         .select("*")
@@ -99,7 +97,6 @@ const Dashboard = () => {
 
       setActiveProgression(progressionData);
 
-      // Cargar bloques de rutinas
       const { data: blocks } = await supabase
         .from("progression_routine_blocks")
         .select(`
@@ -121,7 +118,6 @@ const Dashboard = () => {
         setProgressionBlocks(blocks);
       }
 
-      // Cargar asignaciones del calendario
       const { data: calendar } = await supabase
         .from("progression_calendar")
         .select("*")
@@ -137,7 +133,6 @@ const Dashboard = () => {
         });
         setProgressionAssignments(assignments);
 
-        // ✅ VERIFICAR SI HOY HAY RUTINA DE PROGRESIÓN
         const todayDate = new Date().toISOString().split("T")[0];
         const todayAssignment = assignments[todayDate];
 
@@ -148,7 +143,6 @@ const Dashboard = () => {
           if (routineBlock) {
             setTodayProgressionRoutine(routineBlock.routines);
             
-            // Verificar si ya se completó hoy
             const isCompleted = await checkIfRoutineCompletedToday(routineBlock.routines.id);
             setRoutineCompletedToday(isCompleted);
           }
@@ -157,7 +151,6 @@ const Dashboard = () => {
         }
       }
 
-      // Cargar días completados
       const startDate = new Date(progressionData.start_date);
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + progressionData.duration_weeks * 7);
@@ -180,8 +173,9 @@ const Dashboard = () => {
         setProgressionCompletedDays(completed);
       }
 
-      // Generar calendario semanal de progresión
-      generateProgressionWeekCalendar();
+      // ✅ Calcular semana actual basada en TODAY
+      calculateCurrentProgressionWeek(progressionData);
+      generateProgressionWeekCalendar(progressionData, currentProgressionWeek);
 
     } catch (error) {
       console.error("Error cargando progresión:", error);
@@ -190,16 +184,30 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ GENERAR CALENDARIO SEMANAL DE PROGRESIÓN
-  const generateProgressionWeekCalendar = () => {
+  // ✅ CALCULAR SEMANA ACTUAL DE PROGRESIÓN
+  const calculateCurrentProgressionWeek = (progression) => {
+    const startDate = new Date(progression.start_date);
     const today = new Date();
-    const currentDay = today.getDay();
-    const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+    const diffTime = today - startDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const weekIndex = Math.floor(diffDays / 7);
+
+    const clampedWeek = Math.max(
+      0,
+      Math.min(weekIndex, progression.duration_weeks - 1)
+    );
+    setCurrentProgressionWeek(clampedWeek);
+  };
+
+  // ✅ GENERAR CALENDARIO SEMANAL DE PROGRESIÓN
+  const generateProgressionWeekCalendar = (progression, weekOffset) => {
+    const startDate = new Date(progression.start_date);
+    startDate.setDate(startDate.getDate() + weekOffset * 7);
 
     const days = [];
     for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + mondayOffset + i);
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
 
       const dayName = currentDate.toLocaleDateString("es-ES", {
         weekday: "short",
@@ -219,17 +227,39 @@ const Dashboard = () => {
     setProgressionWeekDays(days);
   };
 
-  // ✅ OBTENER COLOR DE RUTINA
+  // ✅ NAVEGACIÓN DE SEMANAS EN DASHBOARD
+  const handlePreviousProgressionWeek = () => {
+    if (currentProgressionWeek > 0) {
+      const newWeek = currentProgressionWeek - 1;
+      setCurrentProgressionWeek(newWeek);
+      generateProgressionWeekCalendar(activeProgression, newWeek);
+    }
+  };
+
+  const handleNextProgressionWeek = () => {
+    if (currentProgressionWeek < activeProgression.duration_weeks - 1) {
+      const newWeek = currentProgressionWeek + 1;
+      setCurrentProgressionWeek(newWeek);
+      generateProgressionWeekCalendar(activeProgression, newWeek);
+    }
+  };
+
   const getRoutineColor = (routineId) => {
     const block = progressionBlocks.find((b) => b.routine_id === routineId);
     return block?.color_code || "#6c63ff";
   };
 
-  // ✅ MANEJAR CLICK EN DÍA DE PROGRESIÓN
+  // ✅ MANEJAR CLICK EN DÍA DE PROGRESIÓN (SOLO HOY)
   const handleProgressionDayClick = (day) => {
     const assignment = progressionAssignments[day.fullDate];
 
     if (!assignment || assignment.type === "rest") {
+      return;
+    }
+
+    // ✅ SOLO PERMITIR INICIAR SI ES HOY
+    const todayDate = new Date().toISOString().split("T")[0];
+    if (day.fullDate !== todayDate) {
       return;
     }
 
@@ -275,11 +305,9 @@ const Dashboard = () => {
 
   const loadWeekData = async () => {
     try {
-      // Generar array de los 7 días de la semana actual (Lunes a Domingo)
       const currentWeek = getCurrentWeekDays();
       setWeekDays(currentWeek);
 
-      // Obtener sesiones completadas de esta semana
       const startOfWeek = currentWeek[0].fullDate;
       const endOfWeek = currentWeek[6].fullDate;
 
@@ -299,9 +327,8 @@ const Dashboard = () => {
 
   const getCurrentWeekDays = () => {
     const today = new Date();
-    const currentDay = today.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+    const currentDay = today.getDay();
     
-    // Ajustar para que la semana empiece en Lunes
     const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
     
     const weekDays = [];
@@ -334,15 +361,12 @@ const Dashboard = () => {
   };
 
   const handleDayClick = (day) => {
-    // Solo permitir click en días completados
     const session = getSessionForDate(day.fullDate);
     
     if (session) {
-      // Día completado - mostrar resumen
       setSelectedDay(day);
       setSelectedSession(session);
     } else {
-      // Día sin completar - no hacer nada
       setSelectedDay(null);
       setSelectedSession(null);
     }
@@ -365,10 +389,7 @@ const Dashboard = () => {
 
       setName(userData?.first_name ?? "");
 
-      // ✅ SOLO CARGAR RUTINAS NORMALES SI NO HAY PROGRESIÓN
-      // Si hay progresión activa, no mostrar rutinas normales
       if (!activeProgression) {
-        // Obtener todas las rutinas del usuario
         const { data: routines, error } = await supabase
           .from("routines")
           .select(`
@@ -387,7 +408,6 @@ const Dashboard = () => {
           return;
         }
 
-        // Buscar la rutina que corresponde al día de hoy
         const todayDayName = getTodayDayName();
         
         const routineForToday = routines?.find(routine => {
@@ -408,7 +428,6 @@ const Dashboard = () => {
           setRoutineCompletedToday(false);
         }
       } else {
-        // Si hay progresión, no cargar rutinas normales
         setTodayRoutine(null);
       }
 
@@ -474,7 +493,7 @@ const Dashboard = () => {
         .select('*')
         .eq('user_id', user.id)
         .gte('log_date', sevenDaysAgoDate)
-        .order('log_date', { ascending: true });
+        .order('log_date', { ascending: true});
 
       const last7DaysArray = [];
       for (let i = 6; i >= 0; i--) {
@@ -484,7 +503,6 @@ const Dashboard = () => {
         
         const weightLog = last7DaysData?.find(w => w.log_date === dateStr);
         
-        // Obtener nombre del día correctamente (L, M, X, J, V, S, D)
         const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
         const firstLetter = dayName === 'mié' ? 'X' : dayName.charAt(0).toUpperCase();
         
@@ -596,7 +614,6 @@ const Dashboard = () => {
   };
 
   const handleStartRoutine = () => {
-    // ✅ Si hay progresión con rutina hoy, iniciar esa
     if (todayProgressionRoutine) {
       const todayDate = new Date().toISOString().split("T")[0];
       navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
@@ -607,11 +624,9 @@ const Dashboard = () => {
         },
       });
     } 
-    // Si no hay progresión pero hay rutina normal hoy
     else if (todayRoutine) {
       navigate(`/executeRoutine/${todayRoutine.id}`);
     } 
-    // Si no hay ninguna rutina, ir a ver rutinas
     else {
       navigate("/routines1");
     }
@@ -697,7 +712,6 @@ const Dashboard = () => {
     );
   };
 
-  // ✅ DETERMINAR QUÉ RUTINA MOSTRAR (PROGRESIÓN O NORMAL)
   const displayRoutine = todayProgressionRoutine || todayRoutine;
   const stats = getRoutineStats(displayRoutine);
 
@@ -721,12 +735,12 @@ const Dashboard = () => {
         </div>
       </section>
 
-      {/* ✅ SECCIÓN DE PROGRESIÓN - MOSTRAR PRIMERO SI EXISTE */}
+      {/* ✅ SECCIÓN DE PROGRESIÓN CON NAVEGACIÓN */}
       {activeProgression && (
         <section className="mt-4 flex flex-col px-4 gap-3">
           <div className="w-full flex justify-between items-center">
             <p className="font-subheading font-bold text-text-high text-[16px]">
-              📅 ESTA SEMANA (PROGRESIÓN)
+              📅 SEMANA {currentProgressionWeek + 1} (PROGRESIÓN)
             </p>
             <button
               onClick={() => navigate("/progression")}
@@ -737,12 +751,37 @@ const Dashboard = () => {
           </div>
 
           <Card>
-            <p className="font-subheading font-bold text-text-low text-[12px] mb-1 uppercase tracking-wide">
-              {activeProgression.name}
-            </p>
-            <p className="font-body text-[11px] text-text-low mb-4">
-              Objetivo: {activeProgression.goal}
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-subheading font-bold text-text-low text-[11px] uppercase tracking-wide">
+                {activeProgression.name}
+              </p>
+
+              {/* ✅ BOTONES DE NAVEGACIÓN */}
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePreviousProgressionWeek}
+                  disabled={currentProgressionWeek === 0}
+                  className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] transition-colors ${
+                    currentProgressionWeek === 0
+                      ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed"
+                      : "bg-surf border-text-low text-text-high hover:bg-surface"
+                  }`}
+                >
+                  ←
+                </button>
+                <button
+                  onClick={handleNextProgressionWeek}
+                  disabled={currentProgressionWeek >= activeProgression.duration_weeks - 1}
+                  className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] transition-colors ${
+                    currentProgressionWeek >= activeProgression.duration_weeks - 1
+                      ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed"
+                      : "bg-surf border-text-low text-text-high hover:bg-surface"
+                  }`}
+                >
+                  →
+                </button>
+              </div>
+            </div>
 
             <div className="flex items-center justify-between">
               {progressionWeekDays.map((day, index) => {
@@ -751,14 +790,16 @@ const Dashboard = () => {
                 const routineId = assignment?.routineId;
                 const color = routineId ? getRoutineColor(routineId) : null;
                 const isCompleted = progressionCompletedDays.has(day.fullDate);
+                const todayDate = new Date().toISOString().split("T")[0];
+                const canStart = day.fullDate === todayDate && !isCompleted && !isRest && assignment;
 
                 return (
                   <button
                     key={index}
                     onClick={() => handleProgressionDayClick(day)}
-                    disabled={isCompleted || isRest || !assignment}
+                    disabled={!canStart}
                     className={`flex flex-col items-center gap-1.5 relative transition-all ${
-                      !isCompleted && !isRest && assignment ? 'cursor-pointer' : 'cursor-default'
+                      canStart ? 'cursor-pointer' : 'cursor-default'
                     }`}
                   >
                     <p className="font-subheading font-bold text-[12px] text-text-low">
@@ -792,7 +833,6 @@ const Dashboard = () => {
                             : "·"}
                     </p>
 
-                    {/* Indicador de color superior */}
                     {color && !isCompleted && (
                       <div
                         className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full"
@@ -807,7 +847,7 @@ const Dashboard = () => {
         </section>
       )}
 
-      {/* ✅ RUTINA DE HOY (PROGRESIÓN O NORMAL) */}
+      {/* RUTINA DE HOY */}
       <section className="mt-4 flex flex-col px-4 items-center justify-center leading-tight">
         {loading ? (
           <Card>
@@ -1066,7 +1106,6 @@ const Dashboard = () => {
         </Card>
       </section>
 
-      {/* CALENDARIO SEMANAL (RUTINAS NORMALES) */}
       <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
         <div className="w-full flex justify-between">
           <p className="font-subheading font-bold text-text-high text-[16px]">
@@ -1120,7 +1159,6 @@ const Dashboard = () => {
             })}
           </div>
 
-          {/* RESUMEN DE DÍA SELECCIONADO */}
           {selectedDay && selectedSession && (
             <div className="mt-4 pt-4 border-t border-text-low">
               <p className="font-heading font-bold text-text-high text-[18px] mb-2">
