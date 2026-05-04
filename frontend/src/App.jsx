@@ -278,7 +278,6 @@ const App = () => {
                 </PrivateRoute>
               } 
             />
-
             
 
             <Route
