@@ -217,7 +217,7 @@ const Progression = () => {
     return block?.color_code || "#6c63ff";
   };
 
-  // ✅ PROGRESO BASADO EN DÍAS COMPLETADOS
+  //PROGRESO BASADO EN DÍAS COMPLETADOS
   const getProgressPercentage = () => {
     if (!activeProgression) return 0;
     const totalDays = activeProgression.duration_weeks * 7;
@@ -261,13 +261,13 @@ const Progression = () => {
     }
   };
 
-  // ✅ SOLO PERMITIR INICIAR RUTINA SI ES HOY
+  // SOLO PERMITIR INICIAR RUTINA SI ES HOY
   const handleStartRoutine = (routineId, dayFullDate) => {
     const todayDate = new Date().toISOString().split("T")[0];
     
     // Verificar que sea el día de hoy
     if (dayFullDate !== todayDate) {
-      alert("⚠️ Solo puedes iniciar la rutina el día que te toca");
+      alert("Solo puedes iniciar la rutina el día que te toca");
       return;
     }
 
