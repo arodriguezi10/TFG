@@ -26,7 +26,7 @@ const Progress = () => {
 }, [user]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-24">
+    <div className="min-h-screen bg-background flex flex-col pb-3">
       <section className="w-full px-4 pt-4 pb-2">
         <h1 className="font-heading font-extrabold text-[32px] text-text-high">
           Progreso
