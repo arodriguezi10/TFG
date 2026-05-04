@@ -36,6 +36,7 @@ import CreatePersonalExercise from "./pages/CreatePersonalExercise";
 import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
+import Progress from "./pages/Progress";
 import Subscription from "./pages/Subscription";
 import Onboarding from "./pages/Onboarding";
 
@@ -278,6 +279,8 @@ const App = () => {
               } 
             />
 
+            
+
             <Route
               element={
                 <PrivateRoute>
@@ -287,7 +290,7 @@ const App = () => {
             >
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/routines1" element={<Routines1 />} />
-              <Route path="/" element={<Home />} />
+              <Route path="/progress" element={<Progress />} />
             </Route>
           </Routes>
         </RoutineProvider>

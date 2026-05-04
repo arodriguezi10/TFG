@@ -41,7 +41,7 @@ const MainLayout = () => {
             <span className="text-xs md:text-base font-medium">Rutinas</span>
           </Link>
           <Link
-            to="/"
+            to="/progress"
             className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
           >
             <span className="text-xl">📊</span>
