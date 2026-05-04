@@ -279,7 +279,13 @@ const Profile = () => {
             <div className="w-full h-px bg-text-low"></div>
 
             <button 
-              onClick={() => navigate("#")}
+              onClick={() => {
+                if (userData.subscription_tier === 'free') {
+                  navigate("/subscription");
+                } else {
+                  navigate("/subscriptionDetails");
+                }
+              }}
               className="w-full"
             >
               <div className="flex items-center justify-between">

@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import PersonalSettings from "./pages/PersonalSettings";
 import Checkout from "./pages/Checkout";
 import PaymentConfirmation from "./pages/PaymentConfirmation";
+import SubscriptionDetails from "./pages/SubcriptionDetails";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoutes";
@@ -102,6 +103,15 @@ const App = () => {
               element={
                 <PrivateRoute>
                   <PaymentConfirmation />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/subscriptionDetails" 
+              element={
+                <PrivateRoute>
+                  <SubscriptionDetails />
                 </PrivateRoute>
               } 
             />

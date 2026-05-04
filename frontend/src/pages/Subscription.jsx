@@ -467,6 +467,15 @@ const Subscription = () => {
           <p className='font-body text-[12px] text-text-low'>🔒 Pago 100% seguro. Cancela cuando quieras</p>        
       </section>
 
+      <div className="w-full px-4 mt-2 text-center">
+        <button
+          onClick={() => navigate("/subscriptionDetails")}
+          className="font-body text-[13px] text-text-low underline underline-offset-2"
+        >
+          Por ahora no, ver mis datos
+        </button>
+      </div>
+
       {/* STICKY CTA */}
       <div className="w-full px-4 fixed bottom-1 gap-2.5">
           <Button 
