@@ -460,7 +460,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
                   <p className="font-body text-[11px] text-text-low">
                     Registrado el {formatAxisDate(chartData.find((d) => d.weight === pr.actual_weight)?.date || "")}
                   </p>
-                  <span className="mt-1 inline-flex bg-accent3/10 border border-accent3 rounded-full px-3 py-1 font-subheading font-bold text-[12px] text-accent3">
+                  <span className="mt-1 inline-flex bg-accent3/10 border border-text-low rounded-full px-3 py-1 font-subheading font-bold text-[12px] text-text-low">
                     +{Math.round((pr.actual_weight - (chartData[0]?.weight || pr.actual_weight)) * 10) / 10}kg vs anterior
                   </span>
                 </div>

@@ -1,61 +1,43 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const MainLayout = () => {
+  const location = useLocation();
+
+  const navItems = [
+    { to: "/dashboard", icon: "🏠", label: "Home" },
+    { to: "/routines1", icon: "📋", label: "Rutinas" },
+    { to: "/progress",  icon: "📊", label: "Progreso" },
+    { to: "/checkout",  icon: "💬", label: "Chat" },
+  ];
+
   return (
-    // En móvil es columna (contenido arriba, menú abajo). En PC (md:) es fila (menú izq, contenido der)
-    <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row text-white font-sans">
-      {/* 1. CONTENEDOR PRINCIPAL */}
-      {/* pb-20 deja espacio abajo en móvil para que el menú no tape el texto */}
-      <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
+    <div className="min-h-screen bg-background flex flex-col">
+      <main className="flex-1 overflow-y-auto pb-20">
         <Outlet />
       </main>
 
-      {/* 2. MENÚ DE NAVEGACIÓN */}
-      {/* Móvil: fixed abajo, ocupa todo el ancho. PC (md:): relativo a la izquierda, ancho 64 */}
-      <aside
-        className="fixed bottom-0 w-full bg-slate-900 border-t border-slate-800 
-                        md:relative md:w-64 md:border-t-0 md:border-r md:flex md:flex-col md:p-6 z-50"
-      >
-        {/* Título de la App (Oculto en móvil, visible en PC) */}
-        <div className="hidden md:block mb-10">
-          <h1 className="text-2xl font-black text-blue-500 tracking-wider">
-            FYLIOS
-          </h1>
+      <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-text-low/20 z-50">
+        <div className="flex flex-row justify-around p-2 pb-4">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.to;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="flex flex-col items-center gap-1 p-2"
+              >
+                <span className={`text-xl ${isActive ? "opacity-100" : "opacity-40"}`}>
+                  {item.icon}
+                </span>
+                <span className={`text-xs font-medium ${isActive ? "text-primary" : "text-text-low"}`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </div>
-
-        {/* Botones de navegación (Fila en móvil, Columna en PC) */}
-        <nav className="flex flex-row justify-around p-2 md:flex-col md:p-0 md:space-y-4">
-          <Link
-            to="/dashboard"
-            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
-          >
-            <span className="text-xl">🏠</span>
-            <span className="text-xs md:text-base font-medium">Panel</span>
-          </Link>
-          <Link
-            to="/routines1"
-            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
-          >
-            <span className="text-xl">&</span>
-            <span className="text-xs md:text-base font-medium">Rutinas</span>
-          </Link>
-          <Link
-            to="/progress"
-            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
-          >
-            <span className="text-xl">📊</span>
-            <span className="text-xs md:text-base font-medium">Progreso</span>
-          </Link>
-          <Link
-            to="/checkout"
-            className="flex flex-col md:flex-row items-center gap-1 md:gap-3 p-2 text-slate-400 hover:text-white"
-          >
-            <span className="text-xl">💳</span>
-            <span className="text-xs md:text-base font-medium">Chat</span>
-          </Link>
-        </nav>
-      </aside>
+      </nav>
     </div>
   );
 };

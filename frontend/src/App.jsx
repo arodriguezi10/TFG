@@ -37,6 +37,7 @@ import ConfigExerciseFree from "./pages/ConfigExerciseFree";
 import ConfigExercisePro from "./pages/ConfigExercisePro";
 import ConfigExerciseElite from "./pages/ConfigExerciseElite";
 import Progress from "./pages/Progress";
+import DailyRegister from "./pages/DailyRegister";
 import Subscription from "./pages/Subscription";
 import Onboarding from "./pages/Onboarding";
 
@@ -275,6 +276,15 @@ const App = () => {
               element={
                 <PrivateRoute>
                   <CreateProgression />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/dailyRegister" 
+              element={
+                <PrivateRoute>
+                  <DailyRegister />
                 </PrivateRoute>
               } 
             />
