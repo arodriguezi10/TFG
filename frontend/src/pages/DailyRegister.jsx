@@ -3,10 +3,69 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 
-const getLocalDate = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-};
+// Input de texto en vez de number para evitar el problema de un solo digito
+  const MeasurementInput = ({ label, value, onChange, unit, placeholder }) => (
+    <div className="flex flex-col gap-1 flex-1 min-w-0">
+      <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
+        {label}
+      </p>
+      <div className="flex items-center gap-1">
+        <input
+          type="text"
+          inputMode="decimal"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => {
+            // Solo permitir numeros y punto/coma decimal
+            const val = e.target.value.replace(",", ".");
+            if (val === "" || /^\d*\.?\d*$/.test(val)) {
+              onChange(val);
+            }
+          }}
+          className="min-w-0 w-full bg-background border border-text-low rounded-xl px-2 py-2.5 font-heading font-bold text-[18px] text-text-high outline-none focus:border-primary transition-colors text-center"
+        />
+        <span className="font-body text-[13px] text-text-low shrink-0">{unit}</span>
+      </div>
+    </div>
+  );
+
+  const NumberSelector = ({ value, onChange, color = "#ff6b9d" }) => (
+    <div className="flex gap-1.5 flex-wrap">
+      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+        <button
+          key={num}
+          onClick={() => onChange(num)}
+          className="h-8 w-8 rounded-full font-heading font-bold text-[14px] border transition-all"
+          style={{
+            backgroundColor: value === num ? color : "transparent",
+            borderColor: value === num ? color : "#6b6b8a",
+            color: value === num ? "#fff" : "#6b6b8a",
+          }}
+        >
+          {num}
+        </button>
+      ))}
+    </div>
+    );
+
+  const OptionSelector = ({ options, value, onChange, color = "#36d9b8" }) => (
+    <div className="flex gap-2 flex-wrap">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          onClick={() => onChange(opt)}
+          className="px-3 py-1 rounded-full font-subheading font-bold text-[13px] border transition-all"
+          style={{
+            backgroundColor: value === opt ? `${color}20` : "transparent",
+            borderColor: value === opt ? color : "#6b6b8a",
+            color: value === opt ? color : "#6b6b8a",
+          }}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
 
 const DailyRegister = () => {
   const navigate = useNavigate();
@@ -32,17 +91,22 @@ const DailyRegister = () => {
     }
     setSaving(true);
     try {
-      const todayDate = getLocalDate();
-      const { data: existing } = await supabase
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - (day === 0 ? 6 : day - 1);
+      d.setDate(diff);
+      const weekStart = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+      const { data: existing} = await supabase
         .from("daily_checkins")
         .select("id")
         .eq("user_id", user.id)
-        .eq("checkin_date", todayDate)
-        .single();
+        .eq("checkin_date", weekStart)
+        .maybeSingle(); // <- cambia single() por maybeSingle()
 
       const payload = {
         user_id: user.id,
-        checkin_date: todayDate,
+        checkin_date: weekStart,
         sleep_quality: sleepQuality,
         energy_level: energyLevel,
         muscle_fatigue: muscleFatigue,
@@ -72,65 +136,8 @@ const DailyRegister = () => {
     }
   };
 
-  const NumberSelector = ({ value, onChange, color = "#ff6b9d" }) => (
-    <div className="flex gap-1.5 flex-wrap">
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-        <button
-          key={num}
-          onClick={() => onChange(num)}
-          className="h-8 w-8 rounded-full font-heading font-bold text-[14px] border transition-all"
-          style={{
-            backgroundColor: value === num ? color : "transparent",
-            borderColor: value === num ? color : "#6b6b8a",
-            color: value === num ? "#fff" : "#6b6b8a",
-          }}
-        >
-          {num}
-        </button>
-      ))}
-    </div>
-  );
-
-  const OptionSelector = ({ options, value, onChange, color = "#36d9b8" }) => (
-    <div className="flex gap-2 flex-wrap">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          onClick={() => onChange(opt)}
-          className="px-3 py-1 rounded-full font-subheading font-bold text-[13px] border transition-all"
-          style={{
-            backgroundColor: value === opt ? `${color}20` : "transparent",
-            borderColor: value === opt ? color : "#6b6b8a",
-            color: value === opt ? color : "#6b6b8a",
-          }}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
-
-  const MeasurementInput = ({ label, value, onChange, unit, placeholder }) => (
-    <div className="flex flex-col gap-1">
-      <p className="font-subheading font-bold text-[16px] text-text-low uppercase tracking-wide">
-        {label}
-      </p>
-      <div className="flex items-center gap-1">
-        <input
-          type="number"
-          step="0.1"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full min-w-0 bg-background border border-text-low rounded-xl px-3 py-2.5 font-heading font-bold text-[18px] text-text-high outline-none focus:border-primary transition-colors"
-        />
-        <span className="font-body text-[13px] text-text-low w-6">{unit}</span>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-background max-w-md mx-auto">
+    <div className="min-h-screen bg-background">
       <div className="flex flex-col pb-28 px-4">
 
         {/* HEADER */}
@@ -147,7 +154,7 @@ const DailyRegister = () => {
                 Progreso · Cuerpo
               </p>
               <h1 className="font-heading font-extrabold text-[20px] text-text-high leading-tight">
-                Registro de hoy
+                Registro semanal
               </h1>
             </div>
           </div>
@@ -155,29 +162,32 @@ const DailyRegister = () => {
 
         {/* MEDIDAS CORPORALES */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1.5">
-            <p className="font-subheading font-bold text-text-low text-[16px] uppercase tracking-wide">
-              Medidas corporales
-            </p>
-          </div>
+          <p className="font-subheading font-bold text-text-low text-[13px] uppercase tracking-wide mb-3">
+            Medidas corporales
+          </p>
 
           <div className="bg-surf border border-text-low rounded-2xl p-4 flex flex-col gap-4">
+
             {/* GRASA CORPORAL */}
             <div>
-              <p className="font-subheading font-bold text-[16px] text-text-low uppercase tracking-wide mb-2">
+              <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mb-2">
                 % Grasa corporal
               </p>
-              <div className="flex items-center mb-3">
+              <div className="flex items-center gap-2 mb-3">
                 <input
-                  type="number"
-                  step="0.1"
-                  placeholder="14,5"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="14.5"
                   value={bodyFat}
-                  onChange={(e) => setBodyFat(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(",", ".");
+                    if (val === "" || /^\d*\.?\d*$/.test(val)) setBodyFat(val);
+                  }}
                   className="flex-1 bg-background border border-text-low rounded-xl py-3 font-heading font-bold text-[24px] text-text-high outline-none focus:border-primary transition-colors text-center"
                 />
+
               </div>
-              <p className="font-subheading text-[14px] text-text-low mb-2">Selección rápida orientativa:</p>
+              <p className="font-subheading text-[12px] text-text-low mb-2">Selección rápida orientativa:</p>
               <div className="flex gap-2 flex-wrap">
                 {[
                   { label: "Atlético", range: "8-12%",  value: "10" },
@@ -203,25 +213,23 @@ const DailyRegister = () => {
 
             <div className="w-full h-px bg-text-low/20" />
 
-            <div className="flex gap-3 ">
+            <div className="flex gap-3">
               <MeasurementInput label="Cintura" value={waist} onChange={setWaist} unit="cm" placeholder="81" />
               <MeasurementInput label="Pecho"   value={chest} onChange={setChest} unit="cm" placeholder="100" />
             </div>
 
-            <div className="flex gap-3 ">
+            <div className="flex gap-3">
               <MeasurementInput label="Brazo"   value={arm}   onChange={setArm}   unit="cm" placeholder="35" />
               <MeasurementInput label="Pierna"  value={leg}   onChange={setLeg}   unit="cm" placeholder="55" />
             </div>
           </div>
         </div>
 
-        {/* SENSACIONES HOY */}
+        {/* SENSACIONES */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1.5">
-            <p className="font-subheading font-bold text-text-low text-[16px] uppercase tracking-wide">
-              Sensaciones hoy
-            </p>
-          </div>
+          <p className="font-subheading font-bold text-text-low text-[13px] uppercase tracking-wide mb-3">
+            Sensaciones de la semana
+          </p>
 
           <div className="bg-surf border border-text-low rounded-2xl p-4 flex flex-col divide-y divide-text-low/20">
 
@@ -289,14 +297,14 @@ const DailyRegister = () => {
 
         {/* NOTA AL ENTRENADOR */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-3">
             <span className="text-[16px]">💬</span>
-            <p className="font-subheading font-bold text-text-low text-[16px] uppercase tracking-wide">
+            <p className="font-subheading font-bold text-text-low text-[13px] uppercase tracking-wide">
               Nota al entrenador
             </p>
           </div>
           <textarea
-            placeholder="¿Cómo te has sentido hoy? ¿Alguna molestia, cambio en el plan de alimentación o algo que tu entrenador deba saber? Cuéntaselo aquí..."
+            placeholder="¿Cómo te has sentido esta semana? ¿Alguna molestia, cambio en el plan de alimentación o algo que tu entrenador deba saber?"
             value={trainerNote}
             onChange={(e) => setTrainerNote(e.target.value)}
             rows={4}
@@ -306,7 +314,7 @@ const DailyRegister = () => {
       </div>
 
       {/* BOTON GUARDAR */}
-        <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-background overflow-x-hidden">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-background">
         <button
           onClick={handleSave}
           disabled={saving}
