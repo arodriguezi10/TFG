@@ -943,7 +943,7 @@ const Dashboard = () => {
                   <div className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${isCompleted ? "bg-accent1" : day.isToday ? "bg-transparent border-2 border-accent1 text-accent1" : "bg-transparent text-text-low"}`}>
                     {day.dayNum}
                   </div>
-                  <p className="text-[14px]">{isCompleted ? "✓" : "·"}</p>
+                  <p className="text-[14px] text-text-low">{isCompleted ? "✓" : "·"}</p>
                 </button>
               );
             })}
