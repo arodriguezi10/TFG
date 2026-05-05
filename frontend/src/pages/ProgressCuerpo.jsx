@@ -13,6 +13,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
   const [measurements, setMeasurements] = useState([]);
   const [latestMeasurement, setLatestMeasurement] = useState(null);
   const [prevMeasurement, setPrevMeasurement] = useState(null);
+  const [weeklyCheckin, setWeeklyCheckin] = useState(null);
 
   const RANGE_DAYS = { "1M": 30, "3M": 90, "6M": 180, "1A": 365 };
 
@@ -24,48 +25,74 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
   ];
 
   useEffect(() => {
-    if (user) loadMeasurements("1M");
+    if (user) {
+      loadMeasurements("1M");
+      loadWeeklyCheckin();
+    }
   }, [user]);
+
+  // Obtiene el lunes de la semana actual
+  const getWeekStart = () => {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = d.getDate() - (day === 0 ? 6 : day - 1);
+    d.setDate(diff);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+
+  const loadWeeklyCheckin = async () => {
+    try {
+      const weekStart = getWeekStart();
+      const { data } = await supabase
+        .from("daily_checkins")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("checkin_date", weekStart)
+        .maybeSingle();
+      setWeeklyCheckin(data || null);
+    } catch (err) {
+      console.error("Error cargando checkin semanal:", err);
+    }
+  };
 
   const loadMeasurements = async (range) => {
     setLoading(true);
     try {
-        const days = RANGE_DAYS[range] || 30;
-        const fromDate = new Date();
-        fromDate.setDate(fromDate.getDate() - days);
-        const fromDateStr = fromDate.toISOString().split("T")[0];
+      const days = RANGE_DAYS[range] || 30;
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - days);
+      const fromDateStr = fromDate.toISOString().split("T")[0];
 
-        const { data } = await supabase
+      const { data } = await supabase
         .from("weight_logs")
         .select("*")
         .eq("user_id", user.id)
         .gte("log_date", fromDateStr)
         .order("log_date", { ascending: true });
 
-        // Mapear weight_logs al formato que espera la grafica
-        const mapped = (data || []).map((w) => ({
+      const mapped = (data || []).map((w) => ({
         weight_kg: w.weight,
         created_at: w.log_date,
         body_fat_pct: null,
         waist_cm: null,
-        }));
+      }));
 
-        setMeasurements(mapped);
+      setMeasurements(mapped);
 
-        if (mapped.length > 0) {
+      if (mapped.length > 0) {
         setLatestMeasurement(mapped[mapped.length - 1]);
         if (mapped.length > 1) setPrevMeasurement(mapped[mapped.length - 2]);
         else setPrevMeasurement(null);
-        } else {
+      } else {
         setLatestMeasurement(null);
         setPrevMeasurement(null);
-        }
+      }
     } catch (err) {
-        console.error("Error cargando medidas:", err);
+      console.error("Error cargando medidas:", err);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   const handleRangeChange = (range) => {
     const isLocked =
@@ -88,7 +115,6 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
     return Math.round((current[field] - prev[field]) * 10) / 10;
   };
 
-  // Grafica SVG de linea para peso
   const renderWeightChart = () => {
     const validPoints = measurements.filter((m) => m.weight_kg !== null);
     if (validPoints.length === 0) {
@@ -157,8 +183,30 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
   };
 
   const weightDiff = getDiff(latestMeasurement, prevMeasurement, "weight_kg");
-  const fatDiff = getDiff(latestMeasurement, prevMeasurement, "body_fat_pct");
-  const waistDiff = getDiff(latestMeasurement, prevMeasurement, "waist_cm");
+
+  // Barra de progreso para sensaciones numericas
+  const SensacionBar = ({ value, max = 10, color }) => (
+    <div className="w-full h-1.5 bg-surf rounded-full overflow-hidden">
+      <div
+        className="h-full rounded-full transition-all"
+        style={{ width: `${(value / max) * 100}%`, backgroundColor: color }}
+      />
+    </div>
+  );
+
+  // Medida corporal card pequeña
+  const MedidaCard = ({ icon, label, value, unit, color, borderColor, bgColor }) => (
+    <div className={`flex-1 rounded-xl p-3 border flex flex-col gap-1`} style={{ backgroundColor: bgColor, borderColor }}>
+      <span className="text-[16px]">{icon}</span>
+      <p className="font-subheading font-bold text-[10px] text-text-low uppercase tracking-wide">{label}</p>
+      <div className="flex items-baseline gap-0.5">
+        <p className="font-heading font-extrabold text-[20px] leading-none" style={{ color }}>
+          {value ?? "--"}
+        </p>
+        <p className="font-body text-[11px] text-text-low">{unit}</p>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -171,16 +219,16 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
   return (
     <div className="flex flex-col px-4 gap-4">
 
-      {/* CABECERA COMPOSICION CORPORAL */}
+      {/* CABECERA */}
       <div className="flex items-center justify-between">
-        <p className="font-heading font-extrabold text-[20px] text-text-high">
+        <p className="font-subheading font-bold text-[14px] text-text-high tracking-wide">
           Composición Corporal
         </p>
         <button
-          onClick={() => navigate("/bodyRegister")}
+          onClick={() => navigate("/dailyRegister")}
           className="font-subheading font-bold text-[14px] text-primary"
         >
-          + Registrar hoy
+          + Registrar semana
         </button>
       </div>
 
@@ -190,7 +238,6 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           const isLocked =
             (minTier === "pro" && subscriptionTier === "free") ||
             (minTier === "elite" && subscriptionTier !== "elite");
-
           return (
             <button
               key={label}
@@ -212,7 +259,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
         })}
       </div>
 
-      {/* PESO ACTUAL Y DIFERENCIA */}
+      {/* PESO */}
       {latestMeasurement?.weight_kg ? (
         <div className="flex items-center gap-3">
           <span className="font-heading font-extrabold text-[48px] text-text-high leading-none">
@@ -225,7 +272,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
                 ? "bg-accent3/10 border-accent3 text-accent3"
                 : "bg-red-bg1 border-red text-red"
             }`}>
-              {weightDiff >= 0 ? "↑" : "↓"} +{Math.abs(weightDiff)}kg
+              {weightDiff >= 0 ? "↑" : "↓"} {Math.abs(weightDiff)}kg
             </span>
           )}
         </div>
@@ -239,82 +286,93 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
         Peso corporal · Últimas {selectedRange === "1M" ? "4 semanas" : selectedRange === "3M" ? "12 semanas" : selectedRange === "6M" ? "6 meses" : "1 año"}
       </p>
 
-      {/* GRAFICA PESO */}
+      {/* GRAFICA */}
       <Card>{renderWeightChart()}</Card>
 
-      {/* CARDS GRASA Y CINTURA */}
-      <div className="flex gap-3">
-        {/* GRASA CORPORAL */}
-        <Card>
-          <div className="flex flex-col gap-1">
-            <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px]">
-              📉
-            </div>
-            <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">
-              % de grasa
-            </p>
-            <div className="flex items-baseline gap-1">
-              <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
-                {latestMeasurement?.body_fat_pct ?? "--"}
-              </p>
-              <p className="font-body text-[14px] text-text-low">%</p>
-              {fatDiff !== null && (
-                <span style={{ color: fatDiff <= 0 ? "#36d9b8" : "#ff5757", fontSize: "14px" }}>
-                  {fatDiff <= 0 ? "↓" : "↑"}
-                </span>
-              )}
-            </div>
-            <p className="font-body text-[11px] text-text-low">
-              Ultima medicion · {latestMeasurement ? formatAxisDate(latestMeasurement.created_at) : "--"}
-            </p>
-            <button
-              onClick={() => navigate("/bodyRegister")}
-              className="font-subheading font-bold text-[12px] text-primary mt-1"
-            >
-              + Registrar hoy
-            </button>
-          </div>
-        </Card>
+      {/* MEDIDAS SEMANALES — de daily_checkins */}
+      <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mt-2">
+        Medidas esta semana
+      </p>
 
-        {/* CINTURA */}
-        <Card>
-          <div className="flex flex-col gap-1">
-            <div className="h-9 w-9 rounded-lg bg-accent3/10 border border-accent3 flex items-center justify-center text-[16px]">
-              📏
-            </div>
-            <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">
-              Cintura
-            </p>
-            <div className="flex items-baseline gap-1">
-              <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
-                {latestMeasurement?.waist_cm ?? "--"}
-              </p>
-              <p className="font-body text-[14px] text-text-low">cm</p>
-              {waistDiff !== null && (
-                <span style={{ color: waistDiff <= 0 ? "#36d9b8" : "#ff5757", fontSize: "14px" }}>
-                  {waistDiff <= 0 ? "↓" : "↑"}
-                </span>
-              )}
-            </div>
-            <p className="font-body text-[11px] text-text-low">
-              Ultima medicion · {latestMeasurement ? formatAxisDate(latestMeasurement.created_at) : "--"}
-            </p>
-            <button
-              onClick={() => navigate("/bodyRegister")}
-              className="font-subheading font-bold text-[12px] text-primary mt-1"
-            >
-              + Registrar hoy
-            </button>
-          </div>
-        </Card>
-      </div>
+      {weeklyCheckin ? (
+        <>
+          {/* FILA 1: grasa y cintura */}
+          <div className="flex gap-3">
+            <Card>
+              <div className="flex flex-col gap-1">
+                <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px]">📉</div>
+                <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">% Grasa</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
+                    {weeklyCheckin.body_fat_pct ?? "--"}
+                  </p>
+                  <p className="font-body text-[14px] text-text-low">%</p>
+                </div>
+              </div>
+            </Card>
 
-      {/* SENSACIONES Y RECUPERACION — datos estaticos de momento */}
+            <Card>
+              <div className="flex flex-col gap-1">
+                <div className="h-9 w-9 rounded-lg bg-accent3/10 border border-accent3 flex items-center justify-center text-[16px]">📏</div>
+                <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">Cintura</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
+                    {weeklyCheckin.waist_cm ?? "--"}
+                  </p>
+                  <p className="font-body text-[14px] text-text-low">cm</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* FILA 2: pecho, brazo, pierna */}
+          <div className="flex gap-2">
+            <MedidaCard
+              icon="💪"
+              label="Pecho"
+              value={weeklyCheckin.chest_cm}
+              unit="cm"
+              color="#6c63ff"
+              borderColor="rgba(108,99,255,0.4)"
+              bgColor="rgba(108,99,255,0.06)"
+            />
+            <MedidaCard
+              icon="🦾"
+              label="Brazo"
+              value={weeklyCheckin.arm_cm}
+              unit="cm"
+              color="#f5a623"
+              borderColor="rgba(245,166,35,0.4)"
+              bgColor="rgba(245,166,35,0.06)"
+            />
+            <MedidaCard
+              icon="🦵"
+              label="Pierna"
+              value={weeklyCheckin.leg_cm}
+              unit="cm"
+              color="#ff6b9d"
+              borderColor="rgba(255,107,157,0.4)"
+              bgColor="rgba(255,107,157,0.06)"
+            />
+          </div>
+        </>
+      ) : (
+        <button
+          onClick={() => navigate("/dailyRegister")}
+          className="w-full bg-surf border border-text-low border-dashed rounded-2xl py-6 flex flex-col items-center gap-2"
+        >
+          <span className="text-[28px]">📋</span>
+          <p className="font-heading font-bold text-[15px] text-text-high">Sin registro esta semana</p>
+          <p className="font-body text-[12px] text-primary">+ Registrar ahora</p>
+        </button>
+      )}
+
+      {/* SENSACIONES */}
       <div className="flex items-center justify-between mt-2">
-        <p className="font-heading font-extrabold text-[20px] text-text-high">
+        <p className="font-subheading font-bold text-[14px] text-text-high tracking-wide">
           Sensaciones y Recuperación
         </p>
-        <p className="font-body text-[12px] text-text-low">Últimos 7 días</p>
+        <p className="font-body text-[12px] text-text-low">Esta semana</p>
       </div>
 
       <Card>
@@ -323,75 +381,65 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* CALIDAD DEL SUENO */}
           <div className="py-3 first:pt-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary flex items-center justify-center text-[16px] shrink-0">
-                🌙
-              </div>
+              <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary flex items-center justify-center text-[16px] shrink-0">🌙</div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-                    Calidad del sueño
-                  </p>
-                  <p className="font-body text-[11px] text-text-low">Media 7d</p>
+                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Calidad del sueño</p>
+                  <p className="font-body text-[11px] text-text-low">Esta semana</p>
                 </div>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">7</p>
+                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">
+                    {weeklyCheckin?.sleep_quality ?? "--"}
+                  </p>
                   <p className="font-body text-[13px] text-text-low">/10</p>
                 </div>
               </div>
             </div>
-            <div className="w-full h-1.5 bg-surf rounded-full overflow-hidden">
-              <div className="h-full rounded-full" style={{ width: "70%", backgroundColor: "#ff6b9d" }} />
-            </div>
+            {weeklyCheckin?.sleep_quality && (
+              <SensacionBar value={weeklyCheckin.sleep_quality} color="#ff6b9d" />
+            )}
           </div>
 
           {/* NIVEL DE ENERGIA */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center text-[16px] shrink-0">
-                ⚡
-              </div>
+              <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center text-[16px] shrink-0">⚡</div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-                    Nivel de energía
-                  </p>
-                  <p className="font-body text-[11px] text-text-low">Media 7d</p>
+                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Nivel de energía</p>
+                  <p className="font-body text-[11px] text-text-low">Esta semana</p>
                 </div>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">8</p>
+                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">
+                    {weeklyCheckin?.energy_level ?? "--"}
+                  </p>
                   <p className="font-body text-[13px] text-text-low">/10</p>
                 </div>
               </div>
             </div>
-            <div className="w-full h-1.5 bg-surf rounded-full overflow-hidden">
-              <div className="h-full rounded-full" style={{ width: "80%", backgroundColor: "#36d9b8" }} />
-            </div>
+            {weeklyCheckin?.energy_level && (
+              <SensacionBar value={weeklyCheckin.energy_level} color="#36d9b8" />
+            )}
           </div>
 
           {/* FATIGA MUSCULAR */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-accent2/10 border border-accent2 flex items-center justify-center text-[16px] shrink-0">
-                😮‍💨
-              </div>
+              <div className="h-9 w-9 rounded-lg bg-accent2/10 border border-accent2 flex items-center justify-center text-[16px] shrink-0">😮‍💨</div>
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-                    Fatiga muscular
-                  </p>
-                  <p className="font-body text-[11px] text-text-low">Media 7d</p>
-                </div>
+                <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Fatiga muscular</p>
               </div>
             </div>
             <div className="flex gap-2">
-              {["Ninguna", "Baja", "Media", "Alta"].map((nivel, i) => (
+              {["Ninguna", "Baja", "Media", "Alta"].map((nivel) => (
                 <span
                   key={nivel}
-                  className={`px-2.5 py-1 rounded-full font-subheading font-bold text-[12px] border ${
-                    i === 0
-                      ? "bg-accent3/10 border-accent3 text-accent3"
-                      : "bg-surf border-text-low text-text-low"
-                  }`}
+                  className="px-2.5 py-1 rounded-full font-subheading font-bold text-[12px] border transition-all"
+                  style={{
+                    backgroundColor: weeklyCheckin?.muscle_fatigue === nivel ? "rgba(54,217,184,0.1)" : "transparent",
+                    borderColor: weeklyCheckin?.muscle_fatigue === nivel ? "#36d9b8" : "#6b6b8a",
+                    color: weeklyCheckin?.muscle_fatigue === nivel ? "#36d9b8" : "#6b6b8a",
+                  }}
                 >
                   {nivel}
                 </span>
@@ -402,26 +450,21 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* MOLESTIAS ARTICULARES */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-surf border border-text-low flex items-center justify-center text-[16px] shrink-0">
-                🦴
-              </div>
+              <div className="h-9 w-9 rounded-lg bg-surf border border-text-low flex items-center justify-center text-[16px] shrink-0">🦴</div>
               <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-                    Molestias articulares
-                  </p>
-                </div>
+                <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Molestias articulares</p>
               </div>
             </div>
             <div className="flex gap-2">
-              {["Ninguna", "Leves", "Severas"].map((nivel, i) => (
+              {["Ninguna", "Leves", "Severas"].map((nivel) => (
                 <span
                   key={nivel}
-                  className={`px-2.5 py-1 rounded-full font-subheading font-bold text-[12px] border ${
-                    i === 0
-                      ? "bg-accent3/10 border-accent3 text-accent3"
-                      : "bg-surf border-text-low text-text-low"
-                  }`}
+                  className="px-2.5 py-1 rounded-full font-subheading font-bold text-[12px] border transition-all"
+                  style={{
+                    backgroundColor: weeklyCheckin?.joint_pain === nivel ? "rgba(54,217,184,0.1)" : "transparent",
+                    borderColor: weeklyCheckin?.joint_pain === nivel ? "#36d9b8" : "#6b6b8a",
+                    color: weeklyCheckin?.joint_pain === nivel ? "#36d9b8" : "#6b6b8a",
+                  }}
                 >
                   {nivel}
                 </span>
@@ -432,49 +475,50 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* ESTRES PERCIBIDO */}
           <div className="py-3 last:pb-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px] shrink-0">
-                🧠
-              </div>
+              <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px] shrink-0">🧠</div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-                    Estrés percibido
-                  </p>
-                  <p className="font-body text-[11px] text-text-low">Media 7d</p>
+                  <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Estrés percibido</p>
+                  <p className="font-body text-[11px] text-text-low">Esta semana</p>
                 </div>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">5</p>
+                  <p className="font-heading font-extrabold text-[22px] text-text-high leading-none">
+                    {weeklyCheckin?.stress_level ?? "--"}
+                  </p>
                   <p className="font-body text-[13px] text-text-low">/10</p>
                 </div>
               </div>
             </div>
-            <div className="w-full h-1.5 bg-surf rounded-full overflow-hidden">
-              <div className="h-full rounded-full" style={{ width: "50%", backgroundColor: "#f5a623" }} />
-            </div>
+            {weeklyCheckin?.stress_level && (
+              <SensacionBar value={weeklyCheckin.stress_level} color="#f5a623" />
+            )}
           </div>
+
+          {/* NOTA AL ENTRENADOR */}
+          {weeklyCheckin?.trainer_note && (
+            <div className="pt-3">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[16px]">💬</span>
+                <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Nota al entrenador</p>
+              </div>
+              <p className="font-body text-[13px] text-text-low italic">"{weeklyCheckin.trainer_note}"</p>
+            </div>
+          )}
         </div>
       </Card>
 
-      {/* REGISTRO DIARIO */}
-      <div className="flex items-center gap-2 mt-2">
-        <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-          Registro diario
-        </p>
-      </div>
-
+      {/* BOTON REGISTRO */}
       <button
         onClick={() => navigate("/dailyRegister")}
         className="w-full bg-surf border border-text-low rounded-2xl px-4 py-4 flex items-center gap-4 hover:border-primary transition-colors"
       >
-        <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
-          📋
-        </div>
+        <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">📋</div>
         <div className="flex-1 text-left">
           <p className="font-heading font-bold text-[16px] text-text-high">
-            Registrar sensaciones de hoy
+            {weeklyCheckin ? "Actualizar registro semanal" : "Registrar sensaciones de la semana"}
           </p>
           <p className="font-body text-[12px] text-text-low">
-            Envia tu check-in diario al entrenador
+            {weeklyCheckin ? "Modifica tu check-in de esta semana" : "Envia tu check-in semanal al entrenador"}
           </p>
         </div>
         <span className="text-primary text-[18px]">›</span>

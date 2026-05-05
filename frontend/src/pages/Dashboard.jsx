@@ -867,7 +867,7 @@ const Dashboard = () => {
       <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
         <div className="w-full flex justify-between">
           <p className="font-subheading font-bold text-text-high text-[16px]">PESO DE HOY</p>
-          <button onClick={() => navigate("#")} className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity">Historial &</button>
+          <button onClick={() => navigate("/progress")} className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity">Historial &</button>
         </div>
         <Card>
           <div className="flex justify-between items-center mb-3">
