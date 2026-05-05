@@ -489,10 +489,7 @@ const PersonalSettings = () => {
                             <option value="Español" className="bg-primary-bg text-text-high">Español</option>
                             <option value="Inglés" className="bg-primary-bg text-text-high">Inglés</option>
                             <option value="Francés" className="bg-primary-bg text-text-high">Francés</option>
-                            <option value="Alemán" className="bg-primary-bg text-text-high">Alemán</option>
-                            <option value="Chino" className="bg-primary-bg text-text-high">Chino</option>
-                            <option value="Italiano" className="bg-primary-bg text-text-high">Italiano</option>
-                            <option value="Ruso" className="bg-primary-bg text-text-high">Ruso</option>
+                            <option value="Portugués" className="bg-primary-bg text-text-high">Portugués</option>
                         </select>
                     </div>           
                 </div>
