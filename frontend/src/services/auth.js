@@ -37,8 +37,8 @@ export const logoutUser = async () => {
 export const sendPasswordResetEmail = async (email) =>{
 
   const redirectUrl = import.meta.env.PROD 
-    ? 'https://tfg-topaz.vercel.app/reset-password'
-    : 'http://localhost:5173/reset-password';
+    ? 'https://tfg-topaz.vercel.app/resetPassword'
+    : 'http://localhost:5173/resetPassword';
     
   const { error } = await supabase.auth.resetPasswordForEmail(email,{
     redirectTo: redirectUrl,
