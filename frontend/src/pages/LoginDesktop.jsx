@@ -55,14 +55,6 @@ const LoginDesktop = () => {
         className="hidden lg:flex w-1/2 flex-col justify-between p-12 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0a0a0f 0%, #1a1a26 50%, #0f0f1a 100%)" }}
       >
-        {/* Gradiente decorativo */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-          <div className="absolute -top-25 -left-25 w-100 h-100 rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, #6c63ff, transparent)" }} />
-          <div className="absolute -top-25 -right-25 w-87.75 h-87.75 rounded-full opacity-15"
-            style={{ background: "radial-gradient(circle, #ff6b9d, transparent)" }} />
-        </div>
-
         {/* Logo */}
         <div className="flex items-center gap-4 z-10">
           <div className="bg-primary h-14 w-14 rounded-xl flex items-center justify-center font-heading font-extrabold text-[28px] text-text-high">
@@ -209,7 +201,7 @@ const LoginDesktop = () => {
             ¿No tienes cuenta?{" "}
             <button
               onClick={() => navigate("/register")}
-              className="text-primary hover:opacity-80 transition-opacity font-semibold"
+              className="text-accent1 hover:opacity-80 transition-opacity font-semibold"
             >
               Regístrate gratis
             </button>
