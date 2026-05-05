@@ -173,7 +173,7 @@ const DailyRegister = () => {
               <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mb-2">
                 % Grasa corporal
               </p>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center mb-3">
                 <input
                   type="text"
                   inputMode="decimal"
@@ -296,7 +296,7 @@ const DailyRegister = () => {
         </div>
 
         {/* NOTA AL ENTRENADOR */}
-        <div className="mb-6">
+        <div className="mb-1">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-[16px]">💬</span>
             <p className="font-subheading font-bold text-text-low text-[13px] uppercase tracking-wide">
