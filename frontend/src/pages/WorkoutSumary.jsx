@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
@@ -8,7 +8,7 @@ import Button from "../components/Button";
 const WorkoutSummary = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
 
   const {
     sessionDuration,
@@ -109,33 +109,31 @@ const WorkoutSummary = () => {
     }
 
     try {
-      const { error } = await supabase.from("workout_feedback").insert({
-        user_id: user.id,
-        session_id: sessionId,
-        energy_level: personalFeedback.energyLevel,
-        felt_pain: personalFeedback.feltPain,
-        pain_description: personalFeedback.painDescription || null,
-        trainer_notes: personalFeedback.trainerNotes || null,
-      });
+      const { error } = await supabase
+        .from("workout_sessions")
+        .update({
+          energy_level: personalFeedback.energyLevel,
+          felt_pain: personalFeedback.feltPain,
+          pain_description: personalFeedback.painDescription || null,
+          trainer_notes: personalFeedback.trainerNotes || null,
+          total_volume: parseFloat(totalVolume) || 0,
+        })
+        .eq("id", sessionId);
 
       if (error) throw error;
 
-      alert("✅ Feedback guardado");
+      alert("✅ Sesión guardada correctamente");
 
-      // SI VIENE DE PROGRESIÓN, VOLVER A /progression
       if (fromProgression) {
         navigate("/progression", {
-          state: {
-            justCompleted: true,
-            completedDate: completedDate,
-          },
+          state: { justCompleted: true, completedDate },
         });
       } else {
         navigate("/dashboard");
       }
     } catch (error) {
-      console.error("Error guardando feedback:", error);
-      alert("❌ Error al guardar feedback");
+      console.error("Error guardando sesión:", error);
+      alert("❌ Error al guardar");
     }
   };
 
@@ -234,14 +232,14 @@ const WorkoutSummary = () => {
           <Card>
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-accent3/20 flex items-center justify-center text-[20px]">
-                ⚡
+                ✅
               </div>
               <div>
                 <p className="font-heading font-bold text-[24px] text-text-high leading-none">
-                  {Math.floor((sessionDuration || 0) * 0.75)}m
+                  {completedExercises || 0}
                 </p>
                 <p className="font-body text-[11px] text-text-low">
-                  Tiempo de trabajo
+                  Ejercicios completados
                 </p>
               </div>
             </div>
@@ -266,9 +264,7 @@ const WorkoutSummary = () => {
               <Card key={index}>
                 <button
                   onClick={() =>
-                    setExpandedExercise(
-                      isExpanded ? null : exercise.exerciseId
-                    )
+                    setExpandedExercise(isExpanded ? null : exercise.exerciseId)
                   }
                   className="w-full flex items-center gap-3"
                 >
