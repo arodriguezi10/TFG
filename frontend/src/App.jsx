@@ -40,6 +40,7 @@ import Progress from "./pages/Progress";
 import DailyRegister from "./pages/DailyRegister";
 import Subscription from "./pages/Subscription";
 import Onboarding from "./pages/Onboarding";
+import Leaderboard from "./pages/Leaderboard"; 
 
 const App = () => {
   return (
@@ -300,6 +301,7 @@ const App = () => {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/routines1" element={<Routines1 />} />
               <Route path="/progress" element={<Progress />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
             </Route>
           </Routes>
         </RoutineProvider>

@@ -10,6 +10,7 @@ const MainLayout = () => {
     { to: "/dashboard", icon: "🏠", label: "Home" },
     { to: "/routines1", icon: "📋", label: "Rutinas" },
     { to: "/progress",  icon: "📊", label: "Progreso" },
+    { to: "/leaderboard",  icon: "🏆", label: "Clasificación" },
     { to: "/checkout",  icon: "💬", label: "Chat" },
   ];
 
