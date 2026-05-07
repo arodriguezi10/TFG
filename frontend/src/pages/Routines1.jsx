@@ -140,7 +140,7 @@ const Routines1 = () => {
   const handleTabClick = (tab) => {
     if (tab === 'progression' && subscriptionTier === 'free') {
       // Redirigir a suscripción si es free
-      navigate('/subscription');
+      navigate('/progression');
       return;
     }
     

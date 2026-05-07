@@ -5,6 +5,8 @@ import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 
+import { Settings, Plus, ArrowLeft, ChevronLeft, ChevronRight, CircleCheck, Moon, Dumbbell, Lock, Crown, TrendingUp, Target, Clock, ClipboardList, Zap, Lightbulb } from "lucide-react";
+
 const Progression = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -304,13 +306,6 @@ const Progression = () => {
               Progresión
             </h1>
           </div>
-
-          <button
-            onClick={() => navigate("/routines1")}
-            className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors cursor-pointer"
-          >
-            ←
-          </button>
         </section>
 
         {/* TABS */}
@@ -334,10 +329,10 @@ const Progression = () => {
         <section className="mt-16 flex flex-col items-center justify-center gap-3.75 px-4">
           <div className="relative">
             <span className="bg-linear-to-br from-yellow/20 to-orange/20 h-32 w-32 rounded-[40px] font-body text-[70px] flex items-center justify-center border border-yellow/30">
-              👑
+              <Crown size={48} className="text-yellow" />
             </span>
             <div className="absolute -top-2 -right-2 bg-yellow h-8 w-8 rounded-full flex items-center justify-center text-[16px] animate-pulse">
-              ✨
+              <Lightbulb size={16} className="text-background" />
             </div>
           </div>
 
@@ -359,7 +354,7 @@ const Progression = () => {
           <div className="mt-4 w-full flex flex-col gap-3">
             <div className="flex items-start gap-3">
               <div className="h-10 w-10 rounded-xl bg-accent1/10 border border-accent1 flex items-center justify-center text-[18px] shrink-0">
-                📈
+                <TrendingUp size={20} className="text-blue" />
               </div>
               <div className="flex-1">
                 <p className="font-heading font-bold text-[15px] text-text-high mb-0.5">
@@ -373,7 +368,7 @@ const Progression = () => {
 
             <div className="flex items-start gap-3">
               <div className="h-10 w-10 rounded-xl bg-accent2/10 border border-accent2 flex items-center justify-center text-[18px] shrink-0">
-                🎯
+                <Target size={20} className="text-accent1" />
               </div>
               <div className="flex-1">
                 <p className="font-heading font-bold text-[15px] text-text-high mb-0.5">
@@ -386,8 +381,8 @@ const Progression = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-xl bg-accent3/10 border border-accent3 flex items-center justify-center text-[18px] shrink-0">
-                ⚡
+              <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
+                <Zap size={20} className="text-primary" />
               </div>
               <div className="flex-1">
                 <p className="font-heading font-bold text-[15px] text-text-high mb-0.5">
@@ -585,14 +580,14 @@ const Progression = () => {
 
         <div className="flex gap-2.5">
           <button className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors">
-            ⚙️
+            <Settings size={18} />
           </button>
 
           <button
             onClick={handleCreateProgression}
             className="bg-accent1 h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
           >
-            +
+            <Plus size={18} />
           </button>
         </div>
       </section>
@@ -660,7 +655,7 @@ const Progression = () => {
                   : "bg-surf border-text-low text-text-high hover:bg-surface"
               }`}
             >
-              ←
+              <ChevronLeft size={16} />
             </button>
             <button
               onClick={handleNextWeek}
@@ -673,7 +668,7 @@ const Progression = () => {
                   : "bg-surf border-text-low text-text-high hover:bg-surface"
               }`}
             >
-              →
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
@@ -721,11 +716,11 @@ const Progression = () => {
 
                   <p className="text-[14px]">
                     {isCompleted
-                      ? "✅"
+                      ? <CircleCheck size={14} className="text-green" />
                       : isRest
-                        ? "😴"
+                        ? <Moon size={14} className="text-blue" />
                         : routineId
-                          ? "💪"
+                          ? <Dumbbell size={14} className="text-primary" />
                           : "·"}
                   </p>
 
@@ -754,7 +749,7 @@ const Progression = () => {
                     border: `1px solid ${selectedDayDetail.color}`,
                   }}
                 >
-                  💪
+                  <Dumbbell size={18} style={{ color: selectedDayDetail.color }} />
                 </div>
                 <div>
                   <p className="font-body text-[11px] text-text-low">
@@ -810,7 +805,7 @@ const Progression = () => {
               />
             ) : (
               <div className="bg-surf/50 border border-text-low rounded-xl p-4 flex items-center gap-3">
-                <span className="text-[24px]">🔒</span>
+                <span className="text-[24px]"><Lock size={24} /></span>
                 <div className="flex-1">
                   <p className="font-heading font-bold text-[14px] text-text-low">
                     Solo disponible el día indicado
@@ -865,7 +860,7 @@ const Progression = () => {
           <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col items-center">
               <div className="bg-accent1/10 h-12 w-12 rounded-xl border border-accent1 flex items-center justify-center text-[20px] mb-2">
-                ⏰
+                <Clock size={20} className="text-accent1" />
               </div>
               <p className="font-heading font-bold text-[20px] text-text-high">
                 {activeProgression.duration_weeks}
@@ -877,7 +872,7 @@ const Progression = () => {
 
             <div className="flex flex-col items-center">
               <div className="bg-accent2/10 h-12 w-12 rounded-xl border border-accent2 flex items-center justify-center text-[20px] mb-2">
-                📋
+                <ClipboardList size={20} className="text-accent2" />
               </div>
               <p className="font-heading font-bold text-[20px] text-text-high">
                 {progressionBlocks.length}
@@ -888,8 +883,8 @@ const Progression = () => {
             </div>
 
             <div className="flex flex-col items-center">
-              <div className="bg-accent3/10 h-12 w-12 rounded-xl border border-accent3 flex items-center justify-center text-[20px] mb-2">
-                🎯
+              <div className="bg-primary-bg h-12 w-12 rounded-xl border border-primary flex items-center justify-center text-[20px] mb-2">
+                <Target size={20} className="text-primary" />
               </div>
               <p className="font-heading font-bold text-[20px] text-text-high capitalize">
                 {activeProgression.goal}

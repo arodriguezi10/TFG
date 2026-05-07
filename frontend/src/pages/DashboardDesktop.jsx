@@ -9,6 +9,7 @@ import { useContext, useState, useEffect } from "react";
 import {
   Calendar,
   ChevronRight,
+  ChevronLeft,
   CircleCheck,
   Dumbbell,
   Moon,
@@ -18,6 +19,7 @@ import {
   Scale,
   Pencil,
   BarChart2,
+  Lock,
   Clock,
   Layers,
   Plus,
@@ -899,7 +901,7 @@ const DashboardDesktop = () => {
                         disabled={currentProgressionWeek === 0}
                         className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] ${currentProgressionWeek === 0 ? "opacity-30 cursor-not-allowed" : "hover:bg-surface"} bg-surf border-text-low text-text-high`}
                       >
-                        ←
+                        <ChevronLeft size={14} />
                       </button>
                       <button
                         onClick={handleNextProgressionWeek}
@@ -909,7 +911,7 @@ const DashboardDesktop = () => {
                         }
                         className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] ${currentProgressionWeek >= activeProgression.duration_weeks - 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-surface"} bg-surf border-text-low text-text-high`}
                       >
-                        →
+                        <ChevronRight size={14} />
                       </button>
                     </div>
                   </div>
@@ -975,7 +977,10 @@ const DashboardDesktop = () => {
                               border: `1px solid ${selectedProgressionDay.color}`,
                             }}
                           >
-                            💪
+                            <Dumbbell
+                              size={16}
+                              style={{ color: selectedProgressionDay.color }}
+                            />
                           </div>
                           <div>
                             <p className="font-body text-[11px] text-text-low">
@@ -1015,7 +1020,7 @@ const DashboardDesktop = () => {
                         />
                       ) : (
                         <div className="bg-surf/50 border border-text-low rounded-xl p-3 flex items-center gap-3">
-                          <span className="text-[20px]">🔒</span>
+                          <span className="text-[20px]"><Lock size={20} className="text-text-low" /></span>
                           <p className="font-body text-[13px] text-text-low">
                             Solo disponible el día indicado
                           </p>
