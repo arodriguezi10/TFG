@@ -5,6 +5,8 @@ import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
+import { logoutUser } from "../services/auth";
+
 import {
   ClipboardList, Scale, Ruler, Cake, Settings, Star,
   MessageCircle, LogOut, ChevronRight, Crown, Leaf, Flame,
@@ -94,6 +96,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
 
   const getBadgeByTier = (tier) => {
     switch (tier) {
@@ -269,7 +272,15 @@ const Profile = () => {
         </Card>
 
         <Card>
-          <button className="w-full">
+          <button
+            className="w-full"
+            onClick={async () => {
+              if (window.confirm("¿Seguro que quieres cerrar sesión?")) {
+                await logoutUser();
+                navigate("/login");
+              }
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex gap-5 items-center">
                 <div className="bg-red-bg1 h-10 w-10 rounded-lg flex items-center justify-center">

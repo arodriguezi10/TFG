@@ -544,7 +544,7 @@ const PersonalSettings = () => {
                         </div>
 
                         <div className="flex gap-3.75 text-red">
-                            →
+                            <ChevronRight/>
                         </div>      
                     </div>
                 </button>

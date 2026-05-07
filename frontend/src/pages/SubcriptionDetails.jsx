@@ -6,6 +6,11 @@ import Card from "../components/Card";
 import Header from "../components/Header";
 import Button from "../components/Button";
 
+import {
+  Leaf, Zap, Crown, CheckCircle2, X, CreditCard, Calendar,
+  FileText, Download, RefreshCw, ChevronRight, CheckCheck
+} from "lucide-react";
+
 const SubscriptionDetails = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -49,7 +54,7 @@ const SubscriptionDetails = () => {
   const PLAN_CONFIG = {
     free: {
       label: "Plan Free",
-      icon: "🌱",
+      icon: <Leaf className="text-green"/>,
       color: "text-text-low",
       borderColor: "border-text-low",
       bgColor: "bg-surf",
@@ -57,7 +62,7 @@ const SubscriptionDetails = () => {
     },
     pro: {
       label: "Plan Pro",
-      icon: "⚡",
+      icon: <Zap className="text-orange"/>,
       color: "text-orange",
       borderColor: "border-orange",
       bgColor: "bg-orange-bg2",
@@ -65,7 +70,7 @@ const SubscriptionDetails = () => {
     },
     elite: {
       label: "Plan Elite",
-      icon: "👑",
+      icon: <Crown className="text-orange"/>,
       color: "text-primary",
       borderColor: "border-primary",
       bgColor: "bg-primary-bg",
@@ -282,7 +287,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
             {/* Metodo de pago */}
             <button className="w-full flex items-center gap-4 py-1">
               <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
-                💳
+                <CreditCard className="text-text-high"/>
               </div>
               <div className="flex-1 text-left">
                 <p className="font-subheading text-[16px] text-text-low">Método de pago</p>
@@ -290,15 +295,15 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   {userData?.stripe_id ? "Visa ···· 4242" : "Sin metodo de pago"}
                 </p>
               </div>
-              <span className="text-text-low text-[16px]">›</span>
+              <span className="text-text-low text-[16px]"><ChevronRight/></span>
             </button>
 
             <div className="w-full h-px bg-text-low my-3"></div>
 
             {/* Proximo cobro */}
             <div className="w-full flex items-center gap-4 py-1">
-              <div className="h-10 w-10 rounded-xl bg-accent3/10 border border-accent3 flex items-center justify-center text-[18px] shrink-0">
-                📅
+              <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
+                <Calendar className="text-text-high"/>
               </div>
               <div className="flex-1 text-left">
                 <p className="font-body text-[16px] text-text-low">Proximo cobro</p>
@@ -317,7 +322,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
             {/* Historial de facturas */}
             <button className="w-full flex items-center gap-4 py-1">
               <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
-                📄
+                <FileText className="text-text-high"/>
               </div>
               <div className="flex-1 text-left">
                 <p className="font-body text-[16px] text-text-low">Historial de facturas</p>
@@ -325,7 +330,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   Ver todas
                 </p>
               </div>
-              <span className="text-text-low text-[16px]">›</span>
+              <span className="text-text-low text-[16px]"><ChevronRight/></span>
             </button>
           </Card>
         </section>
@@ -397,13 +402,13 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   className="w-full flex items-center gap-4 py-3"
                 >
                   <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">
-                    💳
+                    <CreditCard className="text-blue"/>
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-subheading font-bold text-[16px] text-text-high">Cambiar metodo de pago</p>
                     <p className="font-subheading text-[14px] text-text-low">Actualiza tu tarjeta o añade otra</p>
                   </div>
-                  <span className="text-text-low text-[16px]">›</span>
+                  <span className="text-text-low text-[16px]"><ChevronRight/></span>
                 </button>
                 <div className="w-full h-px bg-text-low"></div>
               </>
@@ -414,8 +419,8 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
               onClick={() => navigate("/subscription")}
               className="w-full flex items-center gap-4 py-3"
             >
-              <div className="h-10 w-10 rounded-xl bg-accent3/10 border border-accent3 flex items-center justify-center text-[18px] shrink-0">
-                🔄
+              <div className="h-10 w-10 rounded-xl bg-green-bg1 border border-green flex items-center justify-center text-[18px] shrink-0">
+                <RefreshCw className="text-text-high"/>
               </div>
               <div className="flex-1 text-left">
                 <p className="font-subheading font-bold text-[16px] text-text-high">Cambiar de plan</p>
@@ -423,7 +428,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   {tier === "free" ? "Consigue mas funciones" : "Sube o baja tu suscripcion"}
                 </p>
               </div>
-              <span className="text-text-low text-[16px]">›</span>
+              <span className="text-text-low text-[16px]"><ChevronRight/></span>
             </button>
 
             {/* Descargar factura y cancelar — solo si tiene plan de pago */}
@@ -435,13 +440,13 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   className="w-full flex items-center gap-4 py-3"
                 >
                   <div className="h-10 w-10 rounded-xl bg-orange-bg2 border border-orange flex items-center justify-center text-[18px] shrink-0">
-                    📥
+                    <FileText className="text-orange"/>
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-subheading font-bold text-[16px] text-text-high">Descargar factura</p>
                     <p className="font-subheading text-[14px] text-text-low">PDF del ultimo periodo</p>
                   </div>
-                  <span className="text-text-low text-[16px]">›</span>
+                  <span className="text-text-low text-[16px]"><ChevronRight/></span>
                 </button>
 
                 <div className="w-full h-px bg-text-low"></div>
@@ -456,7 +461,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                   className="w-full flex items-center gap-4 py-3"
                 >
                   <div className="h-10 w-10 rounded-xl bg-red-bg1 border border-red flex items-center justify-center text-[18px] shrink-0">
-                    ✕
+                    <X className="text-red"/>
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-subheading font-bold text-[16px] text-red">Cancelar suscripcion</p>
@@ -464,7 +469,7 @@ const daysActive = endsAt ? Math.max(0, 30 - (daysRemaining || 0)) : null;
                       Tendras acceso hasta el {formatDateLong(endsAt)}
                     </p>
                   </div>
-                  <span className="text-red text-[16px] opacity-60">›</span>
+                  <span className="text-red text-[16px] opacity-60"><ChevronRight/></span>
                 </button>
               </>
             )}
