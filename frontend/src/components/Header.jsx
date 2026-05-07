@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; 
 
+import { ChevronLeft } from "lucide-react";
+
 const Header = ({ subtitle, title, showback, onBackClick, children }) => {
     const navigate = useNavigate(); 
 
@@ -19,7 +21,7 @@ const Header = ({ subtitle, title, showback, onBackClick, children }) => {
                     onClick={handleBackClick} 
                     className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center cursor-pointer hover:bg-surface transition-colors"
                 >
-                    ←
+                    <ChevronLeft size={24} className="text-text-high"/>
                 </button>
             ) : (
                 <div className="w-10"></div>

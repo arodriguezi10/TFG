@@ -7,6 +7,9 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 
+import { ClipboardList, FileText, Dumbbell, X, Plus, Clock, Calendar, Layers, ChevronRight, AlertCircle } from "lucide-react";
+
+
 const CreateRoutines1 = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -287,8 +290,8 @@ const CreateRoutines1 = () => {
               NOMBRE DE LA RUTINA
             </label>
 
-            <div className="flex gap-3.75">
-              <p className="text-text-low">📋</p>
+            <div className="flex gap-3.75 mt-0.5">
+              <p className="text-text-low"><ClipboardList size={20} /></p>
               <input
                 className="font-body text-[16px] text-text-high bg-transparent border-none outline-none w-full"
                 type="text"
@@ -310,8 +313,8 @@ const CreateRoutines1 = () => {
               </span>
             </label>
 
-            <div className="flex gap-3.75">
-              <p className="text-text-low">📝</p>
+            <div className="flex gap-3.75 mt-0.5">
+              <p className="text-text-low "><FileText size={20} /></p>
               <textarea
                 className="w-full font-body text-[16px] text-text-high bg-transparent border-none outline-none resize-none"
                 placeholder="Ej: Rutina de empuje enfocada en pecho"
@@ -450,7 +453,7 @@ const CreateRoutines1 = () => {
             </p>
           </div>
 
-          {/* ✅ AQUÍ VA EL CÓDIGO */}
+
           {selectedExercises.length > 0 && (
             <button
               onClick={handleNavigateToExercises}
@@ -465,7 +468,7 @@ const CreateRoutines1 = () => {
           <Card>
             <div className="mt-4 flex flex-col items-center justify-center gap-3">
               <span className="bg-primary-bg h-15 w-15 px-2.5 rounded-2xl border border-primary font-body text-[25px] text-primary flex items-center justify-center">
-                💪
+                <Dumbbell size={28} />
               </span>
 
               <p className="font-heading font-bold text-[16px] text-text-high">
@@ -478,6 +481,7 @@ const CreateRoutines1 = () => {
                   ordenarlos y configurar series y repeticiones
                 </p>
               </div>
+              
               <Button
                 onClick={handleNavigateToExercises}
                 variant="outlined"
