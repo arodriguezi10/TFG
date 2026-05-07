@@ -8,6 +8,8 @@ import Button from '../components/Button';
 import Header from '../components/Header';
 import Input from '../components/Input';
 
+import { Zap, Info  } from 'lucide-react';
+
 const CreatePersonalExercise = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -227,7 +229,7 @@ const CreatePersonalExercise = () => {
       {/* INFO CARD */}
       <section className="mt-4 w-full px-4">
         <div className="rounded-2xl bg-primary-bg/50 border border-primary/30 p-3.5 flex items-start gap-3">
-          <span className="text-primary text-[20px] shrink-0">ℹ️</span>
+          <span className="text-primary text-[20px] shrink-0"><Info size={20} className="text-primary shrink-0" /></span>
           <p className="font-body text-[13px] text-text-low leading-relaxed">
             Los ejercicios personalizados se guardan en tu biblioteca y solo estarán disponibles para ti. Podrás editarlos o eliminarlos en cualquier momento.
           </p>
@@ -244,7 +246,7 @@ const CreatePersonalExercise = () => {
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
                 <span className="bg-primary-bg h-12.5 w-12.5 rounded-xl border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center">
-                  ⚡
+                  <Zap size={20} className='text-orange'/>
                 </span>
 
                 <div className="flex flex-col">

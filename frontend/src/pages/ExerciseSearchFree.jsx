@@ -7,6 +7,8 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import Input from "../components/Input";
 
+import { Search, X, Plus, Check, Trash2, Lock, Crown, Zap, Dumbbell, Flame, ChevronRight, Swords  } from "lucide-react";
+
 const ExerciseSearchFree = () => {
   const { user } = useContext(AuthContext);
   const { addExercise, removeExercise, isExerciseSelected, selectedExercises } =
@@ -785,7 +787,7 @@ const ExerciseSearchFree = () => {
             onClick={() => navigate(-1)}
             className="bg-surf h-10 w-10 rounded-lg border border-text-low font-subheading font-bold text-[16px] text-text-low flex items-center justify-center hover:bg-surface transition-colors"
           >
-            X
+            <X className="text-text-low" />
           </button>
         </div>
 
@@ -845,7 +847,7 @@ const ExerciseSearchFree = () => {
           className="h-17.5 rounded-2xl bg-primary border border-primary p-4 flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
         >
           <div className="w-[90%] flex items-center justify-center gap-3.75">
-            <span className="text-text-high text-[20px]">⚡</span>
+            <span className="text-text-high text-[20px]"><Zap className="text-orange" /></span>
             <p className="font-body text-[16px] text-text-high">
               Crea tus propios ejercicios{" "}
               {customExercises.length >= customExerciseLimit && (
@@ -856,15 +858,15 @@ const ExerciseSearchFree = () => {
             </p>
           </div>
           <div className="flex items-center justify-center gap-3.75 text-text-high">
-            →
+            <ChevronRight size={20} />
           </div>
         </button>
       </section>
 
       {filteredCustomExercises.length > 0 && (
         <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
-          <p className="font-subheading font-bold text-[16px] text-primary">
-            ⚡ MIS EJERCICIOS ({customExercises.length}/{customExerciseLimit})
+          <p className="font-subheading font-bold text-[16px] text-primary flex gap-1.5">
+            <Zap className="text-orange" /> MIS EJERCICIOS ({customExercises.length}/{customExerciseLimit})
           </p>
 
           {loading ? (
@@ -879,7 +881,7 @@ const ExerciseSearchFree = () => {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       <span className="bg-primary-bg h-12.5 w-12.5 rounded-xl border border-primary font-heading font-extrabold text-[18px] text-primary flex items-center justify-center flex-shrink-0">
-                        ⚡
+                        <Zap className="text-orange" />
                       </span>
 
                       <div className="flex flex-col">
@@ -925,14 +927,14 @@ const ExerciseSearchFree = () => {
                             : "Añadir a la selección"
                         }
                       >
-                        {isSelected ? "✓" : "+"}
+                        {isSelected ? <Check size={20} /> : <Plus size={20} />}
                       </button>
                       <button
                         onClick={() => handleDeleteExercise(exercise)}
                         className="h-8 w-8 rounded-lg border border-red bg-surf flex items-center justify-center text-red text-[18px] hover:bg-red/10 transition-colors"
                         title="Eliminar ejercicio permanentemente"
                       >
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
@@ -945,8 +947,8 @@ const ExerciseSearchFree = () => {
 
       {filteredPredefinedExercises.length > 0 && (
         <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
-          <p className="font-subheading font-bold text-[16px] text-accent2">
-            💪 PRINCIPIANTE
+          <p className="font-subheading font-bold text-[16px] text-accent2 flex gap-1.5">
+            <Dumbbell size={20} />PRINCIPIANTES
           </p>
 
           {filteredPredefinedExercises.map((exercise) => {
@@ -956,7 +958,7 @@ const ExerciseSearchFree = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <span className="bg-green-bg2 h-12.5 w-12.5 rounded-xl border border-accent2 font-heading font-extrabold text-[18px] text-accent2 flex items-center justify-center">
-                      💪
+                      <Dumbbell size={20} />
                     </span>
 
                     <div className="flex flex-col">
@@ -1001,8 +1003,8 @@ const ExerciseSearchFree = () => {
 
       {hasEliteAccess && filteredIntermediateExercises.length > 0 && (
         <section className="mt-4 w-full px-4 flex flex-col gap-2.5">
-          <p className="font-subheading font-bold text-[16px] text-orange">
-            🔥 INTERMEDIO
+          <p className="font-subheading font-bold text-[16px] text-orange flex gap-1.5">
+            <Flame size={20} /> INTERMEDIO
           </p>
 
           {filteredIntermediateExercises.map((exercise) => {
@@ -1012,7 +1014,7 @@ const ExerciseSearchFree = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <span className="bg-orange-bg2 h-12.5 w-12.5 rounded-xl border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
-                      🔥
+                      <Flame size={20} />
                     </span>
 
                     <div className="flex flex-col">
@@ -1057,8 +1059,8 @@ const ExerciseSearchFree = () => {
 
       {hasEliteAccess && filteredAdvancedExercises.length > 0 && (
         <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5">
-          <p className="font-subheading font-bold text-[16px] text-accent1">
-            ⚡ AVANZADO
+          <p className="font-subheading font-bold text-[16px] text-accent1 flex gap-1.5">
+            <Swords size={20} /> AVANZADO
           </p>
 
           {filteredAdvancedExercises.map((exercise) => {
@@ -1068,7 +1070,7 @@ const ExerciseSearchFree = () => {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <span className="bg-accent1-bg1 h-12.5 w-12.5 rounded-xl border border-accent1 font-heading font-extrabold text-[18px] text-accent1 flex items-center justify-center">
-                      ⚡
+                      <Swords size={20} />
                     </span>
 
                     <div className="flex flex-col">
@@ -1114,12 +1116,12 @@ const ExerciseSearchFree = () => {
       {!hasEliteAccess && (
         <>
           <section className="mt-4 w-full px-4 flex flex-col gap-2.5 opacity-50 pointer-events-none">
-            <p className="font-subheading font-bold text-[16px] text-orange">
-              🔒 INTERMEDIO
+            <p className="font-subheading font-bold text-[16px] text-orange flex gap-1.5">
+              <Lock size={20} /> INTERMEDIO
             </p>
             <Card>
               <div className="flex flex-col items-center justify-center py-7.5 gap-3">
-                <span className="text-[40px]">🔒</span>
+                <span className="text-[40px]"><Lock size={40} /></span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>
@@ -1132,11 +1134,11 @@ const ExerciseSearchFree = () => {
 
           <section className="mt-4 pb-17.5 w-full px-4 flex flex-col gap-2.5 opacity-50 pointer-events-none">
             <p className="font-subheading font-bold text-[16px] text-accent1">
-              🔒 AVANZADO
+              <Lock size={20} /> AVANZADO
             </p>
             <Card>
               <div className="flex flex-col items-center justify-center py-7.5 gap-3">
-                <span className="text-[40px]">🔒</span>
+                <span className="text-[40px]"><Lock size={40} /></span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>
