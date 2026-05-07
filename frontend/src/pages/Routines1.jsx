@@ -446,7 +446,7 @@ const Routines1 = () => {
                     <div className="flex flex-col gap-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 ">
                             <h3 className="font-heading font-bold text-[20px] text-text-high">
                               {routine.name}
                             </h3>
@@ -473,7 +473,7 @@ const Routines1 = () => {
                           onClick={(e) => handleOpenOptions(e, routine)}
                           className="bg-surf h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low text-[18px] hover:bg-surface transition-colors shrink-0"
                         >
-                          ⋮
+                          <MoreVertical size={16} />
                         </button>
                       </div>
 
