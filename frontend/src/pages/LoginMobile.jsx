@@ -6,6 +6,8 @@ import { loginUser } from "../services/auth";
 
 import { useNavigate } from "react-router-dom";
 
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+
 const LoginMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -109,11 +111,13 @@ const LoginMobile = () => {
 
       <section className="mt-3.5">
         <div className="mb-4">
+
           <Input
             variant="outlined"
             label="Correo electrónico"
             p="p-[16px]"
             placeholder="email@ejemplo.com"
+            icon={<Mail size={16} />}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -132,6 +136,7 @@ const LoginMobile = () => {
             label="Contraseña"
             p="p-[16px]"
             placeholder="Tu contraseña"
+            icon={<Lock size={16} />}
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -144,7 +149,7 @@ const LoginMobile = () => {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-16 transform -translate-y-1/2 text-text-low hover:text-text-high transition-colors text-[20px]"
           >
-            {showPassword ? "👁️" : "🙈"}
+            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
           </button>
 
           {passwordError && (

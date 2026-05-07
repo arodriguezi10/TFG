@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import Input from "../components/Input";
+
 
 const LoginDesktop = () => {
   const [email, setEmail] = useState("");
@@ -119,9 +122,10 @@ const LoginDesktop = () => {
             <label className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mb-2 block">
               Correo electrónico
             </label>
-            <input
+            <Input
               type="email"
               placeholder="email@ejemplo.com"
+              icon={<Mail size={16} />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -137,9 +141,10 @@ const LoginDesktop = () => {
             <label className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mb-2 block">
               Contraseña
             </label>
-            <input
+            <Input
               type={showPassword ? "text" : "password"}
               placeholder="Tu contraseña"
+              icon={<Lock size={16} />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -148,9 +153,9 @@ const LoginDesktop = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-[42px] text-text-low hover:text-text-high transition-colors text-[18px]"
+              className="absolute right-7 top-13 text-text-low hover:text-text-high transition-colors text-[18px]"
             >
-              {showPassword ? "👁️" : "🙈"}
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
             {passwordError && (
               <p className="font-body text-[13px] text-red mt-1.5">{passwordError}</p>
