@@ -349,7 +349,7 @@ const Routines1 = () => {
           >
             Progresión
             {subscriptionTier === 'free' && (
-              <span className="text-[11px]">🔒</span>
+              <span className="text-[11px]"><Lock size={15} className="text-orange opacity-50" /></span>
             )}
             {activeTab === 'progression' && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1"></div>
@@ -392,7 +392,7 @@ const Routines1 = () => {
         <>
           <section className="mt-12.5 flex flex-col items-center justify-center gap-3.75">
             <span className="bg-surf h-27.5 w-27.5 px-2.5 rounded-[35px] font-body text-[45px] text-accent1 flex items-center justify-center">
-              📋
+              <Clipboard size={45} />
             </span>
 
             <p className="mt-5 bg-surf px-3.5 py-0.5 rounded-2xl border border-text-low font-subheading font-semibold text-[16px] text-text-low">
@@ -428,7 +428,7 @@ const Routines1 = () => {
             {filteredRoutines.length === 0 ? (
               <Card>
                 <div className="flex flex-col items-center justify-center py-16 gap-4">
-                  <span className="text-[48px]">🔍</span>
+                  <span className="text-[48px]"><Search size={48} className="text-text-low" /></span>
                   <p className="font-heading font-bold text-[18px] text-text-high text-center">
                     No se encontraron rutinas
                   </p>
@@ -561,7 +561,7 @@ const Routines1 = () => {
             <Card>
               <div className="flex items-center justify-between gap-3.75 hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
                 <span className="bg-orange-bg2 h-15 w-15 px-2.5 rounded-2xl border border-orange font-body text-[25px] text-orange flex items-center justify-center">
-                  👑
+                  <Crown size={28} />
                 </span>
 
                 <div className="w-[70%] flex flex-col gap-px">
@@ -584,7 +584,7 @@ const Routines1 = () => {
                 </div>
 
                 <div className="bg-orange-bg2 h-9.25 w-9.25 px-2 rounded-lg border border-orange font-body text-[15px] text-orange flex items-center justify-center">
-                  →
+                  <ChevronRight size={18} />
                 </div>
               </div>
             </Card>

@@ -1,11 +1,12 @@
 import React from "react";
+import { Copy, BarChart2, Share2, Eye, EyeOff, Trash2, ChevronRight } from "lucide-react";
 
 const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, onHistory, onShare, onHide }) => {
   if (!isOpen) return null;
 
   const options = [
     {
-      icon: "📋",
+      icon: <Copy size={20} className="text-accent1" />,
       label: "Duplicar rutina",
       sublabel: "Crea una copia exacta",
       color: "text-text-high",
@@ -14,7 +15,7 @@ const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, 
       onClick: () => { onDuplicate(); onClose(); }
     },
     {
-      icon: "📊",
+      icon: <BarChart2 size={20} className="text-accent1" />,
       label: "Ver historial",
       sublabel: "Sesiones completadas",
       color: "text-text-high",
@@ -23,7 +24,7 @@ const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, 
       onClick: () => { onHistory(); onClose(); }
     },
     {
-      icon: "🔗",
+      icon: <Share2 size={20} className="text-accent1" />,
       label: "Compartir rutina",
       sublabel: "Exporta o comparte",
       color: "text-text-high",
@@ -32,7 +33,7 @@ const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, 
       onClick: () => { onShare(); onClose(); }
     },
     {
-      icon: routine?.is_hidden ? "👁️" : "👁️‍🗨️",
+      icon: routine?.is_hidden ? <Eye size={20} className="text-accent1" /> : <EyeOff size={20} className="text-accent1" />,
       label: routine?.is_hidden ? "Mostrar rutina" : "Ocultar rutina",
       sublabel: routine?.is_hidden ? "Vuelve a aparecer en el panel" : "No aparecerá en el panel",
       color: "text-text-high",
@@ -41,7 +42,7 @@ const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, 
       onClick: () => { onHide(); onClose(); }
     },
     {
-      icon: "🗑️",
+      icon: <Trash2 size={20} className="text-accent1" />,
       label: "Eliminar rutina",
       sublabel: "Esta acción no se puede deshacer",
       color: "text-red",
