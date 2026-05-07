@@ -4,6 +4,9 @@ import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 
+import { BarChart2, Lock, Star, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, ArrowUp, ArrowDown, Activity } from "lucide-react";
+
+
 // Valores MEV/MRV estandar de literatura cientifica de hipertrofia
 const MEV_MRV = {
   "Pecho":       { mev: 8,  mrv: 20 },
@@ -217,7 +220,7 @@ const ProgressVolumen = ({ subscriptionTier }) => {
     switch (status) {
       case "mrv_excedido":
         return {
-          icon: "⚠",
+          icon: <AlertTriangle size={18} color="#f5a623" />,
           iconBg: "rgba(255,87,87,0.1)",
           iconBorder: "#ff5757",
           iconColor: "#ff5757",
@@ -230,7 +233,7 @@ const ProgressVolumen = ({ subscriptionTier }) => {
         };
       case "cerca_mrv":
         return {
-          icon: "⚠",
+          icon: <AlertTriangle size={18} color="#f5a623" />,
           iconBg: "rgba(245,166,35,0.1)",
           iconBorder: "#f5a623",
           iconColor: "#f5a623",
@@ -243,7 +246,7 @@ const ProgressVolumen = ({ subscriptionTier }) => {
         };
       case "mav_optimo":
         return {
-          icon: "✓",
+          icon: < CheckCircle2 size={18} color="#6c63ff" />,
           iconBg: "rgba(108,99,255,0.1)",
           iconBorder: "#6c63ff",
           iconColor: "#6c63ff",
@@ -257,7 +260,7 @@ const ProgressVolumen = ({ subscriptionTier }) => {
       case "mev_bajo":
       default:
         return {
-          icon: "↑",
+          icon: <ArrowUp size={18} color="#36d9b8" />,
           iconBg: "rgba(54,217,184,0.1)",
           iconBorder: "#36d9b8",
           iconColor: "#36d9b8",
@@ -284,24 +287,67 @@ const ProgressVolumen = ({ subscriptionTier }) => {
 
   // Pantalla bloqueada para no elite
   if (!isElite) {
-    return (
-      <div className="flex flex-col px-4 gap-4 items-center justify-center py-20">
-        <span className="text-[48px]">🔒</span>
-        <p className="font-heading font-bold text-[18px] text-text-high text-center">
-          Análisis de volumen
-        </p>
-        <p className="font-body text-[14px] text-text-low text-center">
-          Disponible en el plan Élite
-        </p>
-        <button
-          onClick={() => navigate("/subscription")}
-          className="mt-2 bg-primary border border-primary rounded-xl px-6 py-3 font-subheading font-bold text-[15px] text-text-high"
-        >
-          ⭐ Ver planes
-        </button>
+  return (
+    <div className="flex flex-col px-4 gap-6 py-8">
+
+      {/* ICONO Y BADGE */}
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <div className="h-28 w-28 rounded-3xl bg-primary/10 border border-primary/30 flex items-center justify-center">
+            <BarChart2 size={52} className="text-primary" />
+          </div>
+          <div className="absolute -top-2 -right-2 bg-yellow-500 h-8 w-8 rounded-full flex items-center justify-center">
+            <Lock size={14} className="text-background" />
+          </div>
+        </div>
+
+        <span className="bg-yellow-500/10 border border-yellow-500 px-4 py-1 rounded-full font-subheading font-bold text-[13px] text-yellow-500">
+          FUNCIÓN ÉLITE
+        </span>
       </div>
-    );
-  }
+
+      {/* TITULO */}
+      <div className="text-center">
+        <h2 className="font-heading font-extrabold text-[26px] text-text-high leading-tight mb-2">
+          Análisis de<br />
+          <span className="text-primary">Volumen Efectivo</span>
+        </h2>
+        <p className="font-body text-[14px] text-text-low leading-relaxed">
+          Controla tu volumen semanal por grupo muscular basado en los rangos MEV y MRV de la literatura científica de hipertrofia.
+        </p>
+      </div>
+
+      {/* FEATURES */}
+      <div className="flex flex-col gap-3">
+        {[
+          { icon: <Activity size={18} className="text-primary" />, title: "MEV y MRV por músculo", desc: "Saber exactamente cuántas series necesitas para crecer" },
+          { icon: <TrendingUp size={18} className="text-blue-500" />, title: "Tendencia semanal", desc: "Compara tu volumen con la semana anterior" },
+          { icon: <AlertTriangle size={18} className="text-orange-400" />, title: "Análisis de fatiga", desc: "Detecta sobreentrenamiento antes de que ocurra" },
+          { icon: <CheckCircle2 size={18} className="text-green" />, title: "Proyección de recuperación", desc: "Días estimados hasta recuperación completa por músculo" },
+        ].map((f) => (
+          <div key={f.title} className="flex items-start gap-4 bg-surf border border-text-low/20 rounded-2xl p-4">
+            <div className="h-10 w-10 rounded-xl bg-background flex items-center justify-center shrink-0">
+              {f.icon}
+            </div>
+            <div>
+              <p className="font-heading font-bold text-[15px] text-text-high mb-0.5">{f.title}</p>
+              <p className="font-body text-[13px] text-text-low">{f.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <button
+        onClick={() => navigate("/subscription")}
+        className="w-full bg-primary border border-primary rounded-2xl py-4 font-heading font-bold text-[16px] text-text-high hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+      >
+        <Star size={18} />
+        Ver planes
+      </button>
+    </div>
+  );
+}
 
   if (loading) {
     return (
@@ -372,7 +418,7 @@ const ProgressVolumen = ({ subscriptionTier }) => {
                   className="h-10 w-10 rounded-xl flex items-center justify-center text-[18px]"
                   style={{ backgroundColor: config.bg, border: `1px solid ${config.border}` }}
                 >
-                  📋
+                  <Activity size={18} color={config.color} />
                 </div>
                 <div className="flex-1">
                   <p className="font-heading font-bold text-[18px] text-text-high">
