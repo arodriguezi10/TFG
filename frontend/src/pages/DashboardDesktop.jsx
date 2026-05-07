@@ -1076,15 +1076,15 @@ const DashboardDesktop = () => {
                       {selectedSession.routine_name}
                     </p>
                     <div className="flex justify-between text-[13px] text-text-low">
-                      <span>
+                      <span className="flex items-center gap-1">
                         <Clock size={14} className="text-primary" />{" "}
                         {selectedSession.duration_minutes || 0} min
                       </span>
-                      <span>
+                      <span className="flex items-center gap-1">
                         <Dumbbell size={14} className="text-primary" />
                         {selectedSession.exercises_completed || 0} ejercicios
                       </span>
-                      <span>
+                      <span className="flex items-center gap-1">
                         <Layers size={14} className="text-primary" />
                         {selectedSession.total_sets || 0} series
                       </span>

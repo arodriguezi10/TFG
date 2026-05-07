@@ -5,6 +5,7 @@ import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import ModalRoutineOptions from "../components/ModalRoutineOptions";
+import { Search, Settings, Plus, Calendar, Clock, Dumbbell, Layers, ChevronRight, Lock, Crown, MoreVertical } from "lucide-react"; 
 
 const Routines1 = () => {
   const navigate = useNavigate();
@@ -303,18 +304,18 @@ const Routines1 = () => {
             onClick={() => setShowSearch(!showSearch)}
             className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors cursor-pointer"
           >
-            🔍
+            <Search size={18} />
           </button>
 
           <div className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low">
-            ⚙️
+            <Settings size={18} />
           </div>
 
           <button
             onClick={handleCreateRoutine}
             className="bg-accent1 h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-high cursor-pointer hover:opacity-80 transition-opacity"
           >
-            +
+            <Plus size={18} />
           </button>
         </div>
       </section>
@@ -463,8 +464,8 @@ const Routines1 = () => {
                           )}
 
                           <div className="flex gap-3 text-[12px] text-text-low">
-                            <span>📅 {parseDays(routine.assigned_days)}</span>
-                            <span>⏱️ {stats.duration} min</span>
+                            <span className="flex items-center gap-1"><Calendar size={12} /> {parseDays(routine.assigned_days)}</span>
+                            <span className="flex items-center gap-1"><Clock size={12} /> {stats.duration} min</span>
                           </div>
                         </div>
 
