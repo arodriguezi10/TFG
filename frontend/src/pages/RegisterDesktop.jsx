@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/auth";
+import Input from "../components/Input";
+import { Mail, Lock, Eye, EyeOff, User, Calendar } from "lucide-react";
 
 const RegisterDesktop = () => {
   const [email, setEmail] = useState("");
@@ -150,9 +152,10 @@ const RegisterDesktop = () => {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Nombre</label>
-                <input
+                <Input
                   type="text"
                   placeholder="Alejandro"
+                  icon={<User size={16} />}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
@@ -162,9 +165,10 @@ const RegisterDesktop = () => {
 
               <div className="flex flex-col gap-1.5">
                 <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Apellido</label>
-                <input
+                <Input
                   type="text"
                   placeholder="Rodríguez"
+                  icon={<User size={16} />}
                   value={surname}
                   onChange={(e) => setSurname(e.target.value)}
                   className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
@@ -176,11 +180,12 @@ const RegisterDesktop = () => {
             {/* FECHA NACIMIENTO */}
             <div className="flex flex-col gap-1.5">
               <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Fecha de nacimiento</label>
-              <input
+              <Input
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
                 className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors"
+                icon={<Calendar size={16} />}
               />
               {birthDateError && <p className="font-body text-[12px] text-red">⚠️ {birthDateError}</p>}
             </div>
@@ -188,9 +193,10 @@ const RegisterDesktop = () => {
             {/* EMAIL */}
             <div className="flex flex-col gap-1.5">
               <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Correo electrónico</label>
-              <input
+              <Input
                 type="email"
                 placeholder="email@ejemplo.com"
+                icon={<Mail size={16} />}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
@@ -202,19 +208,20 @@ const RegisterDesktop = () => {
             <div className="flex flex-col gap-1.5">
               <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Contraseña</label>
               <div className="relative">
-                <input
+                <Input
                   type={showPassword ? "text" : "password"}
                   placeholder="Tu contraseña"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 pr-12 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
+                  icon={<Lock size={16} />}
+                  className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-text-low hover:text-text-high text-[16px]"
                 >
-                  {showPassword ? "👁️" : "🙈"}
+                  {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
                 </button>
               </div>
               {passwordError && <p className="font-body text-[12px] text-red">⚠️ {passwordError}</p>}
@@ -224,9 +231,10 @@ const RegisterDesktop = () => {
             <div className="flex flex-col gap-1.5">
               <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">Confirmar contraseña</label>
               <div className="relative">
-                <input
+                <Input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Repite la contraseña"
+                  icon={<Lock size={16} />}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 pr-12 font-body text-[14px] text-text-high outline-none focus:border-primary transition-colors placeholder:text-text-low/50"
@@ -236,7 +244,7 @@ const RegisterDesktop = () => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-text-low hover:text-text-high text-[16px]"
                 >
-                  {showConfirmPassword ? "👁️" : "🙈"}
+                  {showConfirmPassword ? <Eye size={16} /> : <EyeOff size={16} />}
                 </button>
               </div>
               {confirmPasswordError && <p className="font-body text-[12px] text-red">⚠️ {confirmPasswordError}</p>}

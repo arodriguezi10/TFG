@@ -6,6 +6,8 @@ import { registerUser } from "../services/auth";
 
 import { useNavigate } from "react-router-dom";
 
+import { Mail, Lock, Eye, EyeOff, User, Calendar } from "lucide-react";
+
 const RegisterMobile = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -207,6 +209,7 @@ const RegisterMobile = () => {
             variant="outlined"
             p="p-[16px]"
             label="Nombre"
+            icon={<User size={16} />}
             placeholder="Alejandro"
             type="text"
             value={name}
@@ -225,6 +228,7 @@ const RegisterMobile = () => {
               variant="outlined"
               p="p-[16px]"
               label="Apellido"
+              icon={<User size={16} />}
               placeholder="Rodríguez"
               type="text"
               value={surname}
@@ -245,6 +249,7 @@ const RegisterMobile = () => {
               type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
+              icon={<Calendar size={16} />}
             />
             {birthDateError && (
               <p className="font-body text-[14px] text-red mt-1 ml-1">
@@ -259,6 +264,7 @@ const RegisterMobile = () => {
             variant="outlined"
             p="p-[16px]"
             label="Correo electrónico"
+            icon={<Mail size={16} />}
             placeholder="email@ejemplo.com"
             type="email"
             value={email}
@@ -277,6 +283,7 @@ const RegisterMobile = () => {
             p="p-[16px]"
             label="Contraseña"
             placeholder="Tu contraseña"
+            icon={<Lock size={16} />}
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -284,9 +291,9 @@ const RegisterMobile = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-15 transform -translate-y-1/2 text-text-low hover:text-text-high transition-colors text-[20px]"
+            className="absolute right-7 top-16 transform -translate-y-1/2 text-text-low hover:text-text-high transition-colors text-[20px]"
           >
-            {showPassword ? "👁️" : "🙈"}
+            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
           </button>
           {passwordError && (
             <p className="font-body text-[14px] text-red mt-1 ml-1">
@@ -300,6 +307,7 @@ const RegisterMobile = () => {
             variant="outlined"
             p="p-[16px]"
             label="Confirmar contraseña"
+            icon={<Lock size={16} />}
             placeholder="Repite la contraseña"
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
@@ -308,9 +316,9 @@ const RegisterMobile = () => {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-4 top-15 transform -translate-y-1/2 text-text-low hover:text-text-high transition-colors text-[20px]"
+            className="absolute right-7 top-16 transform -translate-y-1/2 text-text-low hover:text-text-high transition-colors text-[20px]"
           >
-            {showConfirmPassword ? "👁️" : "🙈"}
+            {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
           </button>
           {confirmPasswordError && (
             <p className="font-body text-[14px] text-red mt-1 ml-1">
