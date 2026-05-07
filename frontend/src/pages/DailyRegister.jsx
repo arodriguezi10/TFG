@@ -2,70 +2,67 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
+import { ArrowLeft, Moon, Zap, Wind, Bone, Brain, MessageCircle, Send } from "lucide-react";
 
-// Input de texto en vez de number para evitar el problema de un solo digito
-  const MeasurementInput = ({ label, value, onChange, unit, placeholder }) => (
-    <div className="flex flex-col gap-1 flex-1 min-w-0">
-      <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
-        {label}
-      </p>
-      <div className="flex items-center gap-1">
-        <input
-          type="text"
-          inputMode="decimal"
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => {
-            // Solo permitir numeros y punto/coma decimal
-            const val = e.target.value.replace(",", ".");
-            if (val === "" || /^\d*\.?\d*$/.test(val)) {
-              onChange(val);
-            }
-          }}
-          className="min-w-0 w-full bg-background border border-text-low rounded-xl px-2 py-2.5 font-heading font-bold text-[18px] text-text-high outline-none focus:border-primary transition-colors text-center"
-        />
-        <span className="font-body text-[13px] text-text-low shrink-0">{unit}</span>
-      </div>
+const MeasurementInput = ({ label, value, onChange, unit, placeholder }) => (
+  <div className="flex flex-col gap-1 flex-1 min-w-0">
+    <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
+      {label}
+    </p>
+    <div className="flex items-center gap-1">
+      <input
+        type="text"
+        inputMode="decimal"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => {
+          const val = e.target.value.replace(",", ".");
+          if (val === "" || /^\d*\.?\d*$/.test(val)) onChange(val);
+        }}
+        className="min-w-0 w-full bg-background border border-text-low rounded-xl px-2 py-2.5 font-heading font-bold text-[18px] text-text-high outline-none focus:border-primary transition-colors text-center"
+      />
+      <span className="font-body text-[13px] text-text-low shrink-0">{unit}</span>
     </div>
-  );
+  </div>
+);
 
-  const NumberSelector = ({ value, onChange, color = "#ff6b9d" }) => (
-    <div className="flex gap-1.5 flex-wrap">
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-        <button
-          key={num}
-          onClick={() => onChange(num)}
-          className="h-8 w-8 rounded-full font-heading font-bold text-[14px] border transition-all"
-          style={{
-            backgroundColor: value === num ? color : "transparent",
-            borderColor: value === num ? color : "#6b6b8a",
-            color: value === num ? "#fff" : "#6b6b8a",
-          }}
-        >
-          {num}
-        </button>
-      ))}
-    </div>
-    );
+const NumberSelector = ({ value, onChange, color = "#ff6b9d" }) => (
+  <div className="flex gap-1.5 flex-wrap">
+    {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+      <button
+        key={num}
+        onClick={() => onChange(num)}
+        className="h-8 w-8 rounded-full font-heading font-bold text-[14px] border transition-all"
+        style={{
+          backgroundColor: value === num ? color : "transparent",
+          borderColor: value === num ? color : "#6b6b8a",
+          color: value === num ? "#fff" : "#6b6b8a",
+        }}
+      >
+        {num}
+      </button>
+    ))}
+  </div>
+);
 
-  const OptionSelector = ({ options, value, onChange, color = "#36d9b8" }) => (
-    <div className="flex gap-2 flex-wrap">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          onClick={() => onChange(opt)}
-          className="px-3 py-1 rounded-full font-subheading font-bold text-[13px] border transition-all"
-          style={{
-            backgroundColor: value === opt ? `${color}20` : "transparent",
-            borderColor: value === opt ? color : "#6b6b8a",
-            color: value === opt ? color : "#6b6b8a",
-          }}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
+const OptionSelector = ({ options, value, onChange, color = "#36d9b8" }) => (
+  <div className="flex gap-2 flex-wrap">
+    {options.map((opt) => (
+      <button
+        key={opt}
+        onClick={() => onChange(opt)}
+        className="px-3 py-1 rounded-full font-subheading font-bold text-[13px] border transition-all"
+        style={{
+          backgroundColor: value === opt ? `${color}20` : "transparent",
+          borderColor: value === opt ? color : "#6b6b8a",
+          color: value === opt ? color : "#6b6b8a",
+        }}
+      >
+        {opt}
+      </button>
+    ))}
+  </div>
+);
 
 const DailyRegister = () => {
   const navigate = useNavigate();
@@ -97,12 +94,12 @@ const DailyRegister = () => {
       d.setDate(diff);
       const weekStart = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-      const { data: existing} = await supabase
+      const { data: existing } = await supabase
         .from("daily_checkins")
         .select("id")
         .eq("user_id", user.id)
         .eq("checkin_date", weekStart)
-        .maybeSingle(); // <- cambia single() por maybeSingle()
+        .maybeSingle();
 
       const payload = {
         user_id: user.id,
@@ -147,7 +144,7 @@ const DailyRegister = () => {
               onClick={() => navigate(-1)}
               className="bg-surf h-10 w-10 rounded-lg border border-text-low flex items-center justify-center text-text-high shrink-0"
             >
-              ←
+              <ArrowLeft size={18} />
             </button>
             <div className="flex flex-col">
               <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide">
@@ -168,7 +165,6 @@ const DailyRegister = () => {
 
           <div className="bg-surf border border-text-low rounded-2xl p-4 flex flex-col gap-4">
 
-            {/* GRASA CORPORAL */}
             <div>
               <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mb-2">
                 % Grasa corporal
@@ -185,7 +181,6 @@ const DailyRegister = () => {
                   }}
                   className="flex-1 bg-background border border-text-low rounded-xl py-3 font-heading font-bold text-[24px] text-text-high outline-none focus:border-primary transition-colors text-center"
                 />
-
               </div>
               <p className="font-subheading text-[12px] text-text-low mb-2">Selección rápida orientativa:</p>
               <div className="flex gap-2 flex-wrap">
@@ -235,7 +230,7 @@ const DailyRegister = () => {
 
             <div className="pb-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[16px]">🌙</span>
+                <Moon size={16} className="text-primary" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
                   Calidad del sueño
                 </p>
@@ -245,7 +240,7 @@ const DailyRegister = () => {
 
             <div className="py-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[16px]">⚡</span>
+                <Zap size={16} className="text-orange" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
                   Nivel de energía
                 </p>
@@ -255,7 +250,7 @@ const DailyRegister = () => {
 
             <div className="py-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[16px]">😮‍💨</span>
+                <Wind size={16} className="text-accent2" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
                   Fatiga muscular
                 </p>
@@ -270,7 +265,7 @@ const DailyRegister = () => {
 
             <div className="py-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[16px]">🦴</span>
+                <Bone size={16} className="text-text-low" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
                   Molestias articulares
                 </p>
@@ -285,7 +280,7 @@ const DailyRegister = () => {
 
             <div className="pt-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[16px]">🧠</span>
+                <Brain size={16} className="text-red" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">
                   Estrés percibido
                 </p>
@@ -298,7 +293,7 @@ const DailyRegister = () => {
         {/* NOTA AL ENTRENADOR */}
         <div className="mb-1">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-[16px]">💬</span>
+            <MessageCircle size={16} className="text-text-low" />
             <p className="font-subheading font-bold text-text-low text-[13px] uppercase tracking-wide">
               Nota al entrenador
             </p>
@@ -325,7 +320,7 @@ const DailyRegister = () => {
             <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-background" />
           ) : (
             <>
-              <span>✈</span>
+              <Send size={16} />
               Guardar
             </>
           )}

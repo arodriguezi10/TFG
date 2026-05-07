@@ -6,6 +6,11 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import Header from "../components/Header";
 
+import {
+  User, Cake, Phone, Venus, Ruler, Scale, FileText, Globe,
+  Bell, Eye, Smartphone, Languages, Lock, Trash2, ChevronRight, Camera
+} from "lucide-react";
+
 const PersonalSettings = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -216,7 +221,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">NOMBRE COMPLETO</label>
 
                         <div className={`flex items-center gap-5 ${changedFields.has('fullName') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center">👤</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center"><User /></div>
                             <input 
                               type="text"
                               name="fullName"
@@ -234,7 +239,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">FECHA DE NACIMIENTO</label>
 
                         <div className={`flex items-center gap-5 ${changedFields.has('birthDate') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center">🎂</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center"><Cake /></div>
                             <input 
                               type="date"
                               name="birthDate"
@@ -251,7 +256,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">TELÉFONO</label>
 
                         <div className={`flex items-center gap-5 ${changedFields.has('phone') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center">📱</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center"><Phone /></div>
                             <input 
                               type="tel"
                               name="phone"
@@ -269,7 +274,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">SEXO</label>
 
                         <div className={`flex items-center gap-5 ${changedFields.has('sex') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center">⚧️</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center"><Venus /></div>
                             <select 
                               name="sex"
                               className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full cursor-pointer appearance-none"
@@ -290,7 +295,7 @@ const PersonalSettings = () => {
                             <label className="font-subheading font-bold text-[16px] text-text-low">ALTURA (CM)</label>
                             
                             <div className={`flex items-center gap-5 ${changedFields.has('height_cm') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                                <div className="text-text-low text-[20px] flex items-center justify-center">📏</div>
+                                <div className="text-text-low text-[20px] flex items-center justify-center"><Ruler /></div>
                                 <input 
                                   type="number"
                                   name="height_cm"
@@ -308,7 +313,7 @@ const PersonalSettings = () => {
                             <label className="font-subheading font-bold text-[16px] text-text-low">PESO INICIAL (KG)</label>
 
                             <div className={`flex items-center gap-2.5 ${changedFields.has('initial_weight_kg') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                                <div className="text-text-low text-[20px] flex items-center justify-center">⚖️</div>
+                                <div className="text-text-low text-[20px] flex items-center justify-center"><Scale/></div>
                                 <input 
                                   type="number"
                                   name="initial_weight_kg"
@@ -328,7 +333,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">BIO</label>
 
                         <div className={`flex items-start gap-5 ${changedFields.has('bio') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center mt-1">📝</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center mt-1"><FileText/></div>
                             <textarea 
                               name="bio"
                               placeholder="Cuéntanos sobre ti..." 
@@ -346,7 +351,7 @@ const PersonalSettings = () => {
                         <label className="font-subheading font-bold text-[16px] text-text-low">PAÍS</label>
 
                         <div className={`flex items-center gap-5 ${changedFields.has('country') ? 'bg-primary-bg rounded-lg px-2 py-1' : ''}`}>
-                            <div className="text-text-low text-[20px] flex items-center justify-center">🌍</div>
+                            <div className="text-text-low text-[20px] flex items-center justify-center"><Globe /></div>
 
                             <select 
                               name="country"
@@ -388,7 +393,7 @@ const PersonalSettings = () => {
               <div className="flex flex-col gap-3.75">
                 <div className="flex items-center justify-between">
                     <div className="flex gap-3.75 items-center flex-1">
-                        <div className="bg-primary-bg h-10 w-10 rounded-lg text-primary flex items-center justify-center shrink-0">🔔</div>
+                        <div className="bg-primary-bg h-10 w-10 rounded-lg text-primary flex items-center justify-center shrink-0"><Bell/></div>
 
                         <div className="flex flex-col">
                             <p className="font-subheading font-bold text-[16px] text-text-high">Notificaciones</p>
@@ -418,7 +423,7 @@ const PersonalSettings = () => {
 
                 <div className="flex items-center justify-between">
                     <div className="flex gap-3.75 items-center flex-1">
-                        <div className="bg-accent2-bg2 h-10 w-10 rounded-lg text-accent2 flex items-center justify-center shrink-0">👁️</div>
+                        <div className="bg-accent2-bg2 h-10 w-10 rounded-lg text-accent2 flex items-center justify-center shrink-0"><Eye/></div>
 
                         <div className="flex flex-col">
                           <p className="font-subheading font-bold text-[16px] text-text-high">Ocultar series hechas</p>
@@ -448,7 +453,7 @@ const PersonalSettings = () => {
 
                 <div className="flex items-center justify-between">
                     <div className="flex gap-3.75 items-center flex-1">
-                        <div className="bg-orange-bg4 h-10 w-10 rounded-lg text-orange flex items-center justify-center shrink-0">📱</div>
+                        <div className="bg-orange-bg4 h-10 w-10 rounded-lg text-orange flex items-center justify-center shrink-0"><Smartphone /></div>
 
                         <div className="flex flex-col">
                           <p className="font-subheading font-bold text-[16px] text-text-high">Pantalla siempre activa</p>
@@ -480,7 +485,7 @@ const PersonalSettings = () => {
                     <label className="font-subheading font-bold text-[16px] text-text-low">IDIOMA DE LA APP</label>
 
                     <div className="flex items-center gap-5">
-                        <div className="text-text-low text-[20px] flex items-center justify-center">🌐</div>
+                        <div className="text-text-low text-[20px] flex items-center justify-center"><Globe/></div>
 
                         <select 
                           className="font-subheading font-bold text-[16px] text-text-high bg-transparent border-none outline-none w-full cursor-pointer appearance-none" 
@@ -530,9 +535,7 @@ const PersonalSettings = () => {
                     <div className="flex items-center justify-between">  
                         <div className="flex gap-5 items-center justify-center">
                             <div className="bg-red-bg1 h-10 w-10 rounded-lg text-red flex items-center justify-center">
-                                🗑️
-                            </div>
-
+                                <Trash2/></div>
                             <div className="flex flex-col text-left">
                                 <p className="font-heading font-semibold text-[20px] text-red">
                                     Eliminar cuenta
