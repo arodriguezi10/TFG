@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
+import { Dumbbell, ChevronDown, Plus, X, Lock, Trophy, Target, TrendingUp, Search } from "lucide-react";
+
+
 
 const ProgressCarga = ({ subscriptionTier }) => {
   const navigate = useNavigate();
@@ -268,7 +271,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
         className="w-full bg-surf border border-text-low rounded-2xl px-4 py-3 flex items-center gap-3"
       >
         <div className="h-9 w-9 rounded-lg bg-primary-bg border border-primary flex items-center justify-center text-[16px] shrink-0">
-          🏋️
+          <Dumbbell size={16} className="text-orange"/>
         </div>
         <div className="flex-1 text-left">
           <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide">
@@ -282,7 +285,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
           <span className="bg-orange-bg2 border border-orange px-2 py-0.5 rounded-lg font-subheading font-bold text-[11px] text-orange">
             {exercises.length}/6 ejercicios
           </span>
-          <span className="text-text-low text-[18px]">⌄</span>
+          <span className="text-text-low text-[18px]"><ChevronDown size={18} /></span>
         </div>
       </button>
 
@@ -297,7 +300,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
               onClick={() => setShowAddExercise(!showAddExercise)}
               className="bg-primary h-7 w-7 rounded-lg flex items-center justify-center text-text-high font-bold text-[16px]"
             >
-              +
+              {showAddExercise ? <X size={16} /> : <Plus size={16} />}
             </button>
           </div>
 
@@ -410,7 +413,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
             >
               {isLocked ? (
                 <span className="flex flex-col items-center leading-tight">
-                  <span className="text-[10px]">🔒 {lockLabel}</span>
+                  <span className="text-[10px]"><Lock size={10} /> {lockLabel}</span>
                   <span>{range}</span>
                 </span>
               ) : range}
@@ -453,7 +456,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
             <div className="flex gap-3">
               <Card>
                 <div className="flex flex-col gap-1">
-                  <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center text-[16px]">🏆</div>
+                  <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center text-[16px]"><Trophy size={16} className="text-orange"/></div>
                   <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">PR</p>
                   <p className="font-heading font-extrabold text-[32px] text-text-high leading-none">{pr.actual_weight}kg</p>
                   <p className="font-body text-[12px] text-text-low">x {pr.actual_reps} repeticiones</p>
@@ -468,7 +471,7 @@ const ProgressCarga = ({ subscriptionTier }) => {
 
               <Card>
                 <div className="flex flex-col gap-1">
-                  <div className="h-9 w-9 rounded-lg bg-primary-bg border border-primary flex items-center justify-center text-[16px]">🎯</div>
+                  <div className="h-9 w-9 rounded-lg bg-primary-bg border border-primary flex items-center justify-center text-[16px]"><Target size={16} className="text-primary"/></div>
                   <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">RIR MEDIO</p>
                   <p className="font-heading font-extrabold text-[32px] text-text-high leading-none">{avgRir !== null ? avgRir : "--"}</p>
                   <p className="font-body text-[12px] text-text-low">{getRirLabel(avgRir)}</p>
