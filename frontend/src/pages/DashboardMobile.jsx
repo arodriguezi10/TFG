@@ -7,6 +7,26 @@ import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import { useContext, useState, useEffect } from "react";
 
+import {
+  Calendar,
+  ChevronRight,
+  CircleCheck,
+  Dumbbell,
+  Moon,
+  BedDouble,
+  Zap,
+  Timer,
+  Scale,
+  Pencil,
+  BarChart2,
+  Clock,
+  Layers,
+  Plus,
+  CheckCircle2,
+  Minus,
+  LockKeyhole,
+} from "lucide-react";
+
 const getLocalDate = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -46,7 +66,9 @@ const DashboardMobile = () => {
   const [activeProgression, setActiveProgression] = useState(null);
   const [progressionWeekDays, setProgressionWeekDays] = useState([]);
   const [progressionAssignments, setProgressionAssignments] = useState({});
-  const [progressionCompletedDays, setProgressionCompletedDays] = useState(new Set());
+  const [progressionCompletedDays, setProgressionCompletedDays] = useState(
+    new Set(),
+  );
   const [progressionBlocks, setProgressionBlocks] = useState([]);
   const [todayProgressionRoutine, setTodayProgressionRoutine] = useState(null);
   const [currentProgressionWeek, setCurrentProgressionWeek] = useState(0);
@@ -132,7 +154,8 @@ const DashboardMobile = () => {
 
       const { data: blocks } = await supabase
         .from("progression_routine_blocks")
-        .select(`
+        .select(
+          `
           *,
           routines (
             id,
@@ -143,7 +166,8 @@ const DashboardMobile = () => {
               target_sets
             )
           )
-        `)
+        `,
+        )
         .eq("progression_id", progressionData.id)
         .order("position", { ascending: true });
 
@@ -167,11 +191,20 @@ const DashboardMobile = () => {
         const todayDate = getLocalDate();
         const todayAssignment = assignments[todayDate];
 
-        if (todayAssignment && todayAssignment.type === "routine" && todayAssignment.routineId && blocks) {
-          const routineBlock = blocks.find((b) => b.routine_id === todayAssignment.routineId);
+        if (
+          todayAssignment &&
+          todayAssignment.type === "routine" &&
+          todayAssignment.routineId &&
+          blocks
+        ) {
+          const routineBlock = blocks.find(
+            (b) => b.routine_id === todayAssignment.routineId,
+          );
           if (routineBlock) {
             setTodayProgressionRoutine(routineBlock.routines);
-            const isCompleted = await checkIfRoutineCompletedToday(routineBlock.routines.id);
+            const isCompleted = await checkIfRoutineCompletedToday(
+              routineBlock.routines.id,
+            );
             setRoutineCompletedToday(isCompleted);
           } else {
             setTodayProgressionRoutine(null);
@@ -192,7 +225,10 @@ const DashboardMobile = () => {
         .select("session_date, routine_id")
         .eq("user_id", user.id)
         .gte("session_date", progressionData.start_date)
-        .lte("session_date", `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`);
+        .lte(
+          "session_date",
+          `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, "0")}-${String(endDate.getDate()).padStart(2, "0")}`,
+        );
 
       if (sessions) {
         const completed = new Set();
@@ -223,7 +259,10 @@ const DashboardMobile = () => {
     const diffTime = today - startDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const weekIndex = Math.floor(diffDays / 7);
-    const clampedWeek = Math.max(0, Math.min(weekIndex, progression.duration_weeks - 1));
+    const clampedWeek = Math.max(
+      0,
+      Math.min(weekIndex, progression.duration_weeks - 1),
+    );
     setCurrentProgressionWeek(clampedWeek);
   };
 
@@ -236,11 +275,18 @@ const DashboardMobile = () => {
     for (let i = 0; i < 7; i++) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
-      const dayName = currentDate.toLocaleDateString("es-ES", { weekday: "short" });
+      const dayName = currentDate.toLocaleDateString("es-ES", {
+        weekday: "short",
+      });
       const dayNum = currentDate.getDate();
       const fullDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
       const isToday = fullDate === todayLocal;
-      days.push({ dayName: dayName.charAt(0).toUpperCase(), dayNum, fullDate, isToday });
+      days.push({
+        dayName: dayName.charAt(0).toUpperCase(),
+        dayNum,
+        fullDate,
+        isToday,
+      });
     }
 
     setProgressionWeekDays(days);
@@ -279,7 +325,9 @@ const DashboardMobile = () => {
       setSelectedProgressionDay(null);
       return;
     }
-    const routineBlock = progressionBlocks.find((b) => b.routine_id === assignment.routineId);
+    const routineBlock = progressionBlocks.find(
+      (b) => b.routine_id === assignment.routineId,
+    );
     if (routineBlock) {
       setSelectedProgressionDay({
         ...day,
@@ -348,7 +396,10 @@ const DashboardMobile = () => {
     for (let i = 0; i < 7; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + mondayOffset + i);
-      const dayStr = date.toLocaleDateString("es-ES", { weekday: "short" }).charAt(0).toUpperCase();
+      const dayStr = date
+        .toLocaleDateString("es-ES", { weekday: "short" })
+        .charAt(0)
+        .toUpperCase();
       const dayNum = date.getDate();
       const fullDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
       const isToday = fullDate === todayLocal;
@@ -357,8 +408,10 @@ const DashboardMobile = () => {
     return weekDays;
   };
 
-  const isDateCompleted = (dateStr) => completedSessions.some((s) => s.session_date === dateStr);
-  const getSessionForDate = (dateStr) => completedSessions.find((s) => s.session_date === dateStr);
+  const isDateCompleted = (dateStr) =>
+    completedSessions.some((s) => s.session_date === dateStr);
+  const getSessionForDate = (dateStr) =>
+    completedSessions.find((s) => s.session_date === dateStr);
 
   const handleDayClick = (day) => {
     const session = getSessionForDate(day.fullDate);
@@ -372,7 +425,15 @@ const DashboardMobile = () => {
   };
 
   const getTodayDayName = () => {
-    const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const days = [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+    ];
     return days[new Date().getDay()];
   };
 
@@ -392,19 +453,26 @@ const DashboardMobile = () => {
           .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
-        if (error) { setTodayRoutine(null); return; }
+        if (error) {
+          setTodayRoutine(null);
+          return;
+        }
 
         const todayDayName = getTodayDayName();
         const routineForToday = routines?.find((routine) => {
           try {
             const assignedDays = JSON.parse(routine.assigned_days || "[]");
             return assignedDays.includes(todayDayName);
-          } catch { return false; }
+          } catch {
+            return false;
+          }
         });
 
         setTodayRoutine(routineForToday || null);
         if (routineForToday) {
-          const isCompleted = await checkIfRoutineCompletedToday(routineForToday.id);
+          const isCompleted = await checkIfRoutineCompletedToday(
+            routineForToday.id,
+          );
           setRoutineCompletedToday(isCompleted);
         } else {
           setRoutineCompletedToday(false);
@@ -445,10 +513,14 @@ const DashboardMobile = () => {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const sevenDaysAgoDate = `${sevenDaysAgo.getFullYear()}-${String(sevenDaysAgo.getMonth() + 1).padStart(2, "0")}-${String(sevenDaysAgo.getDate()).padStart(2, "0")}`;
-        const weightSevenDaysAgo = recentWeights.find((w) => w.log_date <= sevenDaysAgoDate);
-        if (todayData && weightSevenDaysAgo) setWeeklyChange(todayData.weight - weightSevenDaysAgo.weight);
+        const weightSevenDaysAgo = recentWeights.find(
+          (w) => w.log_date <= sevenDaysAgoDate,
+        );
+        if (todayData && weightSevenDaysAgo)
+          setWeeklyChange(todayData.weight - weightSevenDaysAgo.weight);
         const weightThirtyDaysAgo = recentWeights[recentWeights.length - 1];
-        if (todayData && weightThirtyDaysAgo) setMonthlyChange(todayData.weight - weightThirtyDaysAgo.weight);
+        if (todayData && weightThirtyDaysAgo)
+          setMonthlyChange(todayData.weight - weightThirtyDaysAgo.weight);
       }
 
       const sevenDaysAgo = new Date();
@@ -469,8 +541,13 @@ const DashboardMobile = () => {
         const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
         const weightLog = last7DaysData?.find((w) => w.log_date === dateStr);
         const dayName = date.toLocaleDateString("es-ES", { weekday: "short" });
-        const firstLetter = dayName === "mié" ? "X" : dayName.charAt(0).toUpperCase();
-        last7DaysArray.push({ date: dateStr, weight: weightLog?.weight || null, dayName: firstLetter });
+        const firstLetter =
+          dayName === "mié" ? "X" : dayName.charAt(0).toUpperCase();
+        last7DaysArray.push({
+          date: dateStr,
+          weight: weightLog?.weight || null,
+          dayName: firstLetter,
+        });
       }
       setLast7Days(last7DaysArray);
     } catch (error) {
@@ -479,18 +556,33 @@ const DashboardMobile = () => {
   };
 
   const handleSaveWeight = async () => {
-    if (!weightInput || isNaN(weightInput)) { alert("Por favor ingresa un peso válido"); return; }
+    if (!weightInput || isNaN(weightInput)) {
+      alert("Por favor ingresa un peso válido");
+      return;
+    }
     const weight = parseFloat(weightInput);
-    if (weight <= 0 || weight > 500) { alert("El peso debe estar entre 0 y 500 kg"); return; }
+    if (weight <= 0 || weight > 500) {
+      alert("El peso debe estar entre 0 y 500 kg");
+      return;
+    }
     const todayDate = getLocalDate();
     try {
       const { data: existing } = await supabase
-        .from("weight_logs").select("id").eq("user_id", user.id).eq("log_date", todayDate).single();
+        .from("weight_logs")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("log_date", todayDate)
+        .single();
       if (existing) {
-        const { error } = await supabase.from("weight_logs").update({ weight, updated_at: new Date().toISOString() }).eq("id", existing.id);
+        const { error } = await supabase
+          .from("weight_logs")
+          .update({ weight, updated_at: new Date().toISOString() })
+          .eq("id", existing.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("weight_logs").insert({ user_id: user.id, weight, log_date: todayDate });
+        const { error } = await supabase
+          .from("weight_logs")
+          .insert({ user_id: user.id, weight, log_date: todayDate });
         if (error) throw error;
       }
       setShowWeightInput(false);
@@ -544,21 +636,37 @@ const DashboardMobile = () => {
       const todayDate = getLocalDate();
       if (routineCompletedToday) {
         const { data: session } = await supabase
-          .from("workout_sessions").select("id").eq("user_id", user.id)
-          .eq("routine_id", todayProgressionRoutine.id).eq("session_date", todayDate).single();
-        navigate(`/executeRoutine/${todayProgressionRoutine.id}`, { state: { viewOnly: true, sessionId: session?.id } });
+          .from("workout_sessions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("routine_id", todayProgressionRoutine.id)
+          .eq("session_date", todayDate)
+          .single();
+        navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
+          state: { viewOnly: true, sessionId: session?.id },
+        });
       } else {
         navigate(`/executeRoutine/${todayProgressionRoutine.id}`, {
-          state: { fromProgression: true, progressionId: activeProgression.id, completedDate: todayDate },
+          state: {
+            fromProgression: true,
+            progressionId: activeProgression.id,
+            completedDate: todayDate,
+          },
         });
       }
     } else if (todayRoutine) {
       if (routineCompletedToday) {
         const todayDate = getLocalDate();
         const { data: session } = await supabase
-          .from("workout_sessions").select("id").eq("user_id", user.id)
-          .eq("routine_id", todayRoutine.id).eq("session_date", todayDate).single();
-        navigate(`/executeRoutine/${todayRoutine.id}`, { state: { viewOnly: true, sessionId: session?.id } });
+          .from("workout_sessions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("routine_id", todayRoutine.id)
+          .eq("session_date", todayDate)
+          .single();
+        navigate(`/executeRoutine/${todayRoutine.id}`, {
+          state: { viewOnly: true, sessionId: session?.id },
+        });
       } else {
         navigate(`/executeRoutine/${todayRoutine.id}`);
       }
@@ -572,15 +680,22 @@ const DashboardMobile = () => {
   const parseMuscles = (musclesJson) => {
     try {
       const muscles = JSON.parse(musclesJson);
-      if (Array.isArray(muscles) && muscles.length > 0) return muscles.slice(0, 3).join(" · ");
+      if (Array.isArray(muscles) && muscles.length > 0)
+        return muscles.slice(0, 3).join(" · ");
       return "Sin especificar";
-    } catch { return "Sin especificar"; }
+    } catch {
+      return "Sin especificar";
+    }
   };
 
   const getRoutineStats = (routine) => {
     if (!routine) return { exerciseCount: 0, totalSets: 0, duration: 0 };
     const exerciseCount = routine.routine_exercises?.length || 0;
-    const totalSets = routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0;
+    const totalSets =
+      routine.routine_exercises?.reduce(
+        (sum, ex) => sum + (ex.target_sets || 0),
+        0,
+      ) || 0;
     const duration = routine.estimated_duration_min || 0;
     return { exerciseCount, totalSets, duration };
   };
@@ -593,11 +708,15 @@ const DashboardMobile = () => {
 
   const renderWeightChart = () => {
     if (last7Days.length === 0) return null;
-    const validWeights = last7Days.filter((d) => d.weight !== null).map((d) => d.weight);
+    const validWeights = last7Days
+      .filter((d) => d.weight !== null)
+      .map((d) => d.weight);
     if (validWeights.length === 0) {
       return (
         <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 flex items-center justify-center">
-          <p className="text-text-low text-[12px]">Sin datos suficientes para gráfico</p>
+          <p className="text-text-low text-[12px]">
+            Sin datos suficientes para gráfico
+          </p>
         </div>
       );
     }
@@ -607,17 +726,33 @@ const DashboardMobile = () => {
     return (
       <div className="w-full h-16.25 bg-surf rounded-xl mt-2.5 p-3 flex items-end justify-between gap-1">
         {last7Days.map((day, index) => {
-          const height = day.weight ? ((day.weight - minWeight) / range) * 100 : 0;
+          const height = day.weight
+            ? ((day.weight - minWeight) / range) * 100
+            : 0;
           return (
-            <div key={index} className="flex flex-col items-center flex-1 gap-1">
-              <div className="w-full flex items-end justify-center" style={{ height: "40px" }}>
+            <div
+              key={index}
+              className="flex flex-col items-center flex-1 gap-1"
+            >
+              <div
+                className="w-full flex items-end justify-center"
+                style={{ height: "40px" }}
+              >
                 {day.weight ? (
-                  <div className="w-full bg-accent1 rounded-t-sm transition-all" style={{ height: `${Math.max(height, 10)}%`, minHeight: "4px" }} />
+                  <div
+                    className="w-full bg-accent1 rounded-t-sm transition-all"
+                    style={{
+                      height: `${Math.max(height, 10)}%`,
+                      minHeight: "4px",
+                    }}
+                  />
                 ) : (
                   <div className="w-full h-1 bg-text-low/20 rounded-full" />
                 )}
               </div>
-              <span className="text-[10px] text-text-low font-semibold">{day.dayName}</span>
+              <span className="text-[10px] text-text-low font-semibold">
+                {day.dayName}
+              </span>
             </div>
           );
         })}
@@ -634,8 +769,13 @@ const DashboardMobile = () => {
         return `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, "0")}-${String(end.getDate()).padStart(2, "0")}`;
       })()
     : null;
-  const isTodayInProgressionRange = activeProgression && todayDate >= progressionStartDate && todayDate <= progressionEndDate;
-  const displayRoutine = isTodayInProgressionRange ? todayProgressionRoutine : todayRoutine;
+  const isTodayInProgressionRange =
+    activeProgression &&
+    todayDate >= progressionStartDate &&
+    todayDate <= progressionEndDate;
+  const displayRoutine = isTodayInProgressionRange
+    ? todayProgressionRoutine
+    : todayRoutine;
   const stats = getRoutineStats(displayRoutine);
 
   return (
@@ -660,10 +800,14 @@ const DashboardMobile = () => {
         <section className="mt-4 flex flex-col px-4 gap-3">
           <div className="w-full flex justify-between items-center">
             <p className="font-subheading font-bold text-text-high text-[16px]">
-              📅 SEMANA {currentProgressionWeek + 1} (PROGRESIÓN)
+              <Calendar className="inline-block mr-2 mb-1" size={16} />
+              SEMANA {currentProgressionWeek + 1} (PROGRESIÓN)
             </p>
-            <button onClick={() => navigate("/progression")} className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity">
-              Ver todo &
+            <button
+              onClick={() => navigate("/progression")}
+              className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              Ver todo <ChevronRight className="inline-block mb-1" size={16} />
             </button>
           </div>
 
@@ -677,12 +821,19 @@ const DashboardMobile = () => {
                   onClick={handlePreviousProgressionWeek}
                   disabled={currentProgressionWeek === 0}
                   className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] transition-colors ${currentProgressionWeek === 0 ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed" : "bg-surf border-text-low text-text-high hover:bg-surface"}`}
-                >←</button>
+                >
+                  ←
+                </button>
                 <button
                   onClick={handleNextProgressionWeek}
-                  disabled={currentProgressionWeek >= activeProgression.duration_weeks - 1}
+                  disabled={
+                    currentProgressionWeek >=
+                    activeProgression.duration_weeks - 1
+                  }
                   className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[14px] transition-colors ${currentProgressionWeek >= activeProgression.duration_weeks - 1 ? "bg-surf border-text-low text-text-low/30 cursor-not-allowed" : "bg-surf border-text-low text-text-high hover:bg-surface"}`}
-                >→</button>
+                >
+                  →
+                </button>
               </div>
             </div>
 
@@ -694,14 +845,47 @@ const DashboardMobile = () => {
                 const color = routineId ? getRoutineColor(routineId) : null;
                 const isCompleted = progressionCompletedDays.has(day.fullDate);
                 return (
-                  <button key={index} onClick={() => handleProgressionDayClick(day)} className="flex flex-col items-center gap-1.5 relative transition-all cursor-pointer">
-                    <p className="font-subheading font-bold text-[12px] text-text-low">{day.dayName}</p>
+                  <button
+                    key={index}
+                    onClick={() => handleProgressionDayClick(day)}
+                    className="flex flex-col items-center gap-1.5 relative transition-all cursor-pointer"
+                  >
+                    <p className="font-subheading font-bold text-[12px] text-text-low">
+                      {day.dayName}
+                    </p>
                     <div
                       className={`h-11 w-11 rounded-xl font-heading font-bold text-[16px] flex items-center justify-center transition-all ${day.isToday ? "border-2 border-accent1 bg-accent1/10 text-accent1" : selectedProgressionDay?.fullDate === day.fullDate ? "border-2 border-primary bg-primary/10 text-primary" : isCompleted ? "border-2 border-accent3 bg-accent3/10 text-accent3" : "border border-text-low bg-surf text-text-high"}`}
-                      style={color && !day.isToday && !isCompleted && selectedProgressionDay?.fullDate !== day.fullDate ? { borderColor: color, backgroundColor: `${color}15` } : {}}
-                    >{day.dayNum}</div>
-                    <p className="text-[14px]">{isCompleted ? "✅" : isRest ? "😴" : routineId ? "💪" : "·"}</p>
-                    {color && !isCompleted && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full" style={{ backgroundColor: color }}></div>}
+                      style={
+                        color &&
+                        !day.isToday &&
+                        !isCompleted &&
+                        selectedProgressionDay?.fullDate !== day.fullDate
+                          ? {
+                              borderColor: color,
+                              backgroundColor: `${color}15`,
+                            }
+                          : {}
+                      }
+                    >
+                      {day.dayNum}
+                    </div>
+                    <p className="text-[14px]">
+                      {isCompleted ? (
+                        <CircleCheck size={20} className="text-green" />
+                      ) : isRest ? (
+                        <Moon size={16} className="text-text-low" />
+                      ) : routineId ? (
+                        <Dumbbell size={16} className="text-primary" />
+                      ) : (
+                        "·"
+                      )}
+                    </p>
+                    {color && !isCompleted && (
+                      <div
+                        className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-1 rounded-full"
+                        style={{ backgroundColor: color }}
+                      ></div>
+                    )}
                   </button>
                 );
               })}
@@ -712,34 +896,79 @@ const DashboardMobile = () => {
             <Card>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl flex items-center justify-center text-[18px]" style={{ backgroundColor: `${selectedProgressionDay.color}20`, border: `1px solid ${selectedProgressionDay.color}` }}>💪</div>
+                  <div
+                    className="h-10 w-10 rounded-xl flex items-center justify-center text-[18px]"
+                    style={{
+                      backgroundColor: `${selectedProgressionDay.color}20`,
+                      border: `1px solid ${selectedProgressionDay.color}`,
+                    }}
+                  >
+                    <Dumbbell size={24} className="text-yellow" />
+                  </div>
                   <div>
-                    <p className="font-body text-[11px] text-text-low">{selectedProgressionDay.dayName} {selectedProgressionDay.dayNum}</p>
-                    <p className="font-heading font-bold text-[16px] text-text-high">{selectedProgressionDay.routine.name}</p>
+                    <p className="font-body text-[11px] text-text-low">
+                      {selectedProgressionDay.dayName}{" "}
+                      {selectedProgressionDay.dayNum}
+                    </p>
+                    <p className="font-heading font-bold text-[16px] text-text-high">
+                      {selectedProgressionDay.routine.name}
+                    </p>
                   </div>
                 </div>
-                <button onClick={() => setSelectedProgressionDay(null)} className="h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors">✕</button>
+                <button
+                  onClick={() => setSelectedProgressionDay(null)}
+                  className="h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors"
+                >
+                  ✕
+                </button>
               </div>
               <div className="flex gap-3 mb-4">
-                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">{selectedProgressionDay.routine.routine_exercises?.length || 0} ejercicios</span>
-                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">{selectedProgressionDay.routine.estimated_duration_min || 0} min</span>
+                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                  {selectedProgressionDay.routine.routine_exercises?.length ||
+                    0}{" "}
+                  ejercicios
+                </span>
+                <span className="bg-surf px-3 py-1.5 rounded-lg border border-text-low font-body text-[12px] text-text-low">
+                  {selectedProgressionDay.routine.estimated_duration_min || 0}{" "}
+                  min
+                </span>
               </div>
               {progressionCompletedDays.has(selectedProgressionDay.fullDate) ? (
                 <div className="bg-accent3/10 border border-accent3 rounded-xl p-4 flex items-center gap-3">
-                  <span className="text-[32px]">✅</span>
+                  <span className="text-[32px]">
+                    <CircleCheck className="text-accent3" />
+                  </span>
                   <div className="flex-1">
-                    <p className="font-heading font-bold text-[15px] text-accent3">Rutina completada</p>
-                    <p className="font-body text-[12px] text-text-low">Ya completaste este entrenamiento</p>
+                    <p className="font-heading font-bold text-[15px] text-accent3">
+                      Rutina completada
+                    </p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Ya completaste este entrenamiento
+                    </p>
                   </div>
                 </div>
               ) : selectedProgressionDay.isToday ? (
-                <Button variant="outlined" text="⚡ Iniciar entrenamiento" bgColor="bg-accent1" textColor="text-text-high" borderColor="border-accent1" w="w-full" onClick={handleStartProgressionRoutine} />
+                <Button
+                  variant="outlined"
+                  text="⚡ Iniciar entrenamiento"
+                  bgColor="bg-accent1"
+                  textColor="text-text-high"
+                  borderColor="border-accent1"
+                  w="w-full"
+                  onClick={handleStartProgressionRoutine}
+                />
               ) : (
                 <div className="bg-surf/50 border border-text-low rounded-xl p-4 flex items-center gap-3">
-                  <span className="text-[24px]">🔒</span>
+                  <span className="text-[24px]">
+                    <LockKeyhole className="text-yellow" />
+                  </span>
                   <div className="flex-1">
-                    <p className="font-heading font-bold text-[14px] text-text-low">Solo disponible el día indicado</p>
-                    <p className="font-body text-[12px] text-text-low">Podrás iniciar esta rutina cuando llegue su día</p>
+                    <p className="font-heading font-bold text-[14px] text-text-low">
+                      Solo disponible el día indicado
+                    </p>
+                    <p className="font-body text-[12px] text-text-low">
+                      Podrás iniciar esta rutina cuando llegue su día
+                    </p>
                   </div>
                 </div>
               )}
@@ -755,15 +984,30 @@ const DashboardMobile = () => {
               <div className="flex items-center gap-3">
                 <span className="text-[28px]">📅</span>
                 <div>
-                  <p className="font-subheading font-bold text-text-low text-[11px] uppercase tracking-wide mb-1">Progresión programada</p>
-                  <p className="font-heading font-bold text-text-high text-[15px]">{activeProgression.name}</p>
+                  <p className="font-subheading font-bold text-text-low text-[11px] uppercase tracking-wide mb-1">
+                    Progresión programada
+                  </p>
+                  <p className="font-heading font-bold text-text-high text-[15px]">
+                    {activeProgression.name}
+                  </p>
                   <p className="font-body text-text-low text-[12px] mt-0.5">
-                    Empieza el {new Date(progressionStartDate + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
+                    Empieza el{" "}
+                    {new Date(
+                      progressionStartDate + "T12:00:00",
+                    ).toLocaleDateString("es-ES", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                    })}
                   </p>
                 </div>
               </div>
-              <button onClick={() => navigate("/progression")} className="font-subheading font-bold text-primary text-[13px] cursor-pointer hover:opacity-80 transition-opacity">
-                Ver todo &
+              <button
+                onClick={() => navigate("/progression")}
+                className="font-subheading font-bold text-primary text-[13px] cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                Ver todo{" "}
+                <ChevronRight className="inline-block mb-1" size={16} />
               </button>
             </div>
           </Card>
@@ -780,13 +1024,18 @@ const DashboardMobile = () => {
         ) : displayRoutine ? (
           <Card>
             <p className="font-subheading font-bold text-text-low text-[16px]">
-              {todayProgressionRoutine ? "· RUTINA DE PROGRESIÓN HOY" : "· RUTINA DE HOY"}
+              {todayProgressionRoutine
+                ? "· RUTINA DE PROGRESIÓN HOY"
+                : "· RUTINA DE HOY"}
             </p>
             <div className="mt-4">
-              <p className="font-heading font-extrabold text-text-high text-[28px]">{displayRoutine.name}</p>
+              <p className="font-heading font-extrabold text-text-high text-[28px]">
+                {displayRoutine.name}
+              </p>
               <div className="flex space-x-2">
                 <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
-                  {stats.exerciseCount} ejercicio{stats.exerciseCount !== 1 ? "s" : ""}
+                  {stats.exerciseCount} ejercicio
+                  {stats.exerciseCount !== 1 ? "s" : ""}
                 </span>
                 {displayRoutine.target_muscle_groups && (
                   <span className="bg-surf h-7.5 py-0.5 px-2.5 rounded-2xl border border-text-low text-[14px] text-text-low font-subheading flex items-center justify-center">
@@ -798,26 +1047,38 @@ const DashboardMobile = () => {
             <div className="mt-4 w-[95%] flex items-center justify-between">
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.duration}
-                <span className="font-subheading font-semibold text-[14px] text-text-low">MINUTOS</span>
+                <span className="font-subheading font-semibold text-[14px] text-text-low">
+                  MINUTOS
+                </span>
               </p>
               <div className="w-px h-10 bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.exerciseCount}
-                <span className="font-subheading font-semibold text-[14px] text-text-low">EJERCICIOS</span>
+                <span className="font-subheading font-semibold text-[14px] text-text-low">
+                  EJERCICIOS
+                </span>
               </p>
               <div className="w-px h-10 bg-text-low"></div>
               <p className="flex flex-col items-center font-heading font-bold text-[22px] text-text-high">
                 {stats.totalSets}
-                <span className="font-subheading font-semibold text-[14px] text-text-low">SERIES</span>
+                <span className="font-subheading font-semibold text-[14px] text-text-low">
+                  SERIES
+                </span>
               </p>
             </div>
             <div className="mt-4 flex items-center">
               <Button
                 variant="outlined"
-                text={routineCompletedToday ? "👁️ Ver entrenamiento" : "⚡ Empezar entrenamiento"}
+                text={
+                  routineCompletedToday
+                    ? "👁️ Ver entrenamiento"
+                    : "⚡ Empezar entrenamiento"
+                }
                 bgColor={routineCompletedToday ? "bg-green" : "bg-accent1"}
                 textColor="text-text-high"
-                borderColor={routineCompletedToday ? "border-green" : "border-accent1"}
+                borderColor={
+                  routineCompletedToday ? "border-green" : "border-accent1"
+                }
                 w="w-[100%]"
                 onClick={handleStartRoutine}
                 disabled={false}
@@ -828,37 +1089,78 @@ const DashboardMobile = () => {
           <Card>
             <div className="flex flex-col items-center text-center py-8">
               <div className="w-20 h-20 mb-6 rounded-full bg-linear-to-br from-accent2/20 to-accent3/20 border border-accent2/30 flex items-center justify-center">
-                <span className="text-[40px]">😴</span>
+                <span className="text-[40px]">
+                  <BedDouble size={30} className="text-background" />
+                </span>
               </div>
-              <h3 className="font-heading font-extrabold text-xl text-text-high mb-2 tracking-tight">Día de descanso</h3>
+              <h3 className="font-heading font-extrabold text-xl text-text-high mb-2 tracking-tight">
+                Día de descanso
+              </h3>
               <p className="text-text-low text-sm font-light leading-relaxed mb-6 max-w-xs">
-                No tienes rutinas programadas para hoy. ¡Aprovecha para recuperar!
+                No tienes rutinas programadas para hoy. ¡Aprovecha para
+                recuperar!
               </p>
-              <Button variant="outlined" text="Ver mis rutinas" bgColor="bg-surf" textColor="text-text-high" borderColor="border-text-low" w="w-full" onClick={handleStartRoutine} />
+              <Button
+                variant="outlined"
+                text="Ver mis rutinas"
+                bgColor="bg-surf"
+                textColor="text-text-high"
+                borderColor="border-text-low"
+                w="w-full"
+                onClick={handleStartRoutine}
+              />
             </div>
           </Card>
         )}
       </section>
 
       <section className="mt-4 flex flex-col px-4 gap-3">
-        <p className="font-subheading font-bold text-text-high text-[16px]">¿TODO MARCADO HOY?</p>
+        <p className="font-subheading font-bold text-text-high text-[16px]">
+          ¿TODO MARCADO HOY?
+        </p>
         <div className="flex gap-3.75">
-          <button onClick={handlePreWorkoutToggle} className="flex-1 cursor-pointer">
+          <button
+            onClick={handlePreWorkoutToggle}
+            className="flex-1 cursor-pointer"
+          >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${preWorkout ? "bg-accent1 border-accent1 text-text-high" : "bg-surf border-white/27 text-text-low"}`}>
-                {preWorkout ? "✓" : "&"}
+              <div
+                className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${preWorkout ? "bg-accent1 border-accent1 text-text-high" : "bg-surf border-white/27 text-text-low"}`}
+              >
+                {preWorkout ? (
+                  "✓"
+                ) : (
+                  <Dumbbell size={14} className="text-text-low" />
+                )}
               </div>
-              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${preWorkout ? "text-accent1" : "text-text-high"}`}>Pre-entreno</p>
-              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">Carbohidratos</p>
+              <p
+                className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${preWorkout ? "text-accent1" : "text-text-high"}`}
+              >
+                Pre-entreno
+              </p>
+              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
+                Carbohidratos
+              </p>
             </Card>
           </button>
-          <button onClick={handlePostWorkoutToggle} className="flex-1 cursor-pointer">
+          <button
+            onClick={handlePostWorkoutToggle}
+            className="flex-1 cursor-pointer"
+          >
             <Card>
-              <div className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${postWorkout ? "bg-accent1 border-accent1 text-text-high" : "bg-surf border-white/27 text-text-low"}`}>
-                {postWorkout ? "✓" : "&"}
+              <div
+                className={`h-7.5 w-7.5 rounded-lg border flex justify-center items-center transition-colors ${postWorkout ? "bg-accent1 border-accent1 text-text-high" : "bg-surf border-white/27 text-text-low"}`}
+              >
+                {postWorkout ? "✓" : <Zap size={14} className="text-orange" />}
               </div>
-              <p className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${postWorkout ? "text-accent1" : "text-text-high"}`}>Post-entreno</p>
-              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">Proteína</p>
+              <p
+                className={`font-subheading font-semibold text-[14px] text-left mt-1.25 transition-colors ${postWorkout ? "text-accent1" : "text-text-high"}`}
+              >
+                Post-entreno
+              </p>
+              <p className="font-subheading font-semibold text-text-low text-left text-[14px] mt-1.25">
+                Proteína
+              </p>
             </Card>
           </button>
         </div>
@@ -866,22 +1168,46 @@ const DashboardMobile = () => {
 
       <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
         <div className="w-full flex justify-between">
-          <p className="font-subheading font-bold text-text-high text-[16px]">PESO DE HOY</p>
-          <button onClick={() => navigate("/progress")} className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity">Historial &</button>
+          <p className="font-subheading font-bold text-text-high text-[16px]">
+            PESO DE HOY
+          </p>
+          <button
+            onClick={() => navigate("/progress")}
+            className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            Historial <ChevronRight className="inline-block mb-1" size={16} />
+          </button>
         </div>
         <Card>
           <div className="flex justify-between items-center mb-3">
-            <p className="font-subheading font-bold text-text-low text-[16px]">PESO DEL DÍA HOY</p>
-            <button onClick={() => setShowWeightInput(!showWeightInput)} className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm">
-              {todayWeight ? "✏️" : "+"}
+            <p className="font-subheading font-bold text-text-low text-[16px]">
+              PESO DEL DÍA HOY
+            </p>
+            <button
+              onClick={() => setShowWeightInput(!showWeightInput)}
+              className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm"
+            >
+              {todayWeight ? <Pencil size={18} /> : <Plus size={18} />}
             </button>
           </div>
           {showWeightInput && (
             <div className="mb-4 p-3 bg-surf rounded-xl border border-text-low">
               <div className="flex gap-2 items-center">
-                <input type="number" step="0.1" placeholder="75,5" value={weightInput} onChange={(e) => setWeightInput(e.target.value)}
-                  className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2.5 text-text-high text-[16px] font-heading font-semibold outline-none focus:border-accent1 transition-colors" autoFocus />
-                <button onClick={handleSaveWeight} className="shrink-0 bg-accent1 text-text-high px-4 py-2.5 rounded-lg font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-sm">OK</button>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="75,5"
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
+                  className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2.5 text-text-high text-[16px] font-heading font-semibold outline-none focus:border-accent1 transition-colors"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveWeight}
+                  className="shrink-0 bg-accent1 text-text-high px-4 py-2.5 rounded-lg font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-sm"
+                >
+                  OK
+                </button>
               </div>
             </div>
           )}
@@ -890,22 +1216,37 @@ const DashboardMobile = () => {
               <div className="flex mt-2 items-center justify-between">
                 <div className="flex items-baseline gap-2">
                   <div className="flex items-baseline">
-                    <span className="font-heading font-extrabold text-[64px] text-text-high leading-none tracking-tight">{formatWeight(todayWeight.weight).integer}</span>
-                    <span className="font-heading font-bold text-[32px] text-text-low leading-none">,{formatWeight(todayWeight.weight).decimal}</span>
+                    <span className="font-heading font-extrabold text-[64px] text-text-high leading-none tracking-tight">
+                      {formatWeight(todayWeight.weight).integer}
+                    </span>
+                    <span className="font-heading font-bold text-[32px] text-text-low leading-none">
+                      ,{formatWeight(todayWeight.weight).decimal}
+                    </span>
                   </div>
-                  <span className="font-heading font-bold text-[24px] text-text-low mb-1">kg</span>
+                  <span className="font-heading font-bold text-[24px] text-text-low mb-1">
+                    kg
+                  </span>
                 </div>
                 {monthlyChange !== null && (
                   <div className="bg-surf rounded-xl py-2 px-3.5 border border-accent2 shadow-sm">
-                    <p className="font-heading font-extrabold text-accent2 text-[20px] leading-tight">{monthlyChange > 0 ? "+" : ""}{monthlyChange.toFixed(1)}</p>
-                    <p className="font-subheading font-semibold text-text-low text-[11px] leading-tight mt-0.5">kg/mes</p>
+                    <p className="font-heading font-extrabold text-accent2 text-[20px] leading-tight">
+                      {monthlyChange > 0 ? "+" : ""}
+                      {monthlyChange.toFixed(1)}
+                    </p>
+                    <p className="font-subheading font-semibold text-text-low text-[11px] leading-tight mt-0.5">
+                      kg/mes
+                    </p>
                   </div>
                 )}
               </div>
               {weeklyChange !== null && (
                 <div className="mt-3">
                   <span className="inline-flex items-center bg-surf rounded-xl py-1.5 px-3.5 border border-accent2 font-subheading font-semibold text-[14px] text-accent2 shadow-sm">
-                    <span className="mr-1.5">📊</span>{weeklyChange > 0 ? "+" : ""}{weeklyChange.toFixed(1)} kg esta semana
+                    <span className="mr-1.5">
+                      <BarChart2 size={15} className="text-primary" />
+                    </span>
+                    {weeklyChange > 0 ? "+" : ""}
+                    {weeklyChange.toFixed(1)} kg esta semana
                   </span>
                 </div>
               )}
@@ -914,10 +1255,17 @@ const DashboardMobile = () => {
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-center">
               <div className="w-16 h-16 mb-4 rounded-full bg-accent1/10 border border-accent1/30 flex items-center justify-center">
-                <span className="text-[32px]">⚖️</span>
+                <span className="text-[32px]">
+                  <Scale size={32} className="text-accent1" />
+                </span>
               </div>
-              <p className="text-text-low text-[14px] mb-4 font-subheading">No has registrado tu peso hoy</p>
-              <button onClick={() => setShowWeightInput(true)} className="bg-accent1 text-text-high px-6 py-2.5 rounded-xl font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-md">
+              <p className="text-text-low text-[14px] mb-4 font-subheading">
+                No has registrado tu peso hoy
+              </p>
+              <button
+                onClick={() => setShowWeightInput(true)}
+                className="bg-accent1 text-text-high px-6 py-2.5 rounded-xl font-heading font-bold text-[14px] hover:opacity-80 transition-opacity shadow-md"
+              >
                 Registrar peso
               </button>
             </div>
@@ -927,36 +1275,77 @@ const DashboardMobile = () => {
 
       <section className="mt-4 flex flex-col px-4 gap-3 items-center leading-tight">
         <div className="w-full flex justify-between">
-          <p className="font-subheading font-bold text-text-high text-[16px]">HISTORIAL SEMANAL</p>
-          <button onClick={() => navigate("#")} className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity">Ver todo &</button>
+          <p className="font-subheading font-bold text-text-high text-[16px]">
+            HISTORIAL SEMANAL
+          </p>
+          <button
+            onClick={() => navigate("#")}
+            className="font-subheading font-bold text-primary text-[16px] cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            Ver todo{" "}
+            <ChevronRight className="inline-block mb-1" size={16} />{" "}
+          </button>
         </div>
         <Card>
           <p className="font-subheading font-bold text-text-low text-[16px] mb-4">
-            {new Date().toLocaleDateString("es-ES", { month: "long", year: "numeric" }).toUpperCase()}
+            {new Date()
+              .toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+              .toUpperCase()}
           </p>
           <div className="flex items-center justify-between">
             {weekDays.map((day, index) => {
               const isCompleted = isDateCompleted(day.fullDate);
               return (
-                <button key={index} onClick={() => handleDayClick(day)} className={`flex flex-col items-center gap-1.75 transition-all ${isCompleted ? "cursor-pointer" : "cursor-default"}`} disabled={!isCompleted}>
-                  <p className="font-subheading font-bold text-text-low text-[16px]">{day.dayStr}</p>
-                  <div className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${isCompleted ? "bg-accent1" : day.isToday ? "bg-transparent border-2 border-accent1 text-accent1" : "bg-transparent text-text-low"}`}>
+                <button
+                  key={index}
+                  onClick={() => handleDayClick(day)}
+                  className={`flex flex-col items-center gap-1.75 transition-all ${isCompleted ? "cursor-pointer" : "cursor-default"}`}
+                  disabled={!isCompleted}
+                >
+                  <p className="font-subheading font-bold text-text-low text-[16px]">
+                    {day.dayStr}
+                  </p>
+                  <div
+                    className={`h-5.5 min-w-8.25 px-1.5 rounded-lg font-heading font-bold text-text-high text-[16px] flex items-center justify-center transition-all ${isCompleted ? "bg-accent1" : day.isToday ? "bg-transparent border-2 border-accent1 text-accent1" : "bg-transparent text-text-low"}`}
+                  >
                     {day.dayNum}
                   </div>
-                  <p className="text-[14px] text-text-low">{isCompleted ? "✓" : "·"}</p>
+                  <p className="text-[14px] text-text-low">
+                    {isCompleted ? (
+                      <CheckCircle2 size={14} className="text-accent1" />
+                    ) : (
+                      <Minus size={14} className="text-text-low" />
+                    )}
+                  </p>
                 </button>
               );
             })}
           </div>
           {selectedDay && selectedSession && (
             <div className="mt-4 pt-4 border-t border-text-low">
-              <p className="font-heading font-bold text-text-high text-[18px] mb-2">{selectedSession.routine_name}</p>
-              <div className="flex gap-3 text-[14px] text-text-low">
-                <span>⏱️ {selectedSession.duration_minutes || 0} min</span>
-                <span>💪 {selectedSession.exercises_completed || 0} ejercicios</span>
-                <span>🔢 {selectedSession.total_sets || 0} series</span>
+              <p className="font-heading font-bold text-text-high text-[18px] mb-2">
+                {selectedSession.routine_name}
+              </p>
+              <div className="flex justify-between text-[14px] text-text-low">
+                <span>
+                  <Clock size={14} className="text-primary" />{" "}
+                  {selectedSession.duration_minutes || 0} min
+                </span>
+                <span>
+                  {" "}
+                  <Dumbbell size={14} className="text-primary" />{" "}
+                  {selectedSession.exercises_completed || 0} ejercicios
+                </span>
+                <span>
+                  <Layers size={14} className="text-primary" />{" "}
+                  {selectedSession.total_sets || 0} series
+                </span>
               </div>
-              {selectedSession.notes && <p className="mt-2 text-[13px] text-text-low italic">"{selectedSession.notes}"</p>}
+              {selectedSession.notes && (
+                <p className="mt-2 text-[13px] text-text-low italic">
+                  "{selectedSession.notes}"
+                </p>
+              )}
             </div>
           )}
         </Card>

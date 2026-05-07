@@ -1,17 +1,18 @@
 import React from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import useIsMobile from "../hooks/useIsMobile";
+import {Home, Dumbbell, TrendingUp, Trophy, MessageCircle} from "lucide-react";
 
 const MainLayout = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
   const navItems = [
-    { to: "/dashboard", icon: "🏠", label: "Home" },
-    { to: "/routines1", icon: "📋", label: "Rutinas" },
-    { to: "/progress",  icon: "📊", label: "Progreso" },
-    { to: "/leaderboard",  icon: "🏆", label: "Clasificación" },
-    { to: "/checkout",  icon: "💬", label: "Chat" },
+    { to: "/dashboard", icon: <Home />, label: "Home" },
+    { to: "/routines1", icon: <Dumbbell />, label: "Rutinas" },
+    { to: "/progress",  icon: <TrendingUp />, label: "Progreso" },
+    { to: "/leaderboard",  icon: <Trophy />, label: "Clasificación" },
+    { to: "/checkout",  icon: <MessageCircle />, label: "Chat" },
   ];
 
   if (!isMobile) {
@@ -67,7 +68,7 @@ const MainLayout = () => {
                 to={item.to}
                 className="flex flex-col items-center gap-1 p-2"
               >
-                <span className={`text-xl ${isActive ? "opacity-100" : "opacity-40"}`}>{item.icon}</span>
+                <span className={`text-xl ${isActive ? "text-primary" : "text-text-low"}`}>{item.icon}</span>
                 <span className={`text-xs font-medium ${isActive ? "text-primary" : "text-text-low"}`}>{item.label}</span>
               </Link>
             );
