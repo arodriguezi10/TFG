@@ -827,7 +827,7 @@ const ExerciseSearchFree = () => {
             className="h-20 rounded-2xl bg-primary-bg border border-primary p-4 flex justify-between hover:bg-primary/5 transition-colors cursor-pointer"
           >
             <div className="w-[90%] flex items-center justify-center gap-3.75">
-              <span className="text-primary text-[20px]">👑</span>
+              <span className="text-primary text-[20px]"><Crown size={20} className="text-orange" /></span>
               <p className="font-body text-[16px] text-text-low text-left">
                 Amplía tus posibilidades con el{" "}
                 <span className="text-primary"> Plan Elite. </span>
@@ -1121,7 +1121,7 @@ const ExerciseSearchFree = () => {
             </p>
             <Card>
               <div className="flex flex-col items-center justify-center py-7.5 gap-3">
-                <span className="text-[40px]"><Lock size={40} /></span>
+                <span className="text-[40px]"><Lock size={40} className="text-orange"/></span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>
@@ -1138,7 +1138,7 @@ const ExerciseSearchFree = () => {
             </p>
             <Card>
               <div className="flex flex-col items-center justify-center py-7.5 gap-3">
-                <span className="text-[40px]"><Lock size={40} /></span>
+                <span className="text-[40px]"><Lock size={40} className="text-orange" /></span>
                 <p className="font-heading font-bold text-[16px] text-text-high text-center">
                   Nivel bloqueado
                 </p>

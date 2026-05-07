@@ -7,6 +7,9 @@ import { useRoutine } from "../context/RoutinesContext";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 
+import { Plus, X, Lock, Crown, ChevronRight, AlertCircle, Trash2, Timer } from "lucide-react";
+
+
 const ConfigExerciseFree = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -347,7 +350,7 @@ const ConfigExerciseFree = () => {
                   <div className="flex items-center justify-center gap-0.5">
                     <p className="font-body text-[12px] text-text-low text-center">RIR</p>
                     {!hasProAccess && (
-                      <p className="bg-orange-bg2 h-3.5 w-3.5 rounded-sm border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center">🔒</p>
+                      <p className="bg-orange-bg2 h-3.5 w-3.5 rounded-sm border border-orange font-body text-[10px] text-orange text-center flex items-center justify-center"><Lock size={9} className="text-orange" /></p>
                     )}
                   </div>   
                   <div></div>
@@ -406,7 +409,7 @@ const ConfigExerciseFree = () => {
                         />
                       ) : (
                         <span className="bg-orange-bg2 w-16.25 h-6.25 rounded-lg border border-orange font-body text-[12px] text-orange flex items-center justify-center opacity-55 cursor-not-allowed">
-                          🔒 RIR
+                          <Lock size={16} className="text-orange" />
                         </span>
                       )}
 
@@ -414,7 +417,7 @@ const ConfigExerciseFree = () => {
                         onClick={() => deleteSerie(exercise.id, serie.id)}
                         className="bg-surface w-6.25 h-6.25 rounded-lg border border-red font-body text-[16px] text-red flex items-center justify-center hover:bg-red/10 transition-colors"
                       >
-                        x
+                        <X size={16} />
                       </button>
                     </div>
 
@@ -455,16 +458,16 @@ const ConfigExerciseFree = () => {
               <div className="flex items-center justify-between mt-2">
                 <button
                   onClick={() => addSerie(exercise.id)}
-                  className="font-body font-bold text-[14px] text-primary hover:text-primary/80 transition-colors"
+                  className="font-body font-bold text-[14px] text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
                 >
-                  + Añadir serie
+                  <Plus size={16} className="mr-1" /> Añadir serie
                 </button>
 
                 <button
                   onClick={() => handleRemoveExercise(exercise.id)}
-                  className="font-body font-semibold text-[14px] text-red hover:text-red/80 transition-colors"
+                  className="font-body font-semibold text-[14px] text-red hover:text-red/80 transition-colors flex items-center gap-1"
                 >
-                  Eliminar
+                  <Trash2 size={16} className="mr-1" /> Eliminar
                 </button>
               </div>
             </Card>
@@ -482,7 +485,7 @@ const ConfigExerciseFree = () => {
               <div className="flex items-center justify-between gap-3 cursor-pointer hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
                 <div className="flex items-center justify-center gap-2.5">
                   <span className="bg-brown-bg h-13.75 w-13.75 px-4 rounded-xl border border-orange font-heading font-extrabold text-[18px] text-orange flex items-center justify-center">
-                    👑
+                    <Crown size={20} />
                   </span>
 
                   <div className="flex flex-col">
@@ -497,7 +500,7 @@ const ConfigExerciseFree = () => {
                 </div>
 
                 <div className="flex items-center justify-center text-orange text-[20px]">
-                  →
+                  <ChevronRight size={20} />
                 </div>
               </div>
             </Card>
