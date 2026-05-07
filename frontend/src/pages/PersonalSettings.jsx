@@ -187,12 +187,42 @@ const PersonalSettings = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="font-body text-text-low">Cargando...</p>
-      </div>
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "¿Seguro que quieres eliminar tu cuenta? Esta acción es irreversible y se borrarán todos tus datos permanentemente."
     );
+    if (!confirmed) return;
+
+    const confirmed2 = window.confirm(
+      "Última confirmación: ¿Realmente quieres eliminar tu cuenta?"
+    );
+    if (!confirmed2) return;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error } = await supabase.functions.invoke("delete-user", {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (err) {
+      console.error("Error eliminando cuenta:", err);
+      alert("❌ Error al eliminar la cuenta");
+    }
+    };
+
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <p className="font-body text-text-low">Cargando...</p>
+        </div>
+      );
   }
 
   return (
@@ -531,7 +561,7 @@ const PersonalSettings = () => {
             <p className="font-subheading font-bold text-[16px] text-red">ZONA DE PELIGRO</p>
 
             <Card>
-                <button className="w-full">
+                <button className="w-full" onClick={handleDeleteAccount}>
                     <div className="flex items-center justify-between">  
                         <div className="flex gap-5 items-center justify-center">
                             <div className="bg-red-bg1 h-10 w-10 rounded-lg text-red flex items-center justify-center">
