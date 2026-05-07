@@ -19,6 +19,7 @@ const Routines1 = () => {
   const [activeTab, setActiveTab] = useState('routines'); // 'routines' o 'progression'
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState(null);
+  const [showHidden, setShowHidden] = useState(false);
 
 
   useEffect(() => {
@@ -49,17 +50,18 @@ const Routines1 = () => {
   };
 
   useEffect(() => {
+    const base = showHidden ? routines : routines.filter(r => !r.is_hidden);
+
     if (searchQuery.trim() === "") {
-      setFilteredRoutines(routines);
+      setFilteredRoutines(base);
     } else {
-      const filtered = routines.filter(routine =>
+      setFilteredRoutines(base.filter(routine =>
         routine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         routine.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         routine.training_type?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredRoutines(filtered);
+      ));
     }
-  }, [searchQuery, routines]);
+  }, [searchQuery, routines, showHidden]);
 
   const fetchRoutines = async () => {
     try {
@@ -216,8 +218,29 @@ const Routines1 = () => {
     alert('🔗 Función de compartir próximamente');
   };
 
-  const handleHide = () => {
-    alert('👁️ Función de ocultar próximamente');
+  const handleHide = async () => {
+    try {
+      const newHiddenState = !selectedRoutine.is_hidden;
+
+      const { error } = await supabase
+        .from('routines')
+        .update({ is_hidden: newHiddenState })
+        .eq('id', selectedRoutine.id)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error al ocultar rutina:', error);
+        alert('Error al ocultar la rutina');
+        return;
+      }
+
+      setRoutines(prev =>
+        prev.map(r => r.id === selectedRoutine.id ? { ...r, is_hidden: newHiddenState } : r)
+      );
+    } catch (err) {
+      console.error('Error inesperado:', err);
+      alert('Error inesperado al ocultar');
+    }
   };
 
   const getRoutineStats = (routine) => {
@@ -335,10 +358,20 @@ const Routines1 = () => {
       </section>
 
       {routines.length > 0 && (
-        <section className="mt-2">
+        <section className="mt-2 flex items-center gap-3">
           <p className="font-body text-[14px] text-text-low">
-            {routines.length} {routines.length === 1 ? 'rutina' : 'rutinas'}
+            {routines.filter(r => !r.is_hidden).length} {routines.filter(r => !r.is_hidden).length === 1 ? 'rutina' : 'rutinas'}
           </p>
+          {routines.filter(r => r.is_hidden).length > 0 && (
+            <button
+              onClick={() => setShowHidden(!showHidden)}
+              className="font-body text-[12px] text-text-low underline"
+            >
+              {showHidden
+                ? 'Ocultar ocultas'
+                : `+ ${routines.filter(r => r.is_hidden).length} oculta${routines.filter(r => r.is_hidden).length !== 1 ? 's' : ''}`}
+            </button>
+          )}
         </section>
       )}
 

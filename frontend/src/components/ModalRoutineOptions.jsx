@@ -32,9 +32,9 @@ const ModalRoutineOptions = ({ isOpen, onClose, routine, onDelete, onDuplicate, 
       onClick: () => { onShare(); onClose(); }
     },
     {
-      icon: "👁️",
-      label: "Ocultar rutina",
-      sublabel: "No aparecerá en el panel",
+      icon: routine?.is_hidden ? "👁️" : "👁️‍🗨️",
+      label: routine?.is_hidden ? "Mostrar rutina" : "Ocultar rutina",
+      sublabel: routine?.is_hidden ? "Vuelve a aparecer en el panel" : "No aparecerá en el panel",
       color: "text-text-high",
       borderColor: "border-text-low",
       bgColor: "bg-surf",
