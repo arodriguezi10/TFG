@@ -3,6 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
+import {
+  Scale, TrendingUp, TrendingDown, Lock, Moon, Zap, Wind,
+  Bone, Brain, MessageCircle, ClipboardList, ChevronRight,
+  Percent, Ruler, Dumbbell, PersonStanding
+} from "lucide-react";
 
 const ProgressCuerpo = ({ subscriptionTier }) => {
   const navigate = useNavigate();
@@ -31,7 +36,6 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
     }
   }, [user]);
 
-  // Obtiene el lunes de la semana actual
   const getWeekStart = () => {
     const d = new Date();
     const day = d.getDay();
@@ -184,7 +188,6 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
 
   const weightDiff = getDiff(latestMeasurement, prevMeasurement, "weight_kg");
 
-  // Barra de progreso para sensaciones numericas
   const SensacionBar = ({ value, max = 10, color }) => (
     <div className="w-full h-1.5 bg-surf rounded-full overflow-hidden">
       <div
@@ -194,9 +197,8 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
     </div>
   );
 
-  // Medida corporal card pequeña
   const MedidaCard = ({ icon, label, value, unit, color, borderColor, bgColor }) => (
-    <div className={`flex-1 rounded-xl p-3 border flex flex-col gap-1`} style={{ backgroundColor: bgColor, borderColor }}>
+    <div className="flex-1 rounded-xl p-3 border flex flex-col gap-1" style={{ backgroundColor: bgColor, borderColor }}>
       <span className="text-[16px]">{icon}</span>
       <p className="font-subheading font-bold text-[10px] text-text-low uppercase tracking-wide">{label}</p>
       <div className="flex items-baseline gap-0.5">
@@ -250,7 +252,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
             >
               {isLocked ? (
                 <span className="flex flex-col items-center leading-tight">
-                  <span className="text-[9px]">🔒</span>
+                  <Lock size={9} />
                   <span>{label}</span>
                 </span>
               ) : label}
@@ -272,7 +274,10 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
                 ? "bg-accent3/10 border-accent3 text-accent3"
                 : "bg-red-bg1 border-red text-red"
             }`}>
-              {weightDiff >= 0 ? "↑" : "↓"} {Math.abs(weightDiff)}kg
+              {weightDiff >= 0
+                ? <TrendingUp size={13} />
+                : <TrendingDown size={13} />}
+              {Math.abs(weightDiff)}kg
             </span>
           )}
         </div>
@@ -289,18 +294,19 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
       {/* GRAFICA */}
       <Card>{renderWeightChart()}</Card>
 
-      {/* MEDIDAS SEMANALES — de daily_checkins */}
+      {/* MEDIDAS SEMANALES */}
       <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide mt-2">
         Medidas esta semana
       </p>
 
       {weeklyCheckin ? (
         <>
-          {/* FILA 1: grasa y cintura */}
           <div className="flex gap-3">
             <Card>
               <div className="flex flex-col gap-1">
-                <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px]">📉</div>
+                <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center shrink-0">
+                  <Percent size={16} className="text-red" />
+                </div>
                 <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">% Grasa</p>
                 <div className="flex items-baseline gap-1">
                   <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
@@ -313,7 +319,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
 
             <Card>
               <div className="flex flex-col gap-1">
-                <div className="h-9 w-9 rounded-lg bg-accent3/10 border border-accent3 flex items-center justify-center text-[16px]">📏</div>
+                <div className="h-9 w-9 rounded-lg bg-accent3/10 border border-accent3 flex items-center justify-center shrink-0">
+                  <Ruler size={16} className="text-accent3" />
+                </div>
                 <p className="font-subheading font-bold text-[11px] text-text-low uppercase tracking-wide mt-1">Cintura</p>
                 <div className="flex items-baseline gap-1">
                   <p className="font-heading font-extrabold text-[28px] text-text-high leading-none">
@@ -325,10 +333,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
             </Card>
           </div>
 
-          {/* FILA 2: pecho, brazo, pierna */}
           <div className="flex gap-2">
             <MedidaCard
-              icon="💪"
+              icon={<Dumbbell size={14} color="#6c63ff" />}
               label="Pecho"
               value={weeklyCheckin.chest_cm}
               unit="cm"
@@ -337,7 +344,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
               bgColor="rgba(108,99,255,0.06)"
             />
             <MedidaCard
-              icon="🦾"
+              icon={<Scale size={14} color="#f5a623" />}
               label="Brazo"
               value={weeklyCheckin.arm_cm}
               unit="cm"
@@ -346,7 +353,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
               bgColor="rgba(245,166,35,0.06)"
             />
             <MedidaCard
-              icon="🦵"
+              icon={<PersonStanding size={14} color="#ff6b9d" />}
               label="Pierna"
               value={weeklyCheckin.leg_cm}
               unit="cm"
@@ -361,7 +368,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           onClick={() => navigate("/dailyRegister")}
           className="w-full bg-surf border border-text-low border-dashed rounded-2xl py-6 flex flex-col items-center gap-2"
         >
-          <span className="text-[28px]">📋</span>
+          <ClipboardList size={28} className="text-text-low" />
           <p className="font-heading font-bold text-[15px] text-text-high">Sin registro esta semana</p>
           <p className="font-body text-[12px] text-primary">+ Registrar ahora</p>
         </button>
@@ -381,7 +388,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* CALIDAD DEL SUENO */}
           <div className="py-3 first:pt-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary flex items-center justify-center text-[16px] shrink-0">🌙</div>
+              <div className="h-9 w-9 rounded-lg bg-primary/10 border border-primary flex items-center justify-center shrink-0">
+                <Moon size={16} className="text-primary" />
+              </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Calidad del sueño</p>
@@ -403,7 +412,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* NIVEL DE ENERGIA */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center text-[16px] shrink-0">⚡</div>
+              <div className="h-9 w-9 rounded-lg bg-orange-bg2 border border-orange flex items-center justify-center shrink-0">
+                <Zap size={16} className="text-orange" />
+              </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Nivel de energía</p>
@@ -425,7 +436,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* FATIGA MUSCULAR */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-accent2/10 border border-accent2 flex items-center justify-center text-[16px] shrink-0">😮‍💨</div>
+              <div className="h-9 w-9 rounded-lg bg-accent2/10 border border-accent2 flex items-center justify-center shrink-0">
+                <Wind size={16} className="text-accent2" />
+              </div>
               <div className="flex-1">
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Fatiga muscular</p>
               </div>
@@ -450,7 +463,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* MOLESTIAS ARTICULARES */}
           <div className="py-3">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-surf border border-text-low flex items-center justify-center text-[16px] shrink-0">🦴</div>
+              <div className="h-9 w-9 rounded-lg bg-surf border border-text-low flex items-center justify-center shrink-0">
+                <Bone size={16} className="text-text-low" />
+              </div>
               <div className="flex-1">
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Molestias articulares</p>
               </div>
@@ -475,7 +490,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {/* ESTRES PERCIBIDO */}
           <div className="py-3 last:pb-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center text-[16px] shrink-0">🧠</div>
+              <div className="h-9 w-9 rounded-lg bg-red-bg1 border border-red flex items-center justify-center shrink-0">
+                <Brain size={16} className="text-red" />
+              </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Estrés percibido</p>
@@ -498,7 +515,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
           {weeklyCheckin?.trainer_note && (
             <div className="pt-3">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-[16px]">💬</span>
+                <MessageCircle size={16} className="text-text-low" />
                 <p className="font-subheading font-bold text-[13px] text-text-low uppercase tracking-wide">Nota al entrenador</p>
               </div>
               <p className="font-body text-[13px] text-text-low italic">"{weeklyCheckin.trainer_note}"</p>
@@ -512,7 +529,9 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
         onClick={() => navigate("/dailyRegister")}
         className="w-full bg-surf border border-text-low rounded-2xl px-4 py-4 flex items-center gap-4 hover:border-primary transition-colors"
       >
-        <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center text-[18px] shrink-0">📋</div>
+        <div className="h-10 w-10 rounded-xl bg-primary-bg border border-primary flex items-center justify-center shrink-0">
+          <ClipboardList size={18} className="text-primary" />
+        </div>
         <div className="flex-1 text-left">
           <p className="font-heading font-bold text-[16px] text-text-high">
             {weeklyCheckin ? "Actualizar registro semanal" : "Registrar sensaciones de la semana"}
@@ -521,7 +540,7 @@ const ProgressCuerpo = ({ subscriptionTier }) => {
             {weeklyCheckin ? "Modifica tu check-in de esta semana" : "Envia tu check-in semanal al entrenador"}
           </p>
         </div>
-        <span className="text-primary text-[18px]">›</span>
+        <ChevronRight size={18} className="text-primary" />
       </button>
 
     </div>
