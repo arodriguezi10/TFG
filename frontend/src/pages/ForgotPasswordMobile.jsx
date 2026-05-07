@@ -3,6 +3,8 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import { sendPasswordResetEmail } from "../services/auth";
 import { useNavigate } from "react-router-dom";
+import { Mail, Info, KeyRound } from "lucide-react";
+
 
 const ForgotPasswordMobile = () => {
 
@@ -60,7 +62,7 @@ const ForgotPasswordMobile = () => {
 
         <section className="mt-9.5 flex flex-col items-center justify-center">
             <span className="bg-surf h-25 w-25 px-2.5 rounded-[30px] border border-s-accent2 font-body text-[45px] text-accent2 flex items-center justify-center">
-                & {/*! PONER EL ICONO */}
+                <KeyRound size={45} />
             </span>
         </section>
 
@@ -84,6 +86,7 @@ const ForgotPasswordMobile = () => {
                 variant="outlined" 
                 p="p-[16px]" 
                 label="Correo electrónico" 
+                icon={<Mail size={16} />}
                 placeholder="email@ejemplo.com" 
                 type="email"
                 value={email}
@@ -91,7 +94,7 @@ const ForgotPasswordMobile = () => {
             />
 
             <div className="h-19.25 rounded-2xl bg-primary-bg border border-accent2 p-4 flex gap-2.5 items-center justify-center">
-                <span className="text-accent2">&</span>
+                <span className="text-accent2"><Info size={18} /></span>
 
                 <p className="font-body text-[16px] text-text-low">Revisa también tu carpeta de 
                     <span className="text-accent2"> spam. </span>
@@ -137,12 +140,12 @@ const ForgotPasswordMobile = () => {
 
             <p className="font-body text-[16px] text-text-low text-center mt-5">
                 ¿No recibiste nada?
-                <span className="text-primary"> Reenviar correo</span>
+                <span className="text-primary hover:opacity-80 font-semibold" onClick={() => navigate("/login")}> Reenviar correo</span>
             </p>
 
             <p className="font-body text-[16px] text-text-low text-center mt-5">
                 ¿Recordaste la contraseña?
-                <span className="text-accent1" onClick={() => navigate("/login")}> Iniciar sesión</span>
+                <span className="text-accent1 hover:opacity-80 font-semibold" onClick={() => navigate("/login")}> Iniciar sesión</span>
             </p>
         </section>
     </div>

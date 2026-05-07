@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendPasswordResetEmail } from "../services/auth";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { Mail, Info} from "lucide-react";
 
 const ForgotPasswordDesktop = () => {
   const [email, setEmail] = useState("");
@@ -96,9 +99,10 @@ const ForgotPasswordDesktop = () => {
             <label className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide">
               Correo electrónico
             </label>
-            <input
+            <Input
               type="email"
               placeholder="email@ejemplo.com"
+              icon={<Mail size={16} />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSendEmail()}
@@ -108,7 +112,7 @@ const ForgotPasswordDesktop = () => {
 
           {/* INFO SPAM */}
           <div className="bg-primary-bg border border-accent2 rounded-xl p-4 flex gap-3 items-start mb-6">
-            <span className="text-accent2 text-[18px] shrink-0">📧</span>
+            <span className="text-accent2 text-[18px] shrink-0"><Info size={18} /></span>
             <p className="font-body text-[13px] text-text-low">
               Revisa también tu carpeta de <span className="text-accent2">spam.</span> El enlace expira en <span className="text-accent2">1 hora.</span>
             </p>
@@ -127,27 +131,26 @@ const ForgotPasswordDesktop = () => {
           )}
 
           {/* BOTÓN */}
-          <button
-            onClick={handleSendEmail}
-            disabled={loading}
-            className="w-full bg-accent2 border border-accent2 rounded-xl py-3.5 font-heading font-bold text-[16px] text-text-high hover:opacity-90 transition-opacity disabled:opacity-50 mb-4"
-          >
-            {loading ? "Enviando..." : "Enviar enlace"}
-          </button>
+          <Button
+                variant="filled"
+                text={loading ? "Enviando..." : "Enviar enlace"}
+                bgColor="bg-accent2"
+                textColor="text-text-high"
+                borderColor="border-accent2"
+                w="w-[100%]"
+                onClick={handleSendEmail}
+                disabled={loading}
+          />
 
           {/* LINKS */}
           <div className="flex flex-col gap-2 text-center">
             <p className="font-body text-[14px] text-text-low">
               ¿No recibiste nada?{" "}
-              <button onClick={handleSendEmail} className="text-primary hover:opacity-80 font-semibold">
-                Reenviar correo
-              </button>
+              <button className="text-primary hover:opacity-80 font-semibold" onClick={() => navigate("/login")}> Reenviar correo</button>
             </p>
             <p className="font-body text-[14px] text-text-low">
               ¿Recordaste la contraseña?{" "}
-              <button onClick={() => navigate("/login")} className="text-accent1 hover:opacity-80 font-semibold">
-                Iniciar sesión
-              </button>
+              <button className="text-accent1 hover:opacity-80 font-semibold" onClick={() => navigate("/login")}> Iniciar sesión</button>
             </p>
           </div>
         </div>
