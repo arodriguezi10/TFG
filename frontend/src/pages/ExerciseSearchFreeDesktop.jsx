@@ -202,7 +202,34 @@ const ExerciseSearchFreeDesktop = () => {
             <h1 className="font-heading font-extrabold text-[28px] text-text-high leading-tight">Anadir ejercicio</h1>
           </div>
         </div>
-        <Button variant="outlined" text={selectedExercises.length > 0 ? `Anadir ${selectedExercises.length} ejercicio${selectedExercises.length > 1 ? "s" : ""}` : "Selecciona ejercicios"} bgColor="bg-primary" textColor="text-text-high" borderColor="border-primary" w="w-auto px-6" onClick={() => navigate(-1)} />
+
+        <div className="flex items-center gap-3">
+          {/* TOGGLE BUSCAR / CONFIGURAR */}
+          <div className="bg-surf rounded-2xl border border-text-low p-1.5 flex items-center gap-1">
+            <button
+              onClick={() => navigate("/exerciseSearchFree")}
+              className="rounded-xl px-4 py-1.5 bg-primary transition-colors"
+            >
+              <p className="font-subheading font-bold text-[14px] text-text-high">Buscar</p>
+            </button>
+            <button
+              onClick={() => navigate("/configExerciseFree")}
+              className="rounded-xl px-4 py-1.5 bg-transparent transition-colors"
+            >
+              <p className="font-subheading font-bold text-[14px] text-text-low">Configurar</p>
+            </button>
+          </div>
+
+          <Button
+            variant="outlined"
+            text={selectedExercises.length > 0 ? `Anadir ${selectedExercises.length} ejercicio${selectedExercises.length > 1 ? "s" : ""}` : "Selecciona ejercicios"}
+            bgColor="bg-primary"
+            textColor="text-text-high"
+            borderColor="border-primary"
+            w="w-auto px-6"
+            onClick={() => navigate(-1)}
+          />
+        </div>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
