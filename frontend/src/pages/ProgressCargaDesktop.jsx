@@ -6,7 +6,7 @@ import Card from "../components/Card";
 import { Dumbbell, Plus, X, Lock, Trophy, Target, Search } from "lucide-react";
 import {
   getLibraryLimit, loadSavedLibrary, saveLibrary,
-  getRirLabel, formatAxisDate, loadChartData, renderChartSVG
+  getRirLabel, formatAxisDate, loadChartData,
 } from "../utils/progressCargaUtils";
 
 const ProgressCargaDesktop = ({ subscriptionTier }) => {
@@ -29,13 +29,15 @@ const ProgressCargaDesktop = ({ subscriptionTier }) => {
   const limit = getLibraryLimit(subscriptionTier);
 
   useEffect(() => {
-    if (!user) return;
-    const saved = loadSavedLibrary(user.id);
-    if (saved && saved.length > 0) {
+  if (!user) return;
+  const saved = loadSavedLibrary(user.id);
+  if (saved && saved.length > 0) {
+    setTimeout(() => {
       setExercises(saved);
       setSelectedExercise(saved[0]);
-    }
-  }, [user]);
+    }, 0);
+  }
+}, [user]);
 
   useEffect(() => {
     if (selectedExercise) {
@@ -69,6 +71,56 @@ const ProgressCargaDesktop = ({ subscriptionTier }) => {
     saveLibrary(user.id, updated);
     if (selectedExercise?.id === exId) setSelectedExercise(updated[0] || null);
   };
+
+  const renderChartSVG = (chartData, formatAxisDate) => {
+  if (chartData.length === 0) return null;
+
+  const width = 340;
+  const height = 160;
+  const paddingLeft = 36;
+  const paddingRight = 12;
+  const paddingTop = 16;
+  const paddingBottom = 28;
+
+  const values = chartData.map((d) => d.rm);
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const range = maxVal - minVal || 1;
+
+  const getX = (i) => paddingLeft + (i / Math.max(chartData.length - 1, 1)) * (width - paddingLeft - paddingRight);
+  const getY = (val) => paddingTop + ((maxVal - val) / range) * (height - paddingTop - paddingBottom);
+
+  const points = chartData.map((d, i) => `${getX(i)},${getY(d.rm)}`);
+  const linePath = "M " + points.join(" L ");
+  const areaPath = linePath + ` L ${getX(chartData.length - 1)},${height - paddingBottom} L ${getX(0)},${height - paddingBottom} Z`;
+
+  const yLabels = [maxVal, (maxVal + minVal) / 2, minVal].map(Math.round);
+  const xLabelIndices = chartData.length <= 5
+    ? chartData.map((_, i) => i)
+    : [0, Math.floor(chartData.length / 4), Math.floor(chartData.length / 2), Math.floor((3 * chartData.length) / 4), chartData.length - 1];
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+      <defs>
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#6c63ff" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#6c63ff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={areaPath} fill="url(#chartGrad)" />
+      <path d={linePath} fill="none" stroke="#6c63ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={getX(chartData.length - 1)} cy={getY(chartData[chartData.length - 1].rm)} r="4" fill="#6c63ff" stroke="#0a0a0f" strokeWidth="2" />
+      {yLabels.map((val, i) => (
+        <text key={i} x={paddingLeft - 4} y={getY(val) + 4} textAnchor="end" fontSize="10" fill="#6b6b8a">{val}</text>
+      ))}
+      {xLabelIndices.map((idx) => (
+        <text key={idx} x={getX(idx)} y={height - 4} textAnchor="middle" fontSize="10" fill="#6b6b8a">
+          {formatAxisDate(chartData[idx].date)}
+        </text>
+      ))}
+    </svg>
+  );
+};
 
   const rmDiff = current1RM && prev1RM ? Math.round((current1RM - prev1RM) * 10) / 10 : null;
 
