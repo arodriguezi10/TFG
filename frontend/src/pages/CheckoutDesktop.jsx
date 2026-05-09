@@ -94,9 +94,9 @@ const CheckoutDesktop = () => {
           {/* PREVIEW TARJETA */}
           <div>
             <p className="font-subheading font-bold text-[12px] text-text-low uppercase tracking-wide mb-4">Metodo de pago</p>
-            <div className="w-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] rounded-2xl p-6 border border-white/10 shadow-2xl">
+            <div className="w-full bg-linear-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] rounded-2xl p-6 border border-white/10 shadow-2xl">
               <div className="flex items-start justify-between mb-6">
-                <div className="w-12 h-9 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-md flex items-center justify-center">
+                <div className="w-12 h-9 bg-linear-to-br from-yellow-400 to-orange-500 rounded-md flex items-center justify-center">
                   <div className="w-6 h-4 bg-yellow-200/40 rounded-sm" />
                 </div>
                 <span className="text-white/80 text-xl font-heading font-extrabold tracking-widest italic">{getCardBrand()}</span>
