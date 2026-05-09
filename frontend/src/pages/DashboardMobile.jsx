@@ -1181,11 +1181,11 @@ const DashboardMobile = () => {
         <Card>
           <div className="flex justify-between items-center mb-3">
             <p className="font-subheading font-bold text-text-low text-[16px]">
-              PESO DEL DÍA HOY
+              PESO DEL DÍA
             </p>
             <button
               onClick={() => setShowWeightInput(!showWeightInput)}
-              className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm"
+              className="bg-accent1 h-8 w-8 rounded-lg flex items-center justify-center text-text-high text-[18px] font-bold hover:opacity-80 transition-opacity shadow-sm "
             >
               {todayWeight ? <Pencil size={18} /> : <Plus size={18} />}
             </button>
@@ -1199,7 +1199,7 @@ const DashboardMobile = () => {
                   placeholder="75,5"
                   value={weightInput}
                   onChange={(e) => setWeightInput(e.target.value)}
-                  className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2.5 text-text-high text-[16px] font-heading font-semibold outline-none focus:border-accent1 transition-colors"
+                  className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2.5 text-text-high text-[16px] font-heading font-semibold outline-none focus:border-accent1 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   autoFocus
                 />
                 <button

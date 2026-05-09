@@ -1,0 +1,332 @@
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { supabase } from "../services/supabase";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import ModalRoutineOptions from "../components/ModalRoutineOptions";
+import { Search, Settings, Plus, Calendar, Clock, ChevronRight, Lock, Crown, MoreVertical, ClipboardList } from "lucide-react";
+
+const Routines1Mobile = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+
+  const [routines, setRoutines] = useState([]);
+  const [filteredRoutines, setFilteredRoutines] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const [subscriptionTier, setSubscriptionTier] = useState("free");
+  const [activeTab, setActiveTab] = useState("routines");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRoutine, setSelectedRoutine] = useState(null);
+  const [showHidden, setShowHidden] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      fetchRoutines();
+      loadUserSubscription();
+    }
+  }, [user]);
+
+  const loadUserSubscription = async () => {
+    try {
+      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", user.id).single();
+      if (error) { setSubscriptionTier("free"); return; }
+      setSubscriptionTier(data?.subscription_tier || "free");
+    } catch { setSubscriptionTier("free"); }
+  };
+
+  useEffect(() => {
+    const base = showHidden ? routines : routines.filter(r => !r.is_hidden);
+    if (searchQuery.trim() === "") { setFilteredRoutines(base); return; }
+    setFilteredRoutines(base.filter(r =>
+      r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.training_type?.toLowerCase().includes(searchQuery.toLowerCase())
+    ));
+  }, [searchQuery, routines, showHidden]);
+
+  const fetchRoutines = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("routines")
+        .select(`*, routine_exercises(id, exercise_id, order_index, target_sets, exercises(name, muscle_group))`)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) { console.error(error); return; }
+      setRoutines(data || []);
+      setFilteredRoutines(data || []);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  };
+
+  const handleDeleteRoutine = async (routineId) => {
+    if (!window.confirm("Seguro que quieres eliminar esta rutina permanentemente?")) return;
+    try {
+      const { error } = await supabase.from("routines").delete().eq("id", routineId).eq("user_id", user.id);
+      if (error) { alert("Error al eliminar la rutina"); return; }
+      setRoutines(routines.filter(r => r.id !== routineId));
+      setFilteredRoutines(filteredRoutines.filter(r => r.id !== routineId));
+      alert("Rutina eliminada correctamente");
+    } catch (err) { console.error(err); }
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    if (tab === "progression") navigate("/progression");
+  };
+
+  const handleOpenOptions = (e, routine) => {
+    e.stopPropagation();
+    setSelectedRoutine(routine);
+    setModalOpen(true);
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      const { data: original, error: fetchError } = await supabase.from("routines").select(`*, routine_exercises(*)`).eq("id", selectedRoutine.id).single();
+      if (fetchError) throw fetchError;
+      const { data: newRoutine, error: insertError } = await supabase.from("routines").insert({
+        user_id: original.user_id, name: `${original.name} (copia)`, description: original.description,
+        training_type: original.training_type, estimated_duration_min: original.estimated_duration_min,
+        assigned_days: original.assigned_days, target_muscle_groups: original.target_muscle_groups,
+      }).select().single();
+      if (insertError) throw insertError;
+      if (original.routine_exercises?.length > 0) {
+        const { error: exError } = await supabase.from("routine_exercises").insert(
+          original.routine_exercises.map(ex => ({
+            routine_id: newRoutine.id, exercise_id: ex.exercise_id, order_index: ex.order_index,
+            target_sets: ex.target_sets, target_reps: ex.target_reps, target_weight: ex.target_weight,
+            target_rir: ex.target_rir, rest_seconds: ex.rest_seconds, intensity_technique: ex.intensity_technique,
+          }))
+        );
+        if (exError) throw exError;
+      }
+      await fetchRoutines();
+      alert("Rutina duplicada correctamente");
+    } catch (err) { alert("Error al duplicar: " + err.message); }
+  };
+
+  const handleHide = async () => {
+    try {
+      const newHiddenState = !selectedRoutine.is_hidden;
+      const { error } = await supabase.from("routines").update({ is_hidden: newHiddenState }).eq("id", selectedRoutine.id).eq("user_id", user.id);
+      if (error) { alert("Error al ocultar la rutina"); return; }
+      setRoutines(prev => prev.map(r => r.id === selectedRoutine.id ? { ...r, is_hidden: newHiddenState } : r));
+    } catch (err) { console.error(err); }
+  };
+
+  const getRoutineStats = (routine) => ({
+    exerciseCount: routine.routine_exercises?.length || 0,
+    totalSets: routine.routine_exercises?.reduce((sum, ex) => sum + (ex.target_sets || 0), 0) || 0,
+    duration: routine.estimated_duration_min || 0,
+  });
+
+  const parseDays = (daysJson) => {
+    try {
+      const days = JSON.parse(daysJson);
+      return Array.isArray(days) && days.length > 0 ? days.map(d => d.substring(0, 3)).join(", ") : "No asignado";
+    } catch { return "No asignado"; }
+  };
+
+  const parseMuscles = (musclesJson) => {
+    try {
+      const muscles = JSON.parse(musclesJson);
+      return Array.isArray(muscles) && muscles.length > 0
+        ? muscles.slice(0, 3).join(", ") + (muscles.length > 3 ? "..." : "")
+        : "Sin especificar";
+    } catch { return "Sin especificar"; }
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <p className="font-body text-text-low">Cargando rutinas...</p>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col mb-2.5 px-4">
+      <section className="w-full flex items-center justify-between">
+        <div className="flex flex-col gap-1.25">
+          <p className="font-subheading text-[12px] text-text-low">Biblioteca</p>
+          <h1 className="font-heading font-extrabold text-[28px] text-text-high leading-tight">Rutinas</h1>
+        </div>
+        <div className="flex gap-2.5">
+          <button onClick={() => setShowSearch(!showSearch)} className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low hover:bg-surface transition-colors">
+            <Search size={18} />
+          </button>
+          <div className="bg-surf h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-low">
+            <Settings size={18} />
+          </div>
+          <button onClick={() => navigate("/createRoutines1")} className="bg-accent1 h-10 w-10 rounded-lg border border-white/27 flex items-center justify-center text-text-high hover:opacity-80 transition-opacity">
+            <Plus size={18} />
+          </button>
+        </div>
+      </section>
+
+      <section className="mt-3 w-full border-b border-text-low">
+        <div className="flex gap-8">
+          <button onClick={() => handleTabClick("routines")} className={`pb-2 font-subheading font-semibold text-[15px] transition-all relative ${activeTab === "routines" ? "text-accent1" : "text-text-low hover:text-text-high"}`}>
+            Rutinas
+            {activeTab === "routines" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1" />}
+          </button>
+          <button onClick={() => handleTabClick("progression")} className={`pb-2 font-subheading font-semibold text-[15px] transition-all flex items-center gap-1.5 relative ${activeTab === "progression" ? "text-accent1" : subscriptionTier === "free" ? "text-text-low/50" : "text-text-low hover:text-text-high"}`}>
+            Progresion
+            {subscriptionTier === "free" && <Lock size={12} className="text-orange opacity-50" />}
+            {activeTab === "progression" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent1" />}
+          </button>
+        </div>
+      </section>
+
+      {routines.length > 0 && (
+        <section className="mt-2 flex items-center gap-3">
+          <p className="font-body text-[14px] text-text-low">{routines.filter(r => !r.is_hidden).length} {routines.filter(r => !r.is_hidden).length === 1 ? "rutina" : "rutinas"}</p>
+          {routines.filter(r => r.is_hidden).length > 0 && (
+            <button onClick={() => setShowHidden(!showHidden)} className="font-body text-[12px] text-text-low underline">
+              {showHidden ? "Ocultar ocultas" : `+ ${routines.filter(r => r.is_hidden).length} oculta${routines.filter(r => r.is_hidden).length !== 1 ? "s" : ""}`}
+            </button>
+          )}
+        </section>
+      )}
+
+      {showSearch && (
+        <section className="mt-4 w-full">
+          <input type="text" placeholder="Buscar rutina por nombre, tipo o descripcion..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-surf border border-text-low rounded-xl px-4 py-3 font-body text-[14px] text-text-high placeholder-text-low outline-none focus:border-accent1 transition-colors" />
+        </section>
+      )}
+
+      {routines.length === 0 ? (
+        <>
+          <section className="mt-12.5 flex flex-col items-center justify-center gap-3.75">
+            <span className="bg-surf h-27.5 w-27.5 rounded-[35px] border border-accent1/20 text-accent1 flex items-center justify-center">
+              <ClipboardList size={45} />
+            </span>
+            <p className="mt-5 bg-surf px-3.5 py-0.5 rounded-2xl border border-text-low font-subheading font-semibold text-[16px] text-text-low">Sin rutinas todavia</p>
+            <p className="font-heading font-extrabold text-[28px] text-text-high leading-tight flex flex-col items-center text-center">
+              Empieza a construir tu <span className="text-accent1">entrenamiento</span>
+            </p>
+            <p className="font-body text-[16px] text-text-low text-center">Crea tu primera rutina y disena cada sesion con los ejercicios que necesitas.</p>
+          </section>
+          <section className="mt-7.5 flex flex-col gap-2.5">
+            <Button variant="outlined" text="Crear rutina" bgColor="bg-accent1" textColor="text-text-high" borderColor="border-accent1" w="w-[100%]" onClick={() => navigate("/createRoutines1")} />
+          </section>
+        </>
+      ) : (
+        <>
+          <section className="mt-6 flex flex-col gap-3">
+            {filteredRoutines.length === 0 ? (
+              <Card>
+                <div className="flex flex-col items-center justify-center py-16 gap-4">
+                  <Search size={48} className="text-text-low" />
+                  <p className="font-heading font-bold text-[18px] text-text-high text-center">No se encontraron rutinas</p>
+                  <p className="font-body text-[14px] text-text-low text-center">Intenta con otra busqueda</p>
+                </div>
+              </Card>
+            ) : (
+              filteredRoutines.map((routine) => {
+                const stats = getRoutineStats(routine);
+                return (
+                  <Card key={routine.id}>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-heading font-bold text-[20px] text-text-high">{routine.name}</h3>
+                            {routine.training_type && (
+                              <span className="bg-accent1-bg1 px-2 py-0.5 rounded-xl border border-accent1 font-body text-[11px] text-accent1">{routine.training_type}</span>
+                            )}
+                          </div>
+                          {routine.description && <p className="font-body text-[13px] text-text-low mb-2">{routine.description}</p>}
+                          <div className="flex gap-3 text-[12px] text-text-low">
+                            <span className="flex items-center gap-1"><Calendar size={12} />{parseDays(routine.assigned_days)}</span>
+                            <span className="flex items-center gap-1"><Clock size={12} />{stats.duration} min</span>
+                          </div>
+                        </div>
+                        <button onClick={(e) => handleOpenOptions(e, routine)} className="bg-surf h-8 w-8 rounded-lg border border-text-low flex items-center justify-center text-text-low hover:bg-surface transition-colors shrink-0">
+                          <MoreVertical size={16} />
+                        </button>
+                      </div>
+
+                      <hr className="border-text-low" />
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-4">
+                          <div className="text-center">
+                            <p className="font-heading font-bold text-[20px] text-accent1">{stats.exerciseCount}</p>
+                            <p className="font-body text-[11px] text-text-low">Ejercicios</p>
+                          </div>
+                          <div className="w-px bg-text-low" />
+                          <div className="text-center">
+                            <p className="font-heading font-bold text-[20px] text-accent1">{stats.totalSets}</p>
+                            <p className="font-body text-[11px] text-text-low">Series</p>
+                          </div>
+                          <div className="w-px bg-text-low" />
+                          <div className="text-center">
+                            <p className="font-heading font-bold text-[20px] text-accent1">{stats.duration}</p>
+                            <p className="font-body text-[11px] text-text-low">Minutos</p>
+                          </div>
+                        </div>
+                        <button onClick={() => navigate(`/editRoutine/${routine.id}`)} className="bg-accent1 h-9 px-4 rounded-lg font-body text-[13px] text-text-high hover:bg-accent1/80 transition-colors">Ver</button>
+                      </div>
+
+                      {routine.target_muscle_groups && (
+                        <div className="bg-surface rounded-lg p-2.5">
+                          <p className="font-body text-[11px] text-text-low mb-1">Grupos musculares:</p>
+                          <p className="font-body text-[12px] text-text-high">{parseMuscles(routine.target_muscle_groups)}</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })
+            )}
+          </section>
+
+          <section className="mt-4 flex flex-col gap-2.5">
+            <Button variant="outlined" text="+ Crear nueva rutina" bgColor="bg-accent1-bg1" textColor="text-accent1" borderColor="border-accent1" w="w-[100%]" onClick={() => navigate("/createRoutines1")} />
+          </section>
+        </>
+      )}
+
+      {subscriptionTier !== "elite" && (
+        <section className="mt-4 pb-4">
+          <button onClick={() => navigate("/subscription")} className="w-full cursor-pointer">
+            <Card>
+              <div className="flex items-center justify-between gap-3.75 hover:bg-surface/50 transition-colors rounded-2xl -m-4 p-4">
+                <span className="bg-orange-bg2 h-15 w-15 px-2.5 rounded-2xl border border-orange text-orange flex items-center justify-center">
+                  <Crown size={28} />
+                </span>
+                <div className="w-[70%] flex flex-col gap-px">
+                  <div className="flex gap-0.5 items-start">
+                    <p className="font-heading font-semibold text-[20px] text-text-high leading-tight">Crear <br />progresion</p>
+                    <span className="bg-yellow-bg2 h-5 px-2.5 rounded-2xl border border-yellow font-body text-[12px] text-yellow">ELITE</span>
+                  </div>
+                  <p className="font-body text-[14px] text-text-low">Planifica la evolucion de cargas semana a semana</p>
+                </div>
+                <div className="bg-orange-bg2 h-9.25 w-9.25 px-2 rounded-lg border border-orange text-orange flex items-center justify-center">
+                  <ChevronRight size={18} />
+                </div>
+              </div>
+            </Card>
+          </button>
+        </section>
+      )}
+
+      <ModalRoutineOptions
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        routine={selectedRoutine}
+        onDelete={() => handleDeleteRoutine(selectedRoutine?.id)}
+        onDuplicate={handleDuplicate}
+        onHistory={() => navigate(`/routineHistory/${selectedRoutine?.id}`)}
+        onShare={() => alert("Funcion de compartir proximamente")}
+        onHide={handleHide}
+      />
+    </div>
+  );
+};
+
+export default Routines1Mobile;

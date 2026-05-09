@@ -1136,7 +1136,7 @@ const DashboardDesktop = () => {
                       placeholder="75,5"
                       value={weightInput}
                       onChange={(e) => setWeightInput(e.target.value)}
-                      className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2 text-text-high text-[15px] font-heading font-semibold outline-none focus:border-accent1"
+                      className="flex-1 min-w-0 bg-background border border-text-low rounded-lg px-3 py-2 text-text-high text-[15px] font-heading font-semibold outline-none focus:border-accent1 decoration-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none "
                       autoFocus
                     />
                     <button
