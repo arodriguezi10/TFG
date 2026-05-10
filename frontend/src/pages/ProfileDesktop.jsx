@@ -284,24 +284,23 @@ const ProfileDesktop = () => {
 
               <button
                 onClick={() => navigate("/coach/requests")}
-                className="w-full"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-5 items-center">
-                    <div className="bg-primary-bg h-10 w-10 rounded-lg flex items-center justify-center">
-                      <Users size={18} className="text-primary" />
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <p className="font-subheading font-bold text-[16px] text-text-high">
-                        Solicitudes de entrenador
-                      </p>
-                      <p className="font-subheading font-bold text-[16px] text-text-low">
-                        {pendingRequests > 0
-                          ? `${pendingRequests} pendiente${pendingRequests !== 1 ? "s" : ""}`
-                          : "Sin solicitudes"}
-                      </p>
-                    </div>
+                className="flex items-center gap-4 py-4 hover:bg-surf transition-colors rounded-xl px-2"
+              >      
+                  <div className="bg-primary-bg h-11 w-11 rounded-xl flex items-center justify-center shrink-0">
+                    <Users size={18} className="text-primary" />
                   </div>
+
+                  <div className="flex flex-col text-left flex-1">
+                    <p className="font-subheading font-bold text-[15px] text-text-high">
+                      Solicitudes de entrenador
+                    </p>
+                    <p className="font-subheading text-[16px] text-text-low">
+                      {pendingRequests > 0
+                        ? `${pendingRequests} pendiente${pendingRequests !== 1 ? "s" : ""}`
+                        : "Sin solicitudes"}
+                    </p>
+                  </div>
+                 
                   <div className="flex items-center gap-2">
                     {pendingRequests > 0 && (
                       <span className="bg-orange h-5 w-5 rounded-full font-heading font-bold text-[11px] text-background flex items-center justify-center">
@@ -310,7 +309,7 @@ const ProfileDesktop = () => {
                     )}
                     <ChevronRight size={18} className="text-text-low" />
                   </div>
-                </div>
+      
               </button>
 
               <button
