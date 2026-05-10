@@ -185,20 +185,6 @@ const LoginMobile = () => {
           w="w-[100%]"
           onClick={handleLogin}
         />
-
-        <p className="font-body text-[16px] text-text-low text-center mt-5">
-          o continúa con
-        </p>
-      </section>
-
-      <section className="flex justify-center gap-2.5 mt-5.5">
-        <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">
-          Google
-        </button>
-        
-        <button className="bg-surface w-42.5 h-15.25 rounded-2xl font-body font-semibold text-[24px] text-text-high">
-          Apple
-        </button>
       </section>
 
       <section className="mt-5.5">
