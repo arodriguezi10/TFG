@@ -110,7 +110,7 @@ const LoginDesktop = () => {
               ◆ Acceso seguro
             </span>
             <h1 className="font-heading font-extrabold text-[36px] text-text-high leading-tight">
-              Bienvenido de<span className="text-primary"> vuelta</span>
+              Bienvenido de<span className="text-primary"> vuelte</span>
             </h1>
             <p className="font-body text-[15px] text-text-low mt-2">
               Inicia sesión para continuar donde lo dejaste
