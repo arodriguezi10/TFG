@@ -8,32 +8,31 @@ const PrivateRoute = ({ children }) => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(null);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
-    if (user) {
-      checkOnboardingStatus();
-    } else {
-      setLoading(false);
-    }
+    if (user) checkOnboardingStatus();
+    else setLoading(false);
   }, [user]);
 
   const checkOnboardingStatus = async () => {
     try {
       const { data, error } = await supabase
         .from("users")
-        .select("onboarding_completed")
+        .select("onboarding_completed, role")
         .eq("id", user.id)
         .single();
 
       if (error) {
-        console.error("Error verificando onboarding:", error);
         setOnboardingCompleted(false);
+        setRole("athlete");
       } else {
         setOnboardingCompleted(data?.onboarding_completed || false);
+        setRole(data?.role || "athlete");
       }
-    } catch (error) {
-      console.error("Error inesperado:", error);
+    } catch {
       setOnboardingCompleted(false);
+      setRole("athlete");
     } finally {
       setLoading(false);
     }
@@ -56,7 +55,7 @@ const PrivateRoute = ({ children }) => {
   }
 
   if (onboardingCompleted === true && location.pathname === "/onboarding") {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={role === "coach" ? "/coach" : "/dashboard"} replace />;
   }
 
   return children;
