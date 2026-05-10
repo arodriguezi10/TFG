@@ -31,6 +31,10 @@ import DailyRegister from "./pages/DailyRegister";
 import Subscription from "./pages/Subscription";
 import Onboarding from "./pages/Onboarding";
 import Leaderboard from "./pages/Leaderboard";
+import { CoachProvider } from "./context/CoachContext";
+import CoachDashboard from "./pages/CoachDashboard";
+import CoachSearch from "./pages/CoachSearch";
+import CoachRequests from "./pages/CoachRequests";
 
 const App = () => {
   return (
@@ -60,6 +64,9 @@ const App = () => {
             <Route path="/progression" element={<PrivateRoute><Progression /></PrivateRoute>} />
             <Route path="/createProgression" element={<PrivateRoute><CreateProgression /></PrivateRoute>} />
             <Route path="/dailyRegister" element={<PrivateRoute><DailyRegister /></PrivateRoute>} />
+            <Route path="/coach" element={<PrivateRoute><CoachDashboard /></PrivateRoute>} />
+            <Route path="/coach/search" element={<PrivateRoute><CoachSearch /></PrivateRoute>} />
+            <Route path="/coach/requests" element={<PrivateRoute><CoachRequests /></PrivateRoute>} />
 
             <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
