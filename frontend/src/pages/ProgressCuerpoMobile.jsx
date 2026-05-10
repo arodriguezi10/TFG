@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
+import { useTargetUser } from "../hooks/useTargetUser";
 import {
   Scale, TrendingUp, TrendingDown, Lock, Moon, Zap, Wind,
   Bone, Brain, MessageCircle, ClipboardList, ChevronRight,
@@ -31,7 +32,8 @@ const MedidaCard = ({ icon, label, value, unit, color, borderColor, bgColor }) =
 
 const ProgressCuerpoMobile = ({ subscriptionTier }) => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
 
   const [loading, setLoading] = useState(true);
   const [selectedRange, setSelectedRange] = useState("1M");
@@ -41,16 +43,16 @@ const ProgressCuerpoMobile = ({ subscriptionTier }) => {
   const [weeklyCheckin, setWeeklyCheckin] = useState(null);
 
   useEffect(() => {
-    if (user) {
-      loadMeasurements(user.id, "1M", setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
-      loadWeeklyCheckin(user.id, setWeeklyCheckin);
+    if (targetUserId) {
+      loadMeasurements(targetUserId, "1M", setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
+      loadWeeklyCheckin(targetUserId, setWeeklyCheckin);
     }
-  }, [user]);
+  }, [targetUserId]);
 
   const handleRangeChange = (label, minTier) => {
     if (isRangeLocked(label, minTier, subscriptionTier)) { navigate("/subscription"); return; }
     setSelectedRange(label);
-    loadMeasurements(user.id, label, setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
+    loadMeasurements(targetUserId, label, setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
   };
 
   const weightDiff = getDiff(latestMeasurement, prevMeasurement, "weight_kg");

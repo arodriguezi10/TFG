@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
+import { useTargetUser } from "../hooks/useTargetUser";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors,
 } from '@dnd-kit/core';
@@ -16,7 +17,8 @@ const getColorByPosition = (index) => POSITION_COLORS[index % POSITION_COLORS.le
 
 const CreateProgressionMobile = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
 
   const [loading, setLoading] = useState(false);
   const [mesocycleExpanded, setMesocycleExpanded] = useState(true);
@@ -53,12 +55,12 @@ const CreateProgressionMobile = () => {
     }
   };
 
-  useEffect(() => { if (user) fetchUserRoutines(); }, [user]);
+  useEffect(() => { if (targetUserId) fetchUserRoutines(); }, [targetUserId]);
 
   const fetchUserRoutines = async () => {
     try {
       setLoadingRoutines(true);
-      const { data, error } = await supabase.from('routines').select(`id, name, description, target_muscle_groups, routine_exercises (id)`).eq('user_id', user.id).order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('routines').select(`id, name, description, target_muscle_groups, routine_exercises (id)`).eq('user_id', targetUserId).order('created_at', { ascending: false });
       if (error) throw error;
       setAvailableRoutines(data || []);
     } catch (error) { console.error('Error cargando rutinas:', error); }
@@ -116,7 +118,7 @@ const CreateProgressionMobile = () => {
   const handleCreateProgression = async () => {
     try {
       setLoading(true);
-      const { data: progressionData, error: progressionError } = await supabase.from('progressions').insert([{ user_id: user.id, name: mesocycleName, goal: mesocycleGoal, duration_weeks: mesocycleDuration, start_date: startDate }]).select().single();
+      const { data: progressionData, error: progressionError } = await supabase.from('progressions').insert([{ user_id: targetUserId, name: mesocycleName, goal: mesocycleGoal, duration_weeks: mesocycleDuration, start_date: startDate }]).select().single();
       if (progressionError) { alert('Error al guardar la progresión'); return; }
       const routineBlocks = selectedRoutines.map((routine, index) => ({ progression_id: progressionData.id, routine_id: routine.id, position: index, color_code: getColorByPosition(index) }));
       const { error: blocksError } = await supabase.from('progression_routine_blocks').insert(routineBlocks);

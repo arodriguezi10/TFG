@@ -1,29 +1,31 @@
 // Progress.jsx
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import ProgressCarga from "./ProgressCarga";
 import ProgressVolumen from "./ProgressVolumen";
 import ProgressCuerpo from "./ProgressCuerpo";
-
+import { useTargetUser } from "../hooks/useTargetUser";
 const Progress = () => {
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
+
   const [activeTab, setActiveTab] = useState("carga");
   const [subscriptionTier, setSubscriptionTier] = useState("free");
 
 
   useEffect(() => {
-  if (!user) return;
+  if (!targetUserId) return;
   const fetchTier = async () => {
     const { data } = await supabase
       .from("users")
       .select("subscription_tier")
-      .eq("id", user.id)
+      .eq("id", targetUserId)
       .single();
     setSubscriptionTier(data?.subscription_tier || "free");
   };
   fetchTier();
-}, [user]);
+}, [targetUserId]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-3">

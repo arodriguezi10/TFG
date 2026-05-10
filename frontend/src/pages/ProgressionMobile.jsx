@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { Settings, Plus, ChevronLeft, ChevronRight, CircleCheck, Moon, Dumbbell, Lock, Crown, TrendingUp, Target, Clock, ClipboardList, Zap, Lightbulb } from "lucide-react";
+import { useTargetUser } from "../hooks/useTargetUser";
 
 const ProgressionMobile = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
+
 
   const [activeProgression, setActiveProgression] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,8 +25,8 @@ const ProgressionMobile = () => {
   const [completedDays, setCompletedDays] = useState(new Set());
 
   useEffect(() => {
-    if (user) { loadUserSubscription(); fetchProgressions(); }
-  }, [user]);
+    if (targetUserId) { loadUserSubscription(); fetchProgressions(); }
+  }, [targetUserId]);
 
   useEffect(() => {
     if (location.state?.justCompleted) { fetchProgressions(); window.history.replaceState({}, document.title); }
@@ -31,7 +34,7 @@ const ProgressionMobile = () => {
 
   const loadUserSubscription = async () => {
     try {
-      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", user.id).single();
+      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", targetUserId).single();
       if (error) { setSubscriptionTier("free"); } else { setSubscriptionTier(data?.subscription_tier || "free"); }
     } catch { setSubscriptionTier("free"); }
   };
@@ -39,7 +42,7 @@ const ProgressionMobile = () => {
   const fetchProgressions = async () => {
     try {
       setLoading(true);
-      const { data: progressionData, error: progressionError } = await supabase.from("progressions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1).single();
+      const { data: progressionData, error: progressionError } = await supabase.from("progressions").select("*").eq("user_id", targetUserId).order("created_at", { ascending: false }).limit(1).single();
       if (progressionError) { setActiveProgression(null); return; }
       if (progressionData) {
         setActiveProgression(progressionData);
@@ -54,7 +57,7 @@ const ProgressionMobile = () => {
         const startDate = new Date(progressionData.start_date);
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + progressionData.duration_weeks * 7);
-        const { data: sessions, error: sessionsError } = await supabase.from("workout_sessions").select("session_date, routine_id").eq("user_id", user.id).gte("session_date", startDate.toISOString().split("T")[0]).lte("session_date", endDate.toISOString().split("T")[0]);
+        const { data: sessions, error: sessionsError } = await supabase.from("workout_sessions").select("session_date, routine_id").eq("user_id", targetUserId).gte("session_date", startDate.toISOString().split("T")[0]).lte("session_date", endDate.toISOString().split("T")[0]);
         if (!sessionsError && sessions) {
           const completed = new Set();
           sessions.forEach((session) => {

@@ -4,7 +4,8 @@ import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
-import { useContext, useState, useEffect } from "react";
+import {  useState, useEffect } from "react";
+import { useTargetUser } from "../hooks/useTargetUser";
 
 import {
   Calendar,
@@ -42,7 +43,8 @@ const DashboardDesktop = () => {
     month: "long",
   });
 
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
 
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -133,7 +135,7 @@ const DashboardDesktop = () => {
       const { data: progressionData, error: progressionError } = await supabase
         .from("progressions")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
@@ -206,7 +208,7 @@ const DashboardDesktop = () => {
       const { data: sessions } = await supabase
         .from("workout_sessions")
         .select("session_date, routine_id")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .gte("session_date", progressionData.start_date)
         .lte(
           "session_date",
@@ -336,7 +338,7 @@ const DashboardDesktop = () => {
       const { data, error } = await supabase
         .from("workout_sessions")
         .select("id")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .eq("routine_id", routineId)
         .eq("session_date", todayDate)
         .limit(1);
@@ -354,7 +356,7 @@ const DashboardDesktop = () => {
       const { data: sessions } = await supabase
         .from("workout_sessions")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .gte("session_date", currentWeek[0].fullDate)
         .lte("session_date", currentWeek[6].fullDate)
         .order("session_date", { ascending: true });
@@ -419,14 +421,14 @@ const DashboardDesktop = () => {
       const { data: userData } = await supabase
         .from("users")
         .select("first_name")
-        .eq("id", user.id)
+        .eq("id", targetUserId)
         .single();
       setName(userData?.first_name ?? "");
       if (!hasProgression) {
         const { data: routines, error } = await supabase
           .from("routines")
           .select(`*, routine_exercises (id, target_sets)`)
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .order("created_at", { ascending: false });
         if (error) {
           setTodayRoutine(null);
@@ -466,7 +468,7 @@ const DashboardDesktop = () => {
       const { data: todayData } = await supabase
         .from("weight_logs")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .eq("log_date", todayDate)
         .single();
       setTodayWeight(todayData);
@@ -477,7 +479,7 @@ const DashboardDesktop = () => {
       const { data: recentWeights } = await supabase
         .from("weight_logs")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .gte("log_date", thirtyDaysAgoDate)
         .order("log_date", { ascending: false });
 
@@ -501,7 +503,7 @@ const DashboardDesktop = () => {
       const { data: last7DaysData } = await supabase
         .from("weight_logs")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .gte("log_date", sevenDaysAgoDate)
         .order("log_date", { ascending: true });
 
@@ -541,7 +543,7 @@ const DashboardDesktop = () => {
       const { data: existing } = await supabase
         .from("weight_logs")
         .select("id")
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .eq("log_date", todayDate)
         .single();
       if (existing) {
@@ -552,7 +554,7 @@ const DashboardDesktop = () => {
       } else {
         await supabase
           .from("weight_logs")
-          .insert({ user_id: user.id, weight, log_date: todayDate });
+          .insert({ user_id: targetUserId, weight, log_date: todayDate });
       }
       setShowWeightInput(false);
       setWeightInput("");
@@ -607,7 +609,7 @@ const DashboardDesktop = () => {
         const { data: session } = await supabase
           .from("workout_sessions")
           .select("id")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .eq("routine_id", todayProgressionRoutine.id)
           .eq("session_date", todayDate)
           .single();
@@ -629,7 +631,7 @@ const DashboardDesktop = () => {
         const { data: session } = await supabase
           .from("workout_sessions")
           .select("id")
-          .eq("user_id", user.id)
+          .eq("user_id", targetUserId)
           .eq("routine_id", todayRoutine.id)
           .eq("session_date", todayDate)
           .single();

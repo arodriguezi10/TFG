@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import ModalRoutineOptions from "../components/ModalRoutineOptions";
+import { useTargetUser } from "../hooks/useTargetUser"; 
 import { Search, Plus, Calendar, Clock, Lock, Crown, MoreVertical, ClipboardList, ChevronRight, Filter } from "lucide-react";
 
 const Routines1Desktop = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
 
   const [routines, setRoutines] = useState([]);
   const [filteredRoutines, setFilteredRoutines] = useState([]);
@@ -21,12 +23,12 @@ const Routines1Desktop = () => {
   const [showHidden, setShowHidden] = useState(false);
 
   useEffect(() => {
-    if (user) { fetchRoutines(); loadUserSubscription(); }
-  }, [user]);
+    if (targetUserId) { fetchRoutines(); loadUserSubscription(); }
+  }, [targetUserId]);
 
   const loadUserSubscription = async () => {
     try {
-      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", user.id).single();
+      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", targetUserId).single();
       if (error) { setSubscriptionTier("free"); return; }
       setSubscriptionTier(data?.subscription_tier || "free");
     } catch { setSubscriptionTier("free"); }
@@ -48,7 +50,7 @@ const Routines1Desktop = () => {
       const { data, error } = await supabase
         .from("routines")
         .select(`*, routine_exercises(id, exercise_id, order_index, target_sets, exercises(name, muscle_group))`)
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .order("created_at", { ascending: false });
       if (error) { console.error(error); return; }
       setRoutines(data || []);
@@ -60,7 +62,7 @@ const Routines1Desktop = () => {
   const handleDeleteRoutine = async (routineId) => {
     if (!window.confirm("Seguro que quieres eliminar esta rutina permanentemente?")) return;
     try {
-      const { error } = await supabase.from("routines").delete().eq("id", routineId).eq("user_id", user.id);
+      const { error } = await supabase.from("routines").delete().eq("id", routineId).eq("user_id", targetUserId);
       if (error) { alert("Error al eliminar la rutina"); return; }
       setRoutines(routines.filter(r => r.id !== routineId));
       setFilteredRoutines(filteredRoutines.filter(r => r.id !== routineId));
@@ -100,7 +102,7 @@ const Routines1Desktop = () => {
   const handleHide = async () => {
     try {
       const newHiddenState = !selectedRoutine.is_hidden;
-      const { error } = await supabase.from("routines").update({ is_hidden: newHiddenState }).eq("id", selectedRoutine.id).eq("user_id", user.id);
+      const { error } = await supabase.from("routines").update({ is_hidden: newHiddenState }).eq("id", selectedRoutine.id).eq("user_id", targetUserId);
       if (error) { alert("Error al ocultar la rutina"); return; }
       setRoutines(prev => prev.map(r => r.id === selectedRoutine.id ? { ...r, is_hidden: newHiddenState } : r));
     } catch (err) { console.error(err); }

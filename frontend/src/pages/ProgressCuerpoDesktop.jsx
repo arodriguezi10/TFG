@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
+import { useTargetUser } from "../hooks/useTargetUser";
+
 import {
   Scale, TrendingUp, TrendingDown, Lock, Moon, Zap, Wind,
   Bone, Brain, MessageCircle, ClipboardList, ChevronRight,
@@ -21,6 +23,8 @@ const SensacionBar = ({ value, max = 10, color }) => (
 const ProgressCuerpoDesktop = ({ subscriptionTier }) => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
+
 
   const [loading, setLoading] = useState(true);
   const [selectedRange, setSelectedRange] = useState("1M");
@@ -31,15 +35,15 @@ const ProgressCuerpoDesktop = ({ subscriptionTier }) => {
 
   useEffect(() => {
     if (user) {
-      loadMeasurements(user.id, "1M", setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
-      loadWeeklyCheckin(user.id, setWeeklyCheckin);
+      loadMeasurements(targetUserId, "1M", setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
+      loadWeeklyCheckin(targetUserId, setWeeklyCheckin);
     }
   }, [user]);
 
   const handleRangeChange = (label, minTier) => {
     if (isRangeLocked(label, minTier, subscriptionTier)) { navigate("/subscription"); return; }
     setSelectedRange(label);
-    loadMeasurements(user.id, label, setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
+    loadMeasurements(targetUserId, label, setMeasurements, setLatestMeasurement, setPrevMeasurement, setLoading);
   };
 
   const weightDiff = getDiff(latestMeasurement, prevMeasurement, "weight_kg");

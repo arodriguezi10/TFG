@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Card from "../components/Card";
 import { BarChart2, Lock, Star, TrendingUp, AlertTriangle, CheckCircle2, Activity } from "lucide-react";
 import { STATUS_CONFIG, LEGEND, getRecoveryDays, getFatigaAnalysis, loadVolumeData } from "../utils/progressVolumenUtils";
+import { useTargetUser } from "../hooks/useTargetUser";
 
 const ProgressVolumenMobile = ({ subscriptionTier }) => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
   const [loading, setLoading] = useState(true);
   const [muscleData, setMuscleData] = useState([]);
   const [selectedWeekOffset, setSelectedWeekOffset] = useState(0);
@@ -16,17 +18,17 @@ const ProgressVolumenMobile = ({ subscriptionTier }) => {
   const isElite = subscriptionTier === "elite";
 
   useEffect(() => {
-    if (!user) return;
+    if (!targetUserId) return;
     if (isElite) {
-      loadVolumeData(user, 0, setMuscleData, setWeekOptions, setLoading);
+      loadVolumeData(targetUserId, 0, setMuscleData, setWeekOptions, setLoading);
     } else {
       setTimeout(() => setLoading(false), 0);
     }
-  }, [user]);
+  }, [targetUserId]);
 
   const handleWeekChange = (offset) => {
     setSelectedWeekOffset(offset);
-    loadVolumeData(user, offset, setMuscleData, setWeekOptions, setLoading);
+    loadVolumeData(targetUserId, offset, setMuscleData, setWeekOptions, setLoading);
   };
 
   if (!isElite) return (

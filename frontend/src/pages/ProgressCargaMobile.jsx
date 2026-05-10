@@ -8,10 +8,14 @@ import {
   getLibraryLimit, loadSavedLibrary, saveLibrary,
   getRirLabel, formatAxisDate, loadChartData, 
 } from "../utils/progressCargaUtils";
+import { useTargetUser } from "../hooks/useTargetUser";
+
 
 const ProgressCargaMobile = ({ subscriptionTier }) => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
+
 
   const [exercises, setExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -31,15 +35,15 @@ const ProgressCargaMobile = ({ subscriptionTier }) => {
   const limit = getLibraryLimit(subscriptionTier);
 
   useEffect(() => {
-  if (!user) return;
-  const saved = loadSavedLibrary(user.id);
+  if (!targetUserId) return;
+  const saved = loadSavedLibrary(targetUserId);
   if (saved && saved.length > 0) {
     setTimeout(() => {
       setExercises(saved);
       setSelectedExercise(saved[0]);
     }, 0);
   }
-}, [user]);
+}, [targetUserId]);
   useEffect(() => {
     if (selectedExercise) {
       loadChartData({ user, selectedExercise, selectedRange, setChartData, setPr, setAvgRir, setCurrent1RM, setPrev1RM, setLoadingChart });
