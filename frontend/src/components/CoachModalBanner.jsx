@@ -2,7 +2,7 @@ import React from "react";
 import { useCoach } from "../hooks/useCoach";
 import { Eye, X } from "lucide-react";
 
-const CoachModeBanner = () => {
+const CoachModalBanner = () => {
   const { isCoachMode, activeClient, exitClientView } = useCoach();
   if (!isCoachMode) return null;
 
@@ -24,4 +24,4 @@ const CoachModeBanner = () => {
   );
 };
 
-export default CoachModeBanner;
+export default CoachModalBanner;

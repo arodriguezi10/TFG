@@ -40,6 +40,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <CoachProvider>
         <RoutineProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -76,6 +77,7 @@ const App = () => {
             </Route>
           </Routes>
         </RoutineProvider>
+        </CoachProvider>
       </AuthProvider>
     </BrowserRouter>
   );
