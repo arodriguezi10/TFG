@@ -5,7 +5,7 @@ import { supabase } from "../services/supabase";
 import { useCoach } from "../hooks/useCoach";
 import {
   Users, Search, Eye, UserPlus, Dumbbell, Scale,
-  TrendingUp, Clock, Crown, Zap, Leaf, ChevronRight, Bell
+  TrendingUp, Clock, Crown, Zap, Leaf, ChevronRight, Bell,ChevronLeft 
 } from "lucide-react";
 import Card from "../components/Card";
 
@@ -134,6 +134,9 @@ const CoachDashboardMobile = () => {
       {/* HEADER */}
       <div className="px-4 pt-14 pb-4 border-b border-text-low/20">
         <div className="flex items-center justify-between mb-1">
+          <button onClick={() => navigate(-1)} className="bg-surf h-10 w-10 rounded-xl border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors">
+            <ChevronLeft size={20} />
+          </button>
           <div>
             <p className="font-subheading text-[12px] text-text-low uppercase tracking-wide">Panel</p>
             <h1 className="font-heading font-extrabold text-[28px] text-text-high">Mis atletas</h1>

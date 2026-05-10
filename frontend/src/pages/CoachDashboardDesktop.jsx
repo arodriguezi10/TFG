@@ -5,7 +5,7 @@ import { supabase } from "../services/supabase";
 import { useCoach } from "../hooks/useCoach";
 import {
   Users, Search, Eye, UserPlus, Dumbbell, Scale,
-  TrendingUp, Clock, Crown, Zap, Leaf, Bell, Activity
+  TrendingUp, Clock, Crown, Zap, Leaf, Bell, Activity, ChevronLeft 
 } from "lucide-react";
 import Card from "../components/Card";
 
@@ -108,6 +108,9 @@ const CoachDashboardDesktop = () => {
       {/* HEADER */}
       <div className="px-8 pt-8 pb-6 border-b border-text-low/20 flex items-center justify-between">
         <div>
+          <button onClick={() => navigate(-1)} className="bg-surf h-10 w-10 rounded-xl border border-text-low flex items-center justify-center text-text-low hover:text-text-high transition-colors">
+      <ChevronLeft size={20} />
+    </button>
           <p className="font-subheading text-[12px] text-text-low uppercase tracking-wide mb-0.5">Panel de entrenador</p>
           <h1 className="font-heading font-extrabold text-[32px] text-text-high">Mis atletas</h1>
         </div>

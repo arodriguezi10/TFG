@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import useIsMobile from "../hooks/useIsMobile";
-import { Home, Dumbbell, TrendingUp, Trophy, MessageCircle, Users } from "lucide-react";
+import { Home, Dumbbell, TrendingUp, Trophy, Users } from "lucide-react";
 import CoachModalBanner from "../components/CoachModalBanner";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
@@ -26,7 +26,6 @@ const MainLayout = () => {
     { to: "/routines1", icon: <Dumbbell />, label: "Rutinas" },
     { to: "/progress", icon: <TrendingUp />, label: "Progreso" },
     { to: "/leaderboard", icon: <Trophy />, label: "Clasificacion" },
-    { to: "/checkout", icon: <MessageCircle />, label: "Chat" },
   ];
 
   if (!isMobile) {
