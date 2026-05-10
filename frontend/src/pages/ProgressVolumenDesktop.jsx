@@ -65,7 +65,7 @@ const ProgressVolumenDesktop = ({ subscriptionTier }) => {
         ))}
       </div>
       <button onClick={() => navigate("/subscription")} className="w-full bg-primary border border-primary rounded-2xl py-4 font-heading font-bold text-[16px] text-text-high hover:opacity-90 flex items-center justify-center gap-2">
-        <Star size={18} /> Ver planes
+        <Star size={18} /> Ver planes y precios
       </button>
     </div>
   );
