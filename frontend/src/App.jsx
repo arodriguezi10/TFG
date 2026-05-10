@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+
 
 import { AuthProvider } from "./context/AuthContext";
 import { RoutineProvider } from "./context/RoutinesContext";
@@ -43,6 +45,7 @@ const App = () => {
         <CoachProvider>
         <RoutineProvider>
           <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
