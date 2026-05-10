@@ -274,19 +274,6 @@ const RegisterDesktop = () => {
               Crear cuenta
             </button>
 
-            {/* SEPARADOR */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-text-low/30" />
-              <p className="font-body text-[13px] text-text-low">o continúa con</p>
-              <div className="flex-1 h-px bg-text-low/30" />
-            </div>
-
-            {/* SOCIAL */}
-            <div className="flex gap-3">
-              <button className="flex-1 bg-surf border border-text-low rounded-xl py-3 font-body font-semibold text-[14px] text-text-high hover:border-primary transition-colors">Google</button>
-              <button className="flex-1 bg-surf border border-text-low rounded-xl py-3 font-body font-semibold text-[14px] text-text-high hover:border-primary transition-colors">Apple</button>
-            </div>
-
             {/* LOGIN */}
             <p className="font-body text-[13px] text-text-high text-center">
               ¿Ya tienes cuenta?{" "}
