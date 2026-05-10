@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import { ChevronLeft, Timer, Pause, Play, CheckCircle2, Lock, Dumbbell } from "lucide-react";
+import { useTargetUser } from "../hooks/useTargetUser";
 
 const ExecuteRoutineDesktop = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
+  
+  const { targetUserId } = useTargetUser();
+
   const location = useLocation();
 
   const fromProgression = location.state?.fromProgression || false;
@@ -31,7 +34,7 @@ const ExecuteRoutineDesktop = () => {
 
   const loadUserSubscription = async () => {
     try {
-      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", user.id).single();
+      const { data, error } = await supabase.from("users").select("subscription_tier").eq("id", targetUserId).single();
       setSubscriptionTier(error ? "free" : data?.subscription_tier || "free");
     } catch { setSubscriptionTier("free"); }
   };
@@ -45,7 +48,7 @@ const ExecuteRoutineDesktop = () => {
   const loadRoutineData = async () => {
     try {
       setLoading(true);
-      const { data: routineData, error } = await supabase.from("routines").select(`*, routine_exercises (id, exercise_id, order_index, target_sets, target_reps, target_weight, target_rir, rest_seconds, intensity_technique, exercises (id, name, muscle_group, equipment))`).eq("id", id).eq("user_id", user.id).single();
+      const { data: routineData, error } = await supabase.from("routines").select(`*, routine_exercises (id, exercise_id, order_index, target_sets, target_reps, target_weight, target_rir, rest_seconds, intensity_technique, exercises (id, name, muscle_group, equipment))`).eq("id", id).eq("user_id", targetUserId).single();
       if (error) throw error;
       setRoutine(routineData);
 
@@ -136,7 +139,7 @@ const ExecuteRoutineDesktop = () => {
 
     try {
       const sessionDate = completedDate || new Date().toISOString().split("T")[0];
-      const { data: sessionData, error } = await supabase.from("workout_sessions").insert({ user_id: user.id, routine_id: routine.id, routine_name: routine.name, session_date: sessionDate, duration_minutes: Math.floor(sessionTime / 60), exercises_completed: completedExercises, total_sets: totalSets, notes: null }).select().single();
+      const { data: sessionData, error } = await supabase.from("workout_sessions").insert({ user_id: targetUserId, routine_id: routine.id, routine_name: routine.name, session_date: sessionDate, duration_minutes: Math.floor(sessionTime / 60), exercises_completed: completedExercises, total_sets: totalSets, notes: null }).select().single();
       if (error) throw error;
 
       const exerciseLogs = [];

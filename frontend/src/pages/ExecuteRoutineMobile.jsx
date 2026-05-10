@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import { useTargetUser } from "../hooks/useTargetUser";
 
 const ExecuteRoutineMobile = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
+  const { targetUserId } = useTargetUser();
 
   const location = useLocation();
   const fromProgression = location.state?.fromProgression || false;
@@ -39,7 +41,7 @@ const ExecuteRoutineMobile = () => {
       const { data, error } = await supabase
         .from("users")
         .select("subscription_tier")
-        .eq("id", user.id)
+        .eq("id", targetUserId)
         .single();
 
       if (error) {
@@ -93,7 +95,7 @@ const ExecuteRoutineMobile = () => {
         `,
         )
         .eq("id", id)
-        .eq("user_id", user.id)
+        .eq("user_id", targetUserId)
         .single();
 
       if (error) throw error;
@@ -275,7 +277,7 @@ const ExecuteRoutineMobile = () => {
       const { data: sessionData, error } = await supabase
         .from("workout_sessions")
         .insert({
-          user_id: user.id,
+          user_id: targetUserId,
           routine_id: routine.id,
           routine_name: routine.name,
           session_date: sessionDate, // ✅ FECHA PLANIFICADA O HOY

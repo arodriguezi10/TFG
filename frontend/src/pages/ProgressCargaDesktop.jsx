@@ -62,7 +62,7 @@ const ProgressCargaDesktop = ({ subscriptionTier }) => {
     if (exercises.length >= limit) { alert(`Maximo ${limit} ejercicios en tu biblioteca`); return; }
     const updated = [...exercises, ex];
     setExercises(updated);
-    saveLibrary(user.id, updated);
+    saveLibrary(targetUserId, updated);
     setSelectedExercise(ex);
     setSearchQuery("");
     setSearchResults([]);
@@ -71,7 +71,7 @@ const ProgressCargaDesktop = ({ subscriptionTier }) => {
   const removeExerciseFromLibrary = (exId) => {
     const updated = exercises.filter((e) => e.id !== exId);
     setExercises(updated);
-    saveLibrary(user.id, updated);
+    saveLibrary(targetUserId, updated);
     if (selectedExercise?.id === exId) setSelectedExercise(updated[0] || null);
   };
 

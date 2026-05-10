@@ -162,13 +162,7 @@ export const getFatigaAnalysis = (item) => {
   }
 };
 
-export const loadVolumeData = async (
-  user,
-  weekOffset,
-  setMuscleData,
-  setWeekOptions,
-  setLoading,
-) => {
+export const loadVolumeData = async (userId, weekOffset, setMuscleData, setWeekOptions, setLoading) => {
   setLoading(true);
   try {
     const { monday, sunday } = getWeekRange(weekOffset);
@@ -184,13 +178,13 @@ export const loadVolumeData = async (
     const { data: currentSessions } = await supabase
       .from("workout_sessions")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("session_date", mondayStr)
       .lte("session_date", sundayStr);
     const { data: prevSessions } = await supabase
       .from("workout_sessions")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .gte("session_date", prevMondayStr)
       .lte("session_date", prevSundayStr);
 
