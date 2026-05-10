@@ -5,11 +5,13 @@ import { Home, Dumbbell, TrendingUp, Trophy, MessageCircle, Users } from "lucide
 import CoachModalBanner from "../components/CoachModalBanner";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
+import { useCoach } from "../hooks/useCoach";
 
 const MainLayout = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { user } = useContext(AuthContext);
+  const { isCoachMode } = useCoach();
   const [role, setRole] = useState(null);
 
   useEffect(() => {
@@ -51,7 +53,6 @@ const MainLayout = () => {
                 </Link>
               );
             })}
-
             {role === "coach" && (
               <>
                 <div className="w-full h-px bg-text-low/20 my-2" />
@@ -66,7 +67,7 @@ const MainLayout = () => {
             )}
           </nav>
         </aside>
-        <main className="ml-60 flex-1 overflow-y-auto">
+        <main className={`ml-60 flex-1 overflow-y-auto ${isCoachMode ? "pt-10" : ""}`}>
           <Outlet />
         </main>
       </div>
@@ -75,8 +76,8 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <CoachModeBanner />
-      <main className="flex-1 overflow-y-auto pb-20">
+      <CoachModalBanner />
+      <main className={`flex-1 overflow-y-auto pb-20 ${isCoachMode ? "pt-10" : ""}`}>
         <Outlet />
       </main>
       <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-text-low/20 z-50">

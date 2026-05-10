@@ -106,7 +106,7 @@ const CoachRequestsDesktop = () => {
                       <X size={16} /> Rechazar
                     </button>
                     <button onClick={() => handleRespond(request.id, "active")} disabled={processing === request.id}
-                      className="flex-1 bg-accent3 py-3 rounded-xl font-heading font-bold text-[14px] text-background flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50">
+                      className="flex-1 bg-accent3 py-3 rounded-xl font-heading font-bold text-[14px] text-green border border-green flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50">
                       {processing === request.id
                         ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-background" />
                         : <><CheckCircle2 size={16} /> Aceptar</>}
@@ -134,7 +134,7 @@ const CoachRequestsDesktop = () => {
                 { title: "Revocacion inmediata", desc: "Puedes eliminar la vinculacion en cualquier momento desde tu perfil." },
               ].map(({ title, desc }) => (
                 <div key={title} className="flex items-start gap-3 py-3 border-b border-text-low/20 last:border-0 last:pb-0">
-                  <CheckCircle2 size={16} className="text-accent3 shrink-0 mt-0.5" />
+                  <CheckCircle2 size={16} className="text-green shrink-0 mt-0.5" />
                   <div>
                     <p className="font-subheading font-bold text-[14px] text-text-high mb-0.5">{title}</p>
                     <p className="font-body text-[13px] text-text-low">{desc}</p>
