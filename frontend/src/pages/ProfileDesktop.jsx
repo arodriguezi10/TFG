@@ -26,6 +26,7 @@ import {
   calculateAge,
   calculateTimeSince,
 } from "../utils/profileUtils";
+import SupportModal from "../components/SupportModal"; 
 
 const ProfileDesktop = () => {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const ProfileDesktop = () => {
   });
   const [loading, setLoading] = useState(true);
   const [pendingRequests, setPendingRequests] = useState(0);
+  const [showSupport, setShowSupport] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -313,7 +315,7 @@ const ProfileDesktop = () => {
               </button>
 
               <button
-                onClick={() => navigate("#")}
+                onClick={() => setShowSupport(true)} className="w-full"
                 className="flex items-center gap-4 py-4 hover:bg-surf transition-colors rounded-xl px-2"
               >
                 <div className="bg-primary-bg h-11 w-11 rounded-xl flex items-center justify-center shrink-0">
@@ -355,6 +357,7 @@ const ProfileDesktop = () => {
           </Card>
         </div>
       </div>
+      {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
     </div>
   );
 };

@@ -30,11 +30,12 @@ import {
   calculateAge,
   calculateTimeSince,
 } from "../utils/profileUtils";
-
+import SupportModal from "../components/SupportModal"; 
 
 const ProfileMobile = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+  const [showSupport, setShowSupport] = useState(false);
 
   const [userData, setUserData] = useState({
     fullName: "",
@@ -308,7 +309,7 @@ const ProfileMobile = () => {
 
             <div className="w-full h-px bg-text-low" />
 
-            <button onClick={() => navigate("#")} className="w-full">
+            <button onClick={() => setShowSupport(true)} className="w-full">
               <div className="flex items-center justify-between">
                 <div className="flex gap-5 items-center">
                   <div className="bg-primary-bg h-10 w-10 rounded-lg flex items-center justify-center">
@@ -353,6 +354,7 @@ const ProfileMobile = () => {
           </button>
         </Card>
       </section>
+      {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
     </div>
   );
 };
