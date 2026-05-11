@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { supabase } from "../services/supabase";
 import { useRoutine } from "../context/RoutinesContext";
@@ -70,6 +70,7 @@ const ExerciseSearchFreeDesktop = () => {
   const { user } = useContext(AuthContext);
   const { addExercise, removeExercise, isExerciseSelected, selectedExercises } = useRoutine();
   const navigate = useNavigate();
+  
 
   const [customExercises, setCustomExercises] = useState([]);
   const [predefinedFromDB, setPredefinedFromDB] = useState([]);
@@ -82,6 +83,8 @@ const ExerciseSearchFreeDesktop = () => {
 
   const hasEliteAccess = subscriptionTier === "elite";
   const customLimit = subscriptionTier === "free" ? 5 : 50;
+
+
 
   useEffect(() => {
     if (user) { loadUserSubscription(); loadData(); }

@@ -50,7 +50,8 @@ export function RoutineProvider({ children }) {
     routineConfiguration,
     setRoutineConfiguration,
     saveRoutineConfiguration, 
-    clearRoutineConfiguration 
+    clearRoutineConfiguration,
+  
   };
 
   return (

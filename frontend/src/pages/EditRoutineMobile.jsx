@@ -106,8 +106,9 @@ const EditRoutineMobile = () => {
       .sort((a, b) => a.order_index - b.order_index)
       .map(re => re.exercises);
 
-    setSelectedExercises(exercises);
-
+    if (selectedExercises.length === 0) {
+      setSelectedExercises(exercises);
+    }
     // ✅ CAMBIO AQUÍ: Solo cargar configuración si NO existe ya en el contexto
     if (!routineConfiguration || !routineConfiguration.series) {
       const seriesConfig = {};

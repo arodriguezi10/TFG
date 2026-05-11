@@ -7,6 +7,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import { ChevronLeft, Plus, X, Dumbbell, Zap } from "lucide-react";
 
+
 const EditRoutineDesktop = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,6 +21,9 @@ const EditRoutineDesktop = () => {
     clearExercises,
     clearRoutineConfiguration,
   } = useRoutine();
+
+  console.log("🟡 RENDER EditRoutineDesktop");
+  console.log("🟡 selectedExercises en render:", selectedExercises);
 
   const [loadingRoutine, setLoadingRoutine] = useState(true);
   const [routineName, setRoutineName] = useState("");
@@ -64,8 +68,13 @@ const EditRoutineDesktop = () => {
     "Antebrazo",
   ];
 
+  console.log("🟡 RENDER EditRoutineDesktop");
+console.log("🟡 selectedExercises en render:", selectedExercises);
+
   useEffect(() => {
-    if (user && id) fetchRoutineData();
+   if (user && id){
+        console.log("📥 Cargando rutina desde Supabase...");
+    fetchRoutineData();} 
   }, [user, id]);
 
   const fetchRoutineData = async () => {
@@ -92,10 +101,12 @@ const EditRoutineDesktop = () => {
       setDuration(routineData.estimated_duration_min || 45);
       setSelectedMuscles(JSON.parse(routineData.target_muscle_groups || "[]"));
 
-      const exercises = routineData.routine_exercises
-        .sort((a, b) => a.order_index - b.order_index)
-        .map((re) => re.exercises);
-      setSelectedExercises(exercises);
+      if (selectedExercises.length === 0) {
+  const exercises = routineData.routine_exercises
+    .sort((a, b) => a.order_index - b.order_index)
+    .map((re) => re.exercises);
+  setSelectedExercises(exercises);
+}
 
       if (!routineConfiguration || !routineConfiguration.series) {
         const seriesConfig = {},
